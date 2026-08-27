@@ -1,0 +1,481 @@
+openapi: 3.1.0
+info:
+  title: PowerChain Copilot API
+  version: 1.0.0
+  description: |
+    Canonical API v1 for PowerChain Copilot SaaS. The API exposes authenticated
+    workspace sessions, renewable-asset data, governed approvals, AI chat,
+    messages, market/network adapters, health, and WebSocket discovery.
+  license:
+    name: MIT
+servers:
+  - url: http://localhost:8000
+    description: Local backend
+  - url: https://api.powerchain.energy
+    description: Production placeholder
+security:
+  - sessionCookie: []
+tags:
+  - name: Health
+  - name: Auth
+  - name: Sessions
+  - name: Dashboard
+  - name: Assets
+  - name: Approvals
+  - name: AI
+  - name: Chat
+  - name: Messages
+  - name: Profile
+  - name: Services
+  - name: Markets
+  - name: Network
+  - name: Contact
+paths:
+  /api/v1/health:
+    get:
+      tags: [Health]
+      security: []
+      summary: API and dependency health
+      responses:
+        '200':
+          description: Health snapshot
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HealthEnvelope' }
+  /api/v1/auth/sign-in:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Sign in and issue a signed session cookie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 1 }
+                rememberMe: { type: boolean, default: false }
+      responses:
+        '200': { description: Signed in, headers: { Set-Cookie: { schema: { type: string } } } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/v1/auth/register:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Create user, workspace, membership, and session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password, workspaceName, acceptedTerms]
+              properties:
+                name: { type: string, minLength: 2, maxLength: 120 }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 12 }
+                workspaceName: { type: string, minLength: 2, maxLength: 160 }
+                plan: { type: string, enum: [free, pro, business], default: free }
+                acceptedTerms: { type: boolean }
+      responses:
+        '201': { description: Account created }
+        '409': { description: Account already exists }
+        '422': { $ref: '#/components/responses/Validation' }
+  /api/v1/auth/demo:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Create or enter representative demo workspace
+      responses:
+        '200': { description: Demo session created }
+  /api/v1/auth/sign-out:
+    post:
+      tags: [Auth]
+      summary: Revoke current session and clear cookie
+      responses:
+        '200': { description: Signed out }
+  /api/v1/sessions/current:
+    get:
+      tags: [Sessions]
+      summary: Current authenticated session
+      responses:
+        '200':
+          description: Session context
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SessionContextEnvelope' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/v1/sessions:
+    get:
+      tags: [Sessions]
+      summary: User sessions
+      responses:
+        '200': { description: Session list }
+  /api/v1/sessions/{id}:
+    delete:
+      tags: [Sessions]
+      summary: Revoke a session
+      parameters:
+        - $ref: '#/components/parameters/EntityId'
+      responses:
+        '200': { description: Session revoked }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/v1/security/session:
+    get:
+      tags: [Sessions]
+      summary: Security details for current session
+      parameters:
+        - in: query
+          name: reveal
+          schema: { type: string, enum: ['0', '1'] }
+          description: Reveal the request IP when explicitly set to 1.
+      responses:
+        '200': { description: Session security snapshot }
+  /api/v1/dashboard:
+    get:
+      tags: [Dashboard]
+      summary: Authenticated workspace overview
+      responses:
+        '200': { description: Dashboard state }
+  /api/v1/assets:
+    get:
+      tags: [Assets]
+      summary: Workspace assets
+      responses:
+        '200':
+          description: Assets
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Asset' }
+  /api/v1/approvals:
+    get:
+      tags: [Approvals]
+      summary: Workspace approval queue
+      responses:
+        '200': { description: Approval list }
+  /api/v1/approvals/{id}:
+    post:
+      tags: [Approvals]
+      summary: Approve or request changes
+      parameters:
+        - $ref: '#/components/parameters/EntityId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action: { type: string, enum: [approve, request_changes] }
+      responses:
+        '200': { description: Approval updated }
+        '403': { description: Role or origin rejected }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/v1/ai/generate:
+    post:
+      tags: [AI]
+      summary: Generate governed analysis without persisting a chat message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [prompt]
+              properties:
+                prompt: { type: string, minLength: 2, maxLength: 2000 }
+      responses:
+        '200': { description: Managed or deterministic AI response }
+        '503': { description: No AI provider or allowed fallback }
+  /api/v1/chat:
+    get:
+      tags: [Chat]
+      summary: List user chats
+      responses:
+        '200': { description: Chat list }
+    post:
+      tags: [Chat]
+      summary: Create a new chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string, maxLength: 120 }
+      responses:
+        '201': { description: Chat created }
+  /api/v1/chat/{id}:
+    get:
+      tags: [Chat]
+      summary: Get chat by opaque id or slug
+      parameters:
+        - $ref: '#/components/parameters/EntityIdOrSlug'
+      responses:
+        '200': { description: Chat and messages }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/v1/chat/{id}/messages:
+    post:
+      tags: [Chat]
+      summary: Persist user message and generate Copilot response
+      parameters:
+        - $ref: '#/components/parameters/EntityIdOrSlug'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message: { type: string, minLength: 2, maxLength: 2000 }
+      responses:
+        '200': { description: Assistant message, mode, and suggested actions }
+  /api/v1/copilot:
+    get:
+      tags: [Chat]
+      summary: Compatibility endpoint for current default Copilot chat
+      responses:
+        '200': { description: Default chat messages }
+    post:
+      tags: [Chat]
+      summary: Compatibility endpoint to send a default Copilot message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message: { type: string, minLength: 2, maxLength: 2000 }
+      responses:
+        '200': { description: Assistant response }
+  /api/v1/messages/{id}:
+    get:
+      tags: [Messages]
+      summary: Retrieve one message by opaque message id
+      parameters:
+        - $ref: '#/components/parameters/EntityId'
+      responses:
+        '200':
+          description: Message
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { const: true }
+                  data: { $ref: '#/components/schemas/Message' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/v1/profile:
+    patch:
+      tags: [Profile]
+      summary: Update profile and workspace display names
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, workspaceName]
+              properties:
+                name: { type: string, minLength: 2 }
+                workspaceName: { type: string, minLength: 2 }
+      responses:
+        '200': { description: Profile updated }
+  /api/v1/services:
+    get:
+      tags: [Services]
+      summary: Configured integration catalog
+      responses:
+        '200': { description: Service catalog }
+  /api/v1/market/price:
+    get:
+      tags: [Markets]
+      summary: Read price from configured Pyth or Birdeye adapter
+      parameters:
+        - in: query
+          name: provider
+          schema: { type: string, enum: [auto, pyth, birdeye], default: auto }
+        - in: query
+          name: feedId
+          schema: { type: string }
+        - in: query
+          name: address
+          schema: { type: string }
+      responses:
+        '200': { description: Price result }
+        '422': { $ref: '#/components/responses/Validation' }
+  /api/v1/network/solana:
+    get:
+      tags: [Network]
+      summary: Solana RPC health
+      responses:
+        '200': { description: RPC health }
+  /api/v1/contact:
+    post:
+      tags: [Contact]
+      security: []
+      summary: Submit contact, sales, or access request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, message]
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                company: { type: string }
+                message: { type: string, minLength: 10, maxLength: 4000 }
+                intent: { type: string }
+      responses:
+        '201': { description: Request stored }
+  /ws/v1/chat/{id}:
+    get:
+      tags: [Chat]
+      summary: WebSocket endpoint for authenticated chat events
+      description: |
+        Upgrade this route to WebSocket. Authentication uses the same signed
+        pc_session cookie. The client falls back to HTTP polling when a
+        WebSocket connection is unavailable.
+      parameters:
+        - $ref: '#/components/parameters/EntityIdOrSlug'
+      responses:
+        '101': { description: Switching Protocols }
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: pc_session
+  parameters:
+    EntityId:
+      in: path
+      name: id
+      required: true
+      schema: { type: string, pattern: '^[a-z]{3}_[0-9a-f]{32}$' }
+    EntityIdOrSlug:
+      in: path
+      name: id
+      required: true
+      schema: { type: string, minLength: 3, maxLength: 128 }
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    Validation:
+      description: Invalid request
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+  schemas:
+    ErrorEnvelope:
+      type: object
+      required: [ok, error]
+      properties:
+        ok: { const: false }
+        error:
+          type: object
+          required: [message, code]
+          properties:
+            message: { type: string }
+            code: { type: string }
+            requestId: { type: string }
+    HealthEnvelope:
+      type: object
+      required: [ok, data]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [status, version, timestamp, database, sessions, ai, websocket, providers]
+          properties:
+            status: { type: string, enum: [operational, degraded] }
+            version: { type: string, const: 1.0.0 }
+            timestamp: { type: string, format: date-time }
+            database:
+              type: object
+              required: [ok, adapter, latencyMs]
+              properties:
+                ok: { type: boolean }
+                adapter: { type: string }
+                latencyMs: { type: number }
+            sessions: { type: string }
+            ai: { type: string }
+            websocket: { type: string }
+            providers: { type: object, additionalProperties: { type: boolean } }
+    Workspace:
+      type: object
+      required: [id, name, slug, plan, createdAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        slug: { type: string }
+        plan: { type: string, enum: [free, pro, business] }
+        createdAt: { type: string, format: date-time }
+    SessionContextEnvelope:
+      type: object
+      required: [ok, data]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [session, user, workspace, role]
+          properties:
+            session: { type: object, additionalProperties: true }
+            user:
+              type: object
+              required: [id, name, email]
+              properties:
+                id: { type: string }
+                name: { type: string }
+                email: { type: string, format: email }
+            workspace: { $ref: '#/components/schemas/Workspace' }
+            role: { type: string, enum: [owner, admin, operator, analyst, viewer] }
+    Asset:
+      type: object
+      required: [id, workspaceId, slug, name, type, location, capacityMw, availability, status, verified]
+      properties:
+        id: { type: string }
+        workspaceId: { type: string }
+        slug: { type: string }
+        name: { type: string }
+        type: { type: string, enum: [solar, wind, storage, ev, meter] }
+        location: { type: string }
+        capacityMw: { type: number }
+        availability: { type: number }
+        status: { type: string, enum: [operational, attention, offline] }
+        verified: { type: boolean }
+    Message:
+      type: object
+      required: [id, chatId, workspaceId, userId, role, content, createdAt]
+      properties:
+        id: { type: string }
+        chatId: { type: string }
+        workspaceId: { type: string }
+        userId: { type: string }
+        role: { type: string, enum: [user, assistant, system] }
+        content: { type: string }
+        createdAt: { type: string, format: date-time }

@@ -1,0 +1,7 @@
+import { Quote } from "lucide-react";
+const items=[
+  ["Renewable Operations","Customer validation slot","Use this surface for a verified asset-owner or operator testimonial once approved."],
+  ["Infrastructure Teams","Customer story slot","Pair the quote with role, organization, and an independently supported operational outcome."],
+  ["Digital Energy","Partner proof slot","Use a real integration or partner story instead of fabricated usage metrics."],
+];
+export function Testimonials(){return <section className="bg-[var(--canvas)] py-24"><div className="pc-shell"><div className="mx-auto max-w-3xl text-center"><p className="pc-kicker">Customer proof</p><h2 className="mt-4 text-4xl font-bold tracking-[-.045em] sm:text-5xl">Built for real energy operations.</h2><p className="mt-4 text-sm leading-7 text-[var(--muted)]">The testimonial system is ready for verified customer stories without inventing names, logos, or performance claims.</p></div><div className="mt-12 grid gap-4 lg:grid-cols-3">{items.map(([tag,title,copy])=><article key={tag} className="pc-card p-6"><Quote className="size-6 text-[var(--green)]"/><span className="mt-6 inline-flex rounded-full bg-[#EEF4F0] px-3 py-1 text-[9px] font-bold uppercase tracking-[.12em] text-[#17613F]">{tag}</span><h3 className="mt-4 text-lg font-bold">{title}</h3><p className="mt-3 text-sm leading-6 text-[var(--muted)]">{copy}</p><div className="mt-7 border-t border-[#E6EAE7] pt-4 text-[10px] text-[#8A938E]">Verified customer story coming soon</div></article>)}</div></div></section>}

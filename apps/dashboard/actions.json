@@ -1,0 +1,38 @@
+{
+  "$schema": "../../schemas/actions.schema.json",
+  "version": "1.0.0",
+  "actions": [
+    {
+      "id": "asset.analyze",
+      "label": "Analyze asset",
+      "category": "analysis",
+      "risk": "low",
+      "requiresApproval": false,
+      "route": "/dashboard/copilot"
+    },
+    {
+      "id": "approval.review",
+      "label": "Review approval",
+      "category": "approval",
+      "risk": "medium",
+      "requiresApproval": true,
+      "route": "/dashboard/approvals"
+    },
+    {
+      "id": "report.create",
+      "label": "Create report",
+      "category": "report",
+      "risk": "low",
+      "requiresApproval": false,
+      "route": "/dashboard/copilot"
+    },
+    {
+      "id": "onchain.execute",
+      "label": "Execute approved action",
+      "category": "onchain",
+      "risk": "high",
+      "requiresApproval": true,
+      "route": "/dashboard/approvals"
+    }
+  ]
+}

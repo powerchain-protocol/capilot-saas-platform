@@ -1,0 +1,25 @@
+{
+  "name": "@powerchain/shared",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --max-warnings=0",
+    "check": "pnpm typecheck && pnpm lint",
+    "clean": "node -e \"require('fs/promises').rm('dist',{recursive:true,force:true})\""
+  },
+  "dependencies": {
+    "clsx": "2.1.1",
+    "tailwind-merge": "3.6.0"
+  },
+  "devDependencies": {
+    "eslint": "10.9.1",
+    "typescript": "7.0.2"
+  }
+}

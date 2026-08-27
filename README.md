@@ -1,194 +1,248 @@
-# PowerChain Copilot Frontend
+# PowerChain Copilot
 
-**Canonical product version: 1.0.0**
+PowerChain Copilot is a full-stack SaaS workspace for renewable infrastructure, operational AI, governed approvals, evidence-aware workflows, and onchain integration boundaries.
 
-Production-oriented Next.js full-stack SaaS for PowerChain Copilot: renewable infrastructure operations, AI-assisted analysis, governed approvals, assets, PWRC credits, provider integrations, and verified onchain workflows.
+**Canonical release:** `1.0.0`
 
-## Stack
+## Core features
 
-- Next.js 16.3.3 App Router
-- React 19
-- TypeScript
-- Tailwind CSS 4
-- Supabase/PostgreSQL production persistence through server-side REST
-- Signed HttpOnly sessions
-- Pyth / Birdeye / Helius / Solana RPC server adapters
-- Vercel-ready deployment
+- **Copilot chat** — persisted chats/messages with opaque IDs + human-readable slugs, managed AI, deterministic development fallback, saved prompts, suggested actions, WebSocket updates, and HTTP polling fallback.
+- **Command Center** — authenticated workspace metrics, renewable assets, activity, approvals, service health, and responsive desktop/mobile navigation.
+- **Renewable assets** — solar, wind, storage, EV, and metering entities with operational status and verification state.
+- **Governed actions** — role-aware approval mutations and a canonical action registry at `apps/dashboard/actions.json`.
+- **Session security** — signed HttpOnly cookies, optional 30-day Remember Me, persisted/revocable sessions, workspace membership, role context, and masked IP display.
+- **PostgreSQL storage** — `pg` connection pooling, parameterized queries, explicit migrations, and a memory adapter restricted to development fallback.
+- **API v1** — Fastify backend with exact-origin CORS, rate limiting, request IDs, error envelopes, Swagger UI, OpenAPI 3.1, Postman collection, and same-origin frontend proxying.
+- **Realtime** — authenticated `/ws/v1/chat/:id` WebSocket channel with browser polling fallback when realtime is unavailable.
+- **Energy integrations** — Solana RPC/Helius health and server-only Pyth/Birdeye boundaries.
+- **Cross-platform frontend** — responsive Next.js, PWA metadata, install/setup flows, light/dark/system themes, theme-aware PowerChain app icons, and Lucide interface icons.
+- **Strict engineering gates** — TypeScript strict mode, ESLint `10.9.1`, explicit-`any` rejection, route/API/OpenAPI/action/asset checks, and Turbo build orchestration.
 
-## Product UI
-
-The frontend uses PowerChain's white, light-gray, and dark-green design system with the canonical **PowerChain** wordmark and intentionally subdued light-gray **COPILOT** product label. The application includes responsive 44px+ touch targets, focus-visible states, reduced-motion support, loading skeletons, mobile-safe navigation, toast feedback, lazy-loaded marketing sections, and app/PWRC icon assets.
-
-The authenticated workspace includes:
-
-- Command Center overview
-- Copilot chat with stored history and suggested prompts
-- searchable/filterable operational assets
-- role-gated Approval Center
-- workspace settings
-- current-session IP visibility with masked-by-default display
-- configured provider status
-
-## Main routes
+## Repository layout
 
 ```text
-/
-/product/
-/pricing/
-/install/
-/setup/
-/sign-in/
-/get-started/
-/dashboard/
-/dashboard/copilot/
-/dashboard/assets/
-/dashboard/approvals/
-/dashboard/settings/
-/docs/
-/security/
-/status/
-/about/
-/legal/privacy/
-/legal/terms/
-/legal/cookies/
-/legal/disclaimer/
+.
+├── apps/
+│   ├── frontend/                  # Next.js UI + same-origin /api/v1 proxy
+│   │   ├── app/
+│   │   │   ├── (pages)/           # marketing/auth/legal/install/status routes
+│   │   │   ├── (dashboard)/       # authenticated dashboard routes
+│   │   │   └── api/v1/[...path]/  # thin HTTP reverse proxy only
+│   │   ├── context/
+│   │   ├── constants/
+│   │   ├── data/
+│   │   ├── lib/powerchain/        # API, endpoints, WS, fallbacks
+│   │   ├── storage/
+│   │   └── store/
+│   ├── backend/                   # Fastify API + PostgreSQL + WebSockets
+│   │   └── src/
+│   │       ├── api/v1/
+│   │       │   ├── auth/
+│   │       │   ├── sessions/
+│   │       │   ├── middlewares/
+│   │       │   ├── ai/
+│   │       │   ├── chat/
+│   │       │   └── messages/
+│   │       ├── constants/
+│   │       ├── context/
+│   │       ├── data/
+│   │       ├── storage/
+│   │       ├── store/
+│   │       ├── utils/
+│   │       └── ws/
+│   └── dashboard/                 # canonical action registry
+├── packages/
+│   ├── ai/
+│   └── shared/
+├── api/
+│   ├── openapi/openapi.yaml
+│   ├── postman/PowerChain-Copilot.postman_collection.json
+│   ├── swagger/README.md
+│   └── schema.sql
+├── docs/
+├── turbo.json
+└── pnpm-workspace.yaml
 ```
 
-## API v1
+> Next.js route groups such as `app/(pages)/faq/page.tsx` preserve the public URL `/faq`; the parentheses are organizational and do not become URL segments.
 
-Canonical browser-facing API routes use:
 
-```text
-/api/v1/*
-```
+### Runtime ownership
 
-The typed frontend API surface lives in:
+- `apps/frontend` owns rendering, browser interaction, PWA/install UX, and the same-origin `/api/v1` proxy.
+- `apps/backend` owns authentication, sessions, API policy, PostgreSQL, AI/provider execution, WebSockets, and authoritative mutations.
+- `api/` owns portable API artifacts (OpenAPI, Postman, Swagger notes, and schema reference).
 
-```text
-apps/frontend/api/v1/
-```
+The frontend does not contain a second database/repository implementation; this avoids drift between browser-facing code and the authoritative backend.
 
-Legacy unversioned route modules remain as compatibility implementations, while frontend components target v1 endpoints.
+## Toolchain
 
-See `docs/API.md`.
+- Node.js `24.20.0` LTS
+- pnpm `11.23.0`
+- Turborepo `2.10.11`
+- Next.js `16.3.3`
+- React `19.2.8`
+- TypeScript `7.0.2`
+- ESLint `10.9.1`
+- Tailwind CSS `4.3.3`
+- Lucide React `1.34.0`
+- Fastify `5.12.1`
+- PostgreSQL client `pg` `8.23.0`
 
-## Project organization
+## Quick start
 
-```text
-apps/frontend/api/v1/   Browser API client + types
-data/                   Legal, service, ecosystem data
-utils/                  helpers, errors, formats, utility functions
-lib/cache.ts            short-lived provider cache
-lib/safe-actions.ts     safe async action boundary
-lib/pyth.ts             Pyth adapter
-lib/birdeye.ts          Birdeye adapter
-lib/helius.ts           Helius adapter
-lib/rpc.ts              Solana RPC adapter
-cors/                   exact-origin CORS policy
-components/services/    provider/service UI
-config/                  application configuration and invariants
-```
-
-## Configurable top bar
-
-The announcement bar is controlled only through `config/topbar.ts`:
-
-```ts
-export const topbarConfig = {
-  enabled: true,
-  badge: "NEW",
-  message: "PowerChain Copilot 1.0.0 · AI operations for renewable infrastructure",
-  href: "/product",
-};
-```
-
-Change the message or set `enabled: false` without touching the navbar component.
-
-## Authentication
-
-- Passwords are hashed with scrypt.
-- Standard sessions expire after 12 hours.
-- Selecting **Remember me for 30 days** creates a persistent cookie with a 30-day signed-session lifetime.
-- Without Remember me, the browser cookie is session-scoped.
-- Session cookies are HttpOnly, `SameSite=Lax`, and `Secure` in production.
-- Current IP is derived from the request and masked in the UI until explicitly revealed.
-- Raw IP addresses are not persisted by the reference application database.
-
-## Provider integrations
-
-Provider secrets stay server-side.
-
-- Pyth: explicit Hermes feed IDs
-- Birdeye: optional authenticated market-data adapter
-- Helius: optional Solana infrastructure adapter
-- Solana RPC: configured production endpoint with development-only devnet fallback
-
-Provider reads use short-lived TTL caching and request timeouts. See `docs/INTEGRATIONS.md`.
-
-## CORS
-
-API CORS is same-origin by default. Configure additional exact origins only when required:
-
-```text
-CORS_ALLOWED_ORIGINS=https://app.example.com,https://ops.example.com
-```
-
-Credentialed wildcard CORS is intentionally not supported. `proxy.ts` applies the policy uniformly to every `/api/v1/*` route and handles preflight requests.
-
-## Installation sources
-
-Native distribution remains configuration-driven:
-
-- GitHub Releases
-- Google Drive
-- App Store
-- Google Play
-- Web app
-
-Missing native release URLs fail closed into the access-request workflow rather than presenting fake downloads.
-
-## Development
+### 1. Runtime and dependencies
 
 ```bash
+nvm use
 corepack enable
-corepack prepare pnpm@11.24.0 --activate
+corepack prepare pnpm@11.23.0 --activate
 pnpm install
-cp .env.example .env.local
+```
+
+If pnpm reports blocked lifecycle scripts, review them before approval:
+
+```bash
+pnpm approve-builds
+```
+
+### 2. PostgreSQL
+
+Create a database and export the connection string:
+
+```bash
+createdb powerchain_copilot
+export DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:5432/powerchain_copilot'
+pnpm db:migrate
+```
+
+The executable migration is:
+
+```text
+apps/backend/src/storage/migrations/0001_initial.sql
+```
+
+Database schemas/migrations intentionally live with the backend storage layer, **not** in `utils/`.
+
+### 3. Environment files
+
+```bash
+cp apps/backend/.env.example apps/backend/.env
+cp apps/frontend/.env.example apps/frontend/.env.local
+```
+
+For local development use the same hostname for frontend and backend (`localhost` is recommended) so the session cookie can also authenticate the WebSocket connection.
+
+### 4. Run the monorepo
+
+```bash
 pnpm dev
 ```
 
-Open `http://localhost:3000`.
+Or run services separately:
+
+```bash
+pnpm dev:backend
+pnpm dev:frontend
+```
+
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:8000`
+- Swagger UI: `http://localhost:8000/docs`
+
+## API
+
+Canonical REST prefix:
+
+```text
+/api/v1
+```
+
+Primary groups:
+
+```text
+/api/v1/auth/*
+/api/v1/sessions/*
+/api/v1/ai/*
+/api/v1/chat/*
+/api/v1/messages/:id
+/api/v1/assets
+/api/v1/approvals/*
+/api/v1/dashboard
+/api/v1/services
+/api/v1/market/price
+/api/v1/network/solana
+```
+
+Realtime:
+
+```text
+/ws/v1/chat/:id
+```
+
+Artifacts:
+
+- OpenAPI: `api/openapi/openapi.yaml`
+- Postman: `api/postman/PowerChain-Copilot.postman_collection.json`
+- Swagger: `http://localhost:8000/docs`
+
+Browser code should use `apps/frontend/lib/powerchain/api.ts` rather than hard-coding endpoints. `apps/frontend/lib/powerchain/ws.ts` connects to WebSockets and automatically falls back to HTTP polling.
+
+## ID and slug rules
+
+Public entities use opaque prefixed identifiers:
+
+```text
+usr_<32 hex>
+wsp_<32 hex>
+cht_<32 hex>
+msg_<32 hex>
+```
+
+Human-readable resources such as workspaces, assets, approvals, and chats also carry slugs. IDs remain the immutable identity; slugs are navigation/readability aids and can be resolved where supported.
+
+## Production boundaries
+
+- `DATABASE_URL` is required in production.
+- `SESSION_SECRET` must contain at least 32 characters.
+- Provider keys belong only in `apps/backend` environment variables.
+- Production does not silently fall back to in-memory persistence.
+- AI analysis never implies approval, dispatch, treasury execution, wallet signature, or settlement completion.
+- Missing WebSocket connectivity falls back to HTTP polling; it does not invent realtime state.
 
 ## Quality gates
 
 ```bash
-pnpm check:links
-pnpm check:actions
+pnpm check:source
 pnpm typecheck
 pnpm lint
 pnpm build
+pnpm verify
 ```
 
-## Production requirements
+Frontend structural checks:
 
-Production should configure at minimum:
+```bash
+pnpm --filter @powerchain/capilot-frontend check
+```
 
-- strong `SESSION_SECRET`
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- trusted `SOLANA_RPC_URL` or `HELIUS_RPC_URL`
-- explicit Pyth feed IDs if Pyth is enabled
-- Birdeye credentials if Birdeye is enabled
-- approved release/distribution URLs
-- final production legal text and subprocessor disclosures
+The repository rejects explicit `any` and requires untrusted JSON/external responses to be narrowed from `unknown`.
 
-Production data persistence and RPC behavior are designed to fail closed when required configuration is absent.
+## Vercel
+
+The root Vercel configuration builds the Next.js frontend. The Fastify backend includes long-lived WebSocket connections and should be deployed on a runtime that supports persistent WebSocket upgrades. Configure `POWERCHAIN_BACKEND_URL` and `NEXT_PUBLIC_POWERCHAIN_WS_URL` for the deployed frontend.
 
 ## Documentation
 
-- `docs/ARCHITECTURE.md`
-- `docs/API.md`
-- `docs/INTEGRATIONS.md`
-- `docs/SECURITY.md`
-- `docs/SETUP.md`
-- `PROGRESS.md`
+- [Architecture](docs/ARCHITECTURE.md)
+- [API](docs/API.md)
+- [Security](docs/SECURITY.md)
+- [Setup](docs/SETUP.md)
+- [Integrations](docs/INTEGRATIONS.md)
+- [Contributing](CONTRIBUTING.md)
+- [Contributors](CONTRIBUTORS.md)
+- [Changelog](CHANGELOG.md)
+
+## License
+
+MIT. See [LICENSE](LICENSE).

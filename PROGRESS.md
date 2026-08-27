@@ -1,31 +1,42 @@
-# PowerChain Copilot 1.0.0 — Implementation Progress
+# PowerChain Copilot 1.0.0 — Progress
 
 ## Complete
 
-- Responsive marketing website and product UI
-- Canonical PowerChain / light-gray COPILOT brand lockup
-- Mobile, tablet, and desktop layouts
-- Authenticated SaaS dashboard
-- Copilot chat and persisted conversation history
-- Assets, approvals, settings, contact, pricing, setup, install, docs, status, security, and legal routes
-- Supabase production persistence with local development adapter
-- Signed sessions, Remember me, password visibility, and session/IP visibility
-- `/api/v1` route surface and `apps/frontend/api/v1` browser client
-- CORS policy layer with uniform `/api/v1` proxy/preflight enforcement
-- Server-side Pyth, Birdeye, Helius, and Solana RPC adapters
-- Shared cache, safe-action, formatting, helper, and error utilities
-- Configurable announcement top bar
-- Cookie notice and expanded legal disclosures
-- Ecosystem/integration strip above the footer with neutral light-gray icons
-- Provider service configuration UI in workspace settings
+- [x] pnpm + Turborepo monorepo
+- [x] Next.js frontend in `apps/frontend`
+- [x] Fastify backend in `apps/backend`
+- [x] Dashboard action registry in `apps/dashboard`
+- [x] PostgreSQL storage adapter and migration
+- [x] Development memory persistence fallback
+- [x] Signed/revocable session architecture
+- [x] Remember Me and current-session security metadata
+- [x] `/api/v1/auth/`
+- [x] `/api/v1/sessions/`
+- [x] `/api/v1/middlewares/`
+- [x] `/api/v1/ai/`
+- [x] `/api/v1/chat/`
+- [x] `/api/v1/messages/:id`
+- [x] assets, approvals, dashboard, profile, services, market, network, contact APIs
+- [x] opaque prefixed IDs and readable slugs
+- [x] WebSocket chat events
+- [x] HTTP polling fallback for chat realtime
+- [x] `lib/powerchain/api.ts`, endpoints, WS, and fallbacks
+- [x] OpenAPI 3.1 + Swagger UI + Postman collection
+- [x] route-group organization for public/dashboard pages
+- [x] frontend context/constants/storage/store/data boundaries
+- [x] currency, epoch, explorer, and health utilities
+- [x] strict TypeScript + ESLint 10.9.1 + no-explicit-any policy
+- [x] light/dark/system themes and app icons
+- [x] responsive marketing/dashboard/install UX
 
-## Production configuration required
+## Release gates
 
-- Supabase URL and service-role key
-- strong session secret
-- approved CORS origins when cross-origin API access is required
-- trusted Solana RPC / Helius configuration
-- explicit Pyth feed IDs
-- Birdeye key when Birdeye is enabled
-- final legal review for the actual deployment
-- signed native distribution URLs before native downloads are exposed
+- [ ] Install dependencies on Node 24.20.0 with pnpm 11.23.0 in a network-enabled environment
+- [ ] Generate and commit `pnpm-lock.yaml`
+- [ ] Apply PostgreSQL migration against staging
+- [ ] Run `pnpm verify`
+- [ ] Exercise auth/session revocation and Remember Me integration tests
+- [ ] Exercise WebSocket auth/reconnect/polling fallback tests
+- [ ] Validate frontend preview deployment
+- [ ] Deploy backend to a WebSocket-capable long-lived runtime
+- [ ] Configure production `DATABASE_URL`, strong `SESSION_SECRET`, allowed origins, and intended provider credentials

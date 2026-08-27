@@ -1,0 +1,50 @@
+{
+  "name": "@powerchain/capilot-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PowerChain Copilot full-stack Next.js SaaS frontend",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24.20.0 <27"
+  },
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "check:links": "node scripts/check-links.mjs",
+    "check:actions": "node scripts/check-actions.mjs",
+    "check:api": "node scripts/check-api.mjs",
+    "check": "pnpm check:links && pnpm check:actions && pnpm check:api && pnpm check:assets && pnpm check:openapi && pnpm check:registry && pnpm typecheck && pnpm lint",
+    "clean": "node -e \"Promise.all(['.next','.turbo'].map(p=>require('fs/promises').rm(p,{recursive:true,force:true})))\"",
+    "check:assets": "node scripts/check-assets.mjs",
+    "check:openapi": "node scripts/check-openapi.mjs",
+    "check:registry": "node scripts/check-action-registry.mjs"
+  },
+  "dependencies": {
+    "@base-ui/react": "1.7.0",
+    "@powerchain/ai": "workspace:*",
+    "@powerchain/shared": "workspace:*",
+    "@tailwindcss/postcss": "4.3.3",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "lucide-react": "1.34.0",
+    "next": "16.3.3",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-icons": "5.7.0",
+    "tailwind-merge": "3.6.0",
+    "tailwindcss": "4.3.3",
+    "tw-animate-css": "1.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.5",
+    "eslint": "10.9.1",
+    "eslint-config-next": "16.3.3",
+    "typescript": "7.0.2",
+    "unrs-resolver": "1.12.2"
+  }
+}

@@ -1,5 +1,0 @@
-"use client";
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-import { faqItems } from "@/config/faq";
-export function FAQ(){const [open,setOpen]=useState(0);return <section className="bg-[#F7F9F7] py-24"><div className="pc-shell grid gap-10 lg:grid-cols-[.7fr_1.3fr]"><div><p className="pc-kicker">FAQ</p><h2 className="mt-4 text-4xl font-bold tracking-[-.045em]">Questions, answered clearly.</h2><p className="mt-4 text-sm leading-7 text-[#66706A]">Product, security, AI, onchain, and installation boundaries in plain language.</p></div><div className="divide-y divide-[#DDE3DE] border-y border-[#DDE3DE]">{faqItems.map((item,i)=><button key={item.q} className="w-full py-5 text-left" onClick={()=>setOpen(open===i?-1:i)}><span className="flex items-center justify-between gap-4"><b className="text-sm sm:text-base">{item.q}</b><ChevronDown className={`size-4 shrink-0 transition ${open===i?"rotate-180":""}`}/></span>{open===i&&<span className="mt-3 block max-w-3xl pr-8 text-sm leading-6 text-[#66706A]">{item.a}</span>}</button>)}</div></div></section>}

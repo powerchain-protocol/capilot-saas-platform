@@ -1,36 +1,47 @@
 # Security Model
 
-## Authentication
+## Trust boundaries
 
-- Signed HttpOnly session cookie
-- `SameSite=Lax`
-- secure cookie in production
-- 12-hour standard signed session
-- optional 30-day remembered session only after explicit user selection
-- scrypt password hashing
+- Browser UI is untrusted input.
+- Next.js `/api/v1/*` is a transport proxy, not an authorization boundary.
+- Fastify backend is the authoritative API policy boundary.
+- PostgreSQL is the durable state boundary.
+- AI/provider output is untrusted analysis until reviewed.
 
-## Request protection
+## Sessions
 
-- same-origin checks on mutation endpoints
-- IP-keyed in-memory rate limiting using hashed transient keys
-- workspace-scoped authorization
-- role gates on approval mutations
-- no raw IP persistence in the reference application database
-- request/response security headers
+- HttpOnly, SameSite=Lax session cookie
+- HMAC-signed session claim
+- persisted server session record
+- explicit expiry and revocation
+- optional 30-day Remember Me
+- current session inventory and revoke endpoint
+- masked request IP by default
 
-## API providers
+## API
 
-Pyth, Birdeye, Helius, Solana RPC, Supabase service-role credentials, and AI provider credentials remain server-side.
+- exact-origin CORS allowlist
+- no credentialed `*` origin
+- request IDs
+- body-size limit
+- rate limiting on sensitive public/mutation routes
+- role checks on approval mutation
+- parameterized PostgreSQL queries
+- generic production error messages for unexpected failures
 
-## CORS
+## WebSockets
 
-Cross-origin access is deny-by-default except same-origin traffic and exact origins configured through `CORS_ALLOWED_ORIGINS`.
+WebSocket chat rooms require the same session cookie and workspace/user ownership check as HTTP chat routes. A user cannot join another user's chat by guessing an ID or slug.
 
-## Execution boundary
+## Provider credentials
 
-Copilot analysis never grants execution authority. Sensitive operational, wallet, treasury, or blockchain actions should remain behind policy, evidence, simulation where applicable, explicit approval, and signature authorization.
+OpenAI, Birdeye, Helius, RPC, and related secrets remain backend-only. They must not be exposed through `NEXT_PUBLIC_*` values.
 
+## Production fail-closed rules
 
-## Cross-origin mutations
+Production startup fails when:
 
-Mutation handlers accept requests from the application origin by default. A cross-origin mutation is accepted only when its exact origin is configured in `CORS_ALLOWED_ORIGINS`; wildcard credentialed origins are not supported. The `/api/v1` proxy applies matching response and preflight headers.
+- `DATABASE_URL` is missing
+- `SESSION_SECRET` is shorter than 32 characters
+
+The memory store is not an automatic production fallback.

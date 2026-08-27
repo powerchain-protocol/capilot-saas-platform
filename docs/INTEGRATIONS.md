@@ -1,41 +1,32 @@
-# Provider Integrations
+# Integrations
 
-PowerChain keeps external provider access behind server-side adapters. API keys are never shipped to client components.
+Integration adapters execute only on the backend.
+
+## AI
+
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL`
+- deterministic representative fallback only when `ALLOW_DEMO_AI=true`
+
+## Solana / Helius
+
+- `SOLANA_RPC_URL`
+- `HELIUS_RPC_URL`
+- `HELIUS_API_KEY`
+
+Resolution order: explicit Helius RPC → Helius API-key URL → explicit Solana RPC → development devnet fallback. Production does not silently invent an RPC endpoint.
 
 ## Pyth
 
-`lib/pyth.ts` reads configurable Hermes price feeds. Configure:
-
-```text
-PYTH_HERMES_URL=
-PYTH_DEFAULT_FEED_ID=
-PYTH_SOL_USD_FEED_ID=
-```
-
-No feed ID is invented by the application. A deployment must explicitly configure the feed it trusts.
+- `PYTH_HERMES_URL`
+- price requests use explicit feed IDs
 
 ## Birdeye
 
-`lib/birdeye.ts` provides optional Solana token price lookup with:
+- `BIRDEYE_API_URL`
+- `BIRDEYE_API_KEY`
+- token addresses are validated before requests
 
-```text
-BIRDEYE_API_URL=
-BIRDEYE_API_KEY=
-```
+## Explorers
 
-## Helius
-
-`lib/helius.ts` uses either a complete server RPC URL or a Helius API key:
-
-```text
-HELIUS_RPC_URL=
-HELIUS_API_KEY=
-```
-
-## Solana RPC
-
-`lib/rpc.ts` uses `SOLANA_RPC_URL`, then `HELIUS_RPC_URL`. A public devnet fallback is permitted only outside production. Production fails closed when no RPC is configured.
-
-## Cache and timeout boundary
-
-Provider reads use the shared in-memory TTL cache in `lib/cache.ts` for short-lived request de-duplication and a six-second default provider timeout. This cache is not a durable source of truth.
+Read-only explorer metadata lives in `apps/backend/src/data/explorers.ts` and frontend display metadata in `apps/frontend/data/explorers.ts`.

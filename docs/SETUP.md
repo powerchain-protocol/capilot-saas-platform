@@ -1,38 +1,68 @@
-# PowerChain Copilot Setup
+# Setup
 
-Canonical product version: **1.0.0**.
+## Requirements
 
-## Distribution sources
+- Node.js 24.20.0
+- pnpm 11.23.0
+- PostgreSQL 15+ recommended
 
-`/setup/` is the canonical installation entry point. Available sources are resolved from `config/install.ts` and constrained by `config/rules.ts`.
-
-- **GitHub Releases** — public or approved signed artifacts and checksums.
-- **Google Drive** — managed beta / enterprise distribution when `NEXT_PUBLIC_GOOGLE_DRIVE_RELEASE_URL` is configured.
-- **App Store / Google Play** — managed mobile release channels when store URLs are configured.
-- **Web** — authenticated browser application; no native installation required.
-
-Missing native source URLs do not become fake download buttons. They route to the stored contact/access-request flow.
-
-## Required environment
-
-Copy `.env.example` to `.env.local` and configure production secrets and distribution URLs. Never commit production secrets or service-role credentials.
-
-## Quality gates
-
-Run:
+## Install
 
 ```bash
-pnpm check:links
-pnpm check:actions
-pnpm check:api
-pnpm typecheck
-pnpm lint
-pnpm build
+nvm use
+corepack enable
+corepack prepare pnpm@11.23.0 --activate
+pnpm install
 ```
 
+Review blocked lifecycle scripts before approving:
 
-## API and integrations
+```bash
+pnpm approve-builds
+```
 
-The canonical browser API is `/api/v1/*`. Server-only provider adapters live in `lib/pyth.ts`, `lib/birdeye.ts`, `lib/helius.ts`, and `lib/rpc.ts`; credentials must never be exposed through `NEXT_PUBLIC_*` variables. Cross-origin access is same-origin by default and may be extended only with exact values in `CORS_ALLOWED_ORIGINS`.
+## PostgreSQL
 
-For authenticated sessions, **Remember me** is opt-in. The current request IP is masked by default in Settings and is only revealed on explicit user action; the reference application does not persist raw IP addresses.
+```bash
+createdb powerchain_copilot
+export DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:5432/powerchain_copilot'
+pnpm db:migrate
+```
+
+## Environment
+
+```bash
+cp apps/backend/.env.example apps/backend/.env
+cp apps/frontend/.env.example apps/frontend/.env.local
+```
+
+Backend production-critical settings:
+
+- `DATABASE_URL`
+- `SESSION_SECRET` (minimum 32 characters)
+- `CORS_ALLOWED_ORIGINS`
+- provider keys for intentionally enabled adapters
+
+Frontend connectivity settings:
+
+- `POWERCHAIN_BACKEND_URL`
+- `NEXT_PUBLIC_POWERCHAIN_WS_URL`
+
+## Development
+
+```bash
+pnpm dev
+```
+
+Run independently if needed:
+
+```bash
+pnpm dev:backend
+pnpm dev:frontend
+```
+
+Open:
+
+- frontend `http://localhost:3000`
+- backend `http://localhost:8000`
+- Swagger `http://localhost:8000/docs`
