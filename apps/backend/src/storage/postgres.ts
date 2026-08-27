@@ -9,6 +9,10 @@ import type {
   ContactRequest,
   CreditAccount,
   CreditLedgerEntry,
+  CreditQuote,
+  CreditReceipt,
+  CreditReservationResult,
+  CreditSettlementResult,
   Membership,
   Message,
   Plan,
@@ -140,6 +144,255 @@ export class PostgresStore implements Store {
       [workspaceId, userId, bounded]
     );
     return result.rows.map((item) => row<CreditLedgerEntry>(item));
+  }
+
+  async createCreditQuote(input: Omit<CreditQuote, "id" | "accountId" | "status" | "createdAt" | "updatedAt" | "responseMessageId">): Promise<CreditQuote> {
+    const account = await this.getCreditAccount(input.workspaceId, input.userId);
+    const id = createId("qt");
+    const result = await this.pool.query(
+      `insert into credit_quotes(
+        id,account_id,workspace_id,user_id,chat_id,request_message_id,response_message_id,asset,amount,pricing_version,canonical_payload,quote_hash,status,expires_at,created_at,updated_at
+      ) values($1,$2,$3,$4,$5,$6,null,'PWRC',$7,'pwrc-message-v1',$8,$9,'quoted',$10,now(),now())
+      returning id,account_id as "accountId",workspace_id as "workspaceId",user_id as "userId",chat_id as "chatId",request_message_id as "requestMessageId",response_message_id as "responseMessageId",asset,amount::text,pricing_version as "pricingVersion",canonical_payload as "canonicalPayload",quote_hash as "quoteHash",status,expires_at as "expiresAt",created_at as "createdAt",updated_at as "updatedAt"`,
+      [id, account.id, input.workspaceId, input.userId, input.chatId, input.requestMessageId, input.amount, input.canonicalPayload, input.quoteHash, input.expiresAt]
+    );
+    return row<CreditQuote>(result.rows[0]);
+  }
+
+  async reserveCreditQuote(quoteId: string, workspaceId: string, userId: string): Promise<CreditReservationResult> {
+    const client = await this.pool.connect();
+    try {
+      await client.query("begin");
+      const quoteResult = await client.query(
+        `select id,account_id as "accountId",workspace_id as "workspaceId",user_id as "userId",chat_id as "chatId",request_message_id as "requestMessageId",response_message_id as "responseMessageId",asset,amount::text,pricing_version as "pricingVersion",canonical_payload as "canonicalPayload",quote_hash as "quoteHash",status,expires_at as "expiresAt",created_at as "createdAt",updated_at as "updatedAt"
+         from credit_quotes where id=$1 and workspace_id=$2 and user_id=$3 for update`,
+        [quoteId, workspaceId, userId]
+      );
+      if (!quoteResult.rows[0]) { await client.query("rollback"); return { ok: false, reason: "not_found" }; }
+      const quote = row<CreditQuote>(quoteResult.rows[0]);
+      if (quote.status !== "quoted") { await client.query("rollback"); return { ok: false, reason: "invalid_state" }; }
+      if (Date.parse(quote.expiresAt) <= Date.now()) {
+        await client.query("update credit_quotes set status='expired',updated_at=now() where id=$1", [quote.id]);
+        await client.query("commit");
+        return { ok: false, reason: "expired" };
+      }
+      const accountResult = await client.query(
+        `select id,workspace_id as "workspaceId",user_id as "userId",asset,decimals,available::text,reserved::text,spent::text,funded::text,updated_at as "updatedAt"
+         from credit_accounts where id=$1 for update`,
+        [quote.accountId]
+      );
+      const account = accountResult.rows[0] ? row<CreditAccount>(accountResult.rows[0]) : null;
+      if (!account) { await client.query("rollback"); return { ok: false, reason: "not_found" }; }
+      const amount = BigInt(quote.amount);
+      const available = BigInt(account.available);
+      if (available < amount) {
+        await client.query("rollback");
+        return { ok: false, reason: "insufficient", available: account.available, required: quote.amount };
+      }
+      const ledgerId = createId("clg");
+      const nextAvailable = (available - amount).toString();
+      await client.query(
+        "update credit_accounts set available=available-$1,reserved=reserved+$1,updated_at=now() where id=$2",
+        [quote.amount, account.id]
+      );
+      await client.query(
+        "insert into credit_ledger(id,account_id,workspace_id,user_id,kind,amount,balance_after,reference,created_at) values($1,$2,$3,$4,'reserve',$5,$6,$7,now())",
+        [ledgerId, account.id, workspaceId, userId, quote.amount, nextAvailable, quote.id]
+      );
+      await client.query("update credit_quotes set status='reserved',updated_at=now() where id=$1", [quote.id]);
+      const nextAccountResult = await client.query(
+        `select id,workspace_id as "workspaceId",user_id as "userId",asset,decimals,available::text,reserved::text,spent::text,funded::text,updated_at as "updatedAt" from credit_accounts where id=$1`,
+        [account.id]
+      );
+      const nextQuoteResult = await client.query(
+        `select id,account_id as "accountId",workspace_id as "workspaceId",user_id as "userId",chat_id as "chatId",request_message_id as "requestMessageId",response_message_id as "responseMessageId",asset,amount::text,pricing_version as "pricingVersion",canonical_payload as "canonicalPayload",quote_hash as "quoteHash",status,expires_at as "expiresAt",created_at as "createdAt",updated_at as "updatedAt" from credit_quotes where id=$1`,
+        [quote.id]
+      );
+      const ledgerResult = await client.query(
+        `select id,account_id as "accountId",workspace_id as "workspaceId",user_id as "userId",kind,amount::text,balance_after::text as "balanceAfter",reference,created_at as "createdAt" from credit_ledger where id=$1`,
+        [ledgerId]
+      );
+      await client.query("commit");
+      return { ok: true, quote: row<CreditQuote>(nextQuoteResult.rows[0]), account: row<CreditAccount>(nextAccountResult.rows[0]), ledger: row<CreditLedgerEntry>(ledgerResult.rows[0]) };
+    } catch (error) {
+      await client.query("rollback");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async releaseCreditQuote(quoteId: string, workspaceId: string, userId: string, reference: string): Promise<boolean> {
+    const client = await this.pool.connect();
+    try {
+      await client.query("begin");
+      const quoteResult = await client.query("select id,account_id,amount::text,status from credit_quotes where id=$1 and workspace_id=$2 and user_id=$3 for update", [quoteId, workspaceId, userId]);
+      const quote = quoteResult.rows[0] as { id: string; account_id: string; amount: string; status: string } | undefined;
+      if (!quote || quote.status !== "reserved") { await client.query("rollback"); return false; }
+      const accountResult = await client.query("select available::text,reserved::text from credit_accounts where id=$1 for update", [quote.account_id]);
+      const account = accountResult.rows[0] as { available: string; reserved: string } | undefined;
+      if (!account || BigInt(account.reserved) < BigInt(quote.amount)) { await client.query("rollback"); return false; }
+      const nextAvailable = (BigInt(account.available) + BigInt(quote.amount)).toString();
+      await client.query("update credit_accounts set available=available+$1,reserved=reserved-$1,updated_at=now() where id=$2", [quote.amount, quote.account_id]);
+      await client.query(
+        "insert into credit_ledger(id,account_id,workspace_id,user_id,kind,amount,balance_after,reference,created_at) values($1,$2,$3,$4,'release',$5,$6,$7,now())",
+        [createId("clg"), quote.account_id, workspaceId, userId, quote.amount, nextAvailable, `${quote.id}:${reference.slice(0, 96)}`]
+      );
+      await client.query("update credit_quotes set status='released',updated_at=now() where id=$1", [quote.id]);
+      await client.query("commit");
+      return true;
+    } catch (error) {
+      await client.query("rollback");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async releaseStaleCreditReservations(staleBefore: string, limit = 100): Promise<number> {
+    const bounded = Math.max(1, Math.min(limit, 500));
+    const client = await this.pool.connect();
+    try {
+      await client.query("begin");
+      const staleResult = await client.query(
+        `select id,account_id,workspace_id,user_id,amount::text
+         from credit_quotes
+         where status='reserved' and updated_at <= $1
+         order by updated_at asc
+         for update skip locked
+         limit $2`,
+        [staleBefore, bounded]
+      );
+      let released = 0;
+      for (const quote of staleResult.rows as Array<{ id: string; account_id: string; workspace_id: string; user_id: string; amount: string }>) {
+        const accountResult = await client.query(
+          "select available::text,reserved::text from credit_accounts where id=$1 for update",
+          [quote.account_id]
+        );
+        const account = accountResult.rows[0] as { available: string; reserved: string } | undefined;
+        if (!account || BigInt(account.reserved) < BigInt(quote.amount)) throw new Error(`Credit reservation invariant failed for quote ${quote.id}.`);
+        const nextAvailable = (BigInt(account.available) + BigInt(quote.amount)).toString();
+        await client.query(
+          "update credit_accounts set available=available+$1,reserved=reserved-$1,updated_at=now() where id=$2",
+          [quote.amount, quote.account_id]
+        );
+        await client.query(
+          "insert into credit_ledger(id,account_id,workspace_id,user_id,kind,amount,balance_after,reference,created_at) values($1,$2,$3,$4,'release',$5,$6,$7,now())",
+          [createId("clg"), quote.account_id, quote.workspace_id, quote.user_id, quote.amount, nextAvailable, `${quote.id}:stale_reservation_recovery`]
+        );
+        await client.query("update credit_quotes set status='released',updated_at=now() where id=$1", [quote.id]);
+        released += 1;
+      }
+      await client.query("commit");
+      return released;
+    } catch (error) {
+      await client.query("rollback");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async completeCreditSettledMessage(input: { quoteId: string; chatId: string; workspaceId: string; userId: string; content: string }): Promise<CreditSettlementResult> {
+    const client = await this.pool.connect();
+    try {
+      await client.query("begin");
+      const existingReceipt = await client.query(
+        `select r.id,r.quote_id as "quoteId",r.account_id as "accountId",r.workspace_id as "workspaceId",r.user_id as "userId",r.chat_id as "chatId",r.response_message_id as "responseMessageId",r.quote_hash as "quoteHash",r.amount::text,r.reservation_ledger_id as "reservationLedgerId",r.settlement_ledger_id as "settlementLedgerId",r.transferable,r.created_at as "createdAt"
+         from credit_receipts r where r.quote_id=$1 limit 1`,
+        [input.quoteId]
+      );
+      if (existingReceipt.rows[0]) { await client.query("rollback"); return { ok: false, reason: "invalid_state" }; }
+      const quoteResult = await client.query(
+        `select id,account_id as "accountId",workspace_id as "workspaceId",user_id as "userId",chat_id as "chatId",request_message_id as "requestMessageId",response_message_id as "responseMessageId",asset,amount::text,pricing_version as "pricingVersion",canonical_payload as "canonicalPayload",quote_hash as "quoteHash",status,expires_at as "expiresAt",created_at as "createdAt",updated_at as "updatedAt"
+         from credit_quotes where id=$1 and workspace_id=$2 and user_id=$3 for update`,
+        [input.quoteId, input.workspaceId, input.userId]
+      );
+      if (!quoteResult.rows[0]) { await client.query("rollback"); return { ok: false, reason: "not_found" }; }
+      const quote = row<CreditQuote>(quoteResult.rows[0]);
+      if (quote.status !== "reserved" || quote.chatId !== input.chatId) { await client.query("rollback"); return { ok: false, reason: "invalid_state" }; }
+      const accountResult = await client.query(
+        `select id,workspace_id as "workspaceId",user_id as "userId",asset,decimals,available::text,reserved::text,spent::text,funded::text,updated_at as "updatedAt" from credit_accounts where id=$1 for update`,
+        [quote.accountId]
+      );
+      const account = accountResult.rows[0] ? row<CreditAccount>(accountResult.rows[0]) : null;
+      if (!account || BigInt(account.reserved) < BigInt(quote.amount)) { await client.query("rollback"); return { ok: false, reason: "invalid_state" }; }
+      const reservationResult = await client.query(
+        "select id from credit_ledger where account_id=$1 and kind='reserve' and reference=$2 order by created_at desc limit 1",
+        [quote.accountId, quote.id]
+      );
+      const reservationLedgerId = String(reservationResult.rows[0]?.id ?? "");
+      if (!reservationLedgerId) { await client.query("rollback"); return { ok: false, reason: "invalid_state" }; }
+      const message: Message = { id: createId("msg"), chatId: input.chatId, workspaceId: input.workspaceId, userId: input.userId, role: "assistant", content: input.content, createdAt: now() };
+      const settlementLedgerId = createId("clg");
+      const receiptId = createId("rcp");
+      await client.query(
+        "insert into messages(id,chat_id,workspace_id,user_id,role,content,created_at) values($1,$2,$3,$4,'assistant',$5,$6)",
+        [message.id, message.chatId, message.workspaceId, message.userId, message.content, message.createdAt]
+      );
+      await client.query("update chats set updated_at=$1 where id=$2", [message.createdAt, message.chatId]);
+      await client.query("update credit_accounts set reserved=reserved-$1,spent=spent+$1,updated_at=now() where id=$2", [quote.amount, quote.accountId]);
+      await client.query(
+        "insert into credit_ledger(id,account_id,workspace_id,user_id,kind,amount,balance_after,reference,created_at) values($1,$2,$3,$4,'settle',$5,$6,$7,now())",
+        [settlementLedgerId, quote.accountId, input.workspaceId, input.userId, quote.amount, account.available, quote.id]
+      );
+      await client.query("update credit_quotes set status='settled',response_message_id=$1,updated_at=now() where id=$2", [message.id, quote.id]);
+      await client.query(
+        `insert into credit_receipts(id,quote_id,account_id,workspace_id,user_id,chat_id,response_message_id,quote_hash,amount,reservation_ledger_id,settlement_ledger_id,transferable,created_at)
+         values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,false,now())`,
+        [receiptId, quote.id, quote.accountId, input.workspaceId, input.userId, input.chatId, message.id, quote.quoteHash, quote.amount, reservationLedgerId, settlementLedgerId]
+      );
+      const nextQuoteResult = await client.query(
+        `select id,account_id as "accountId",workspace_id as "workspaceId",user_id as "userId",chat_id as "chatId",request_message_id as "requestMessageId",response_message_id as "responseMessageId",asset,amount::text,pricing_version as "pricingVersion",canonical_payload as "canonicalPayload",quote_hash as "quoteHash",status,expires_at as "expiresAt",created_at as "createdAt",updated_at as "updatedAt" from credit_quotes where id=$1`,
+        [quote.id]
+      );
+      const nextAccountResult = await client.query(
+        `select id,workspace_id as "workspaceId",user_id as "userId",asset,decimals,available::text,reserved::text,spent::text,funded::text,updated_at as "updatedAt" from credit_accounts where id=$1`,
+        [quote.accountId]
+      );
+      const ledgerResult = await client.query(
+        `select id,account_id as "accountId",workspace_id as "workspaceId",user_id as "userId",kind,amount::text,balance_after::text as "balanceAfter",reference,created_at as "createdAt" from credit_ledger where id=$1`,
+        [settlementLedgerId]
+      );
+      const receiptResult = await client.query(
+        `select id,quote_id as "quoteId",account_id as "accountId",workspace_id as "workspaceId",user_id as "userId",chat_id as "chatId",response_message_id as "responseMessageId",quote_hash as "quoteHash",amount::text,reservation_ledger_id as "reservationLedgerId",settlement_ledger_id as "settlementLedgerId",transferable,created_at as "createdAt" from credit_receipts where id=$1`,
+        [receiptId]
+      );
+      await client.query("commit");
+      return {
+        ok: true,
+        quote: row<CreditQuote>(nextQuoteResult.rows[0]),
+        account: row<CreditAccount>(nextAccountResult.rows[0]),
+        ledger: row<CreditLedgerEntry>(ledgerResult.rows[0]),
+        receipt: row<CreditReceipt>(receiptResult.rows[0]),
+        message,
+      };
+    } catch (error) {
+      await client.query("rollback");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async listCreditQuotes(workspaceId: string, userId: string, limit = 50): Promise<CreditQuote[]> {
+    const bounded = Math.max(1, Math.min(limit, 100));
+    const result = await this.pool.query(
+      `select id,account_id as "accountId",workspace_id as "workspaceId",user_id as "userId",chat_id as "chatId",request_message_id as "requestMessageId",response_message_id as "responseMessageId",asset,amount::text,pricing_version as "pricingVersion",canonical_payload as "canonicalPayload",quote_hash as "quoteHash",status,expires_at as "expiresAt",created_at as "createdAt",updated_at as "updatedAt"
+       from credit_quotes where workspace_id=$1 and user_id=$2 order by created_at desc limit $3`,
+      [workspaceId, userId, bounded]
+    );
+    return result.rows.map((item) => row<CreditQuote>(item));
+  }
+
+  async listCreditReceipts(workspaceId: string, userId: string, limit = 50): Promise<CreditReceipt[]> {
+    const bounded = Math.max(1, Math.min(limit, 100));
+    const result = await this.pool.query(
+      `select id,quote_id as "quoteId",account_id as "accountId",workspace_id as "workspaceId",user_id as "userId",chat_id as "chatId",response_message_id as "responseMessageId",quote_hash as "quoteHash",amount::text,reservation_ledger_id as "reservationLedgerId",settlement_ledger_id as "settlementLedgerId",transferable,created_at as "createdAt"
+       from credit_receipts where workspace_id=$1 and user_id=$2 order by created_at desc limit $3`,
+      [workspaceId, userId, bounded]
+    );
+    return result.rows.map((item) => row<CreditReceipt>(item));
   }
 
   private async seedWorkspace(client: PoolClient, workspaceId: string): Promise<void> {

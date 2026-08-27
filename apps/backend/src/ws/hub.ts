@@ -1,7 +1,7 @@
 import type WebSocket from "ws";
 
 export type WsEvent = {
-  type: "chat.message" | "chat.updated" | "system.heartbeat";
+  type: "chat.message" | "chat.receipt" | "chat.updated" | "system.heartbeat";
   chatId?: string;
   payload: unknown;
   timestamp: string;

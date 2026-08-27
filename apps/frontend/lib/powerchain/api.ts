@@ -1,7 +1,7 @@
 import { withQuery } from "@/queries/queries";
 import { endpoints } from "./endpoints";
 import type { ApiEnvelope, ApiMessage, ChatSummary, HealthSnapshot, SecuritySession, ServiceHealth, SessionContext } from "./types";
-import type { CreditsSnapshot, CreditLedgerEntry } from "@/types/credits";
+import type { CreditsSnapshot, CreditLedgerEntry, CreditQuote, CreditReceipt } from "@/types/credits";
 import type { TokenDescriptor } from "@/types/tokens";
 
 export class PowerChainApiError extends Error {
@@ -38,6 +38,8 @@ export const powerChainApi = {
   getServices: () => apiFetch<ServiceHealth[]>(endpoints.services),
   getCredits: () => apiFetch<CreditsSnapshot>(endpoints.credits),
   getCreditLedger: () => apiFetch<CreditLedgerEntry[]>(endpoints.creditLedger),
+  getCreditQuotes: () => apiFetch<CreditQuote[]>(endpoints.creditQuotes),
+  getCreditReceipts: () => apiFetch<CreditReceipt[]>(endpoints.creditReceipts),
   getTokens: () => apiFetch<TokenDescriptor[]>(endpoints.tokens),
   getPwrcToken: () => apiFetch<TokenDescriptor>(endpoints.pwrcToken),
   getSecuritySession: (reveal = false) => apiFetch<SecuritySession>(withQuery(endpoints.securitySession, { reveal: reveal ? 1 : undefined })),
@@ -52,7 +54,7 @@ export const powerChainApi = {
     body: JSON.stringify({ title }),
   }),
   getChat: (idOrSlug: string) => apiFetch<{ chat: ChatSummary; messages: ApiMessage[] }>(endpoints.chat.byId(idOrSlug)),
-  sendChatMessage: (idOrSlug: string, message: string) => apiFetch<{ chat: ChatSummary; userMessage: ApiMessage; message: ApiMessage; mode: "managed" | "demo"; text: string; actions: Array<{ id: string; label: string; href: string }> }>(endpoints.chat.messages(idOrSlug), {
+  sendChatMessage: (idOrSlug: string, message: string) => apiFetch<{ chat: ChatSummary; userMessage: ApiMessage; message: ApiMessage; mode: "managed" | "demo"; text: string; actions: Array<{ id: string; label: string; href: string }>; billing: { quote: CreditQuote; receipt: CreditReceipt; account: CreditsSnapshot["account"] } }>(endpoints.chat.messages(idOrSlug), {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ message }),

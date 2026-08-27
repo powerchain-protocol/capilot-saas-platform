@@ -4,23 +4,42 @@ Validated in the artifact build environment on 2026-08-27.
 
 ## Passed
 
-- Source architecture audit: 235 TypeScript/TSX files, no detected explicit `any` annotations/casts.
-- Internal route audit: 24 application page routes; no dead literal internal links.
-- Interactive action audit: passed across 178 frontend TypeScript/TSX files.
-- API/backend structure audit: 17 canonical frontend/backend/API artifacts present.
-- Public asset audit: all literal static asset references resolve.
-- OpenAPI audit: 25 canonical HTTP/WebSocket paths represented.
-- Dashboard action-registry audit: 4 registered governed actions.
-- TypeScript syntax/transpile scan: 234 implementation files, 0 syntax diagnostics.
-- Static `@/` and relative import resolution: 0 unresolved imports across 235 TS/TSX files.
-- JSON/YAML parsing: passed.
-- PWA service-worker JavaScript syntax: passed.
+- Source architecture audit: **258 TS/TSX source files**, no detected explicit `any` annotations/casts.
+- TypeScript syntax/transpile scan: **259 implementation TS/TSX files**, **0 syntax diagnostics**.
+- Internal import audit: **465** relative, frontend `@/`, and backend `@backend/` imports resolved.
+- Internal route audit: **25 application page routes**, no dead literal internal routes.
+- Interactive action audit: passed across **189 frontend TS/TSX files**.
+- API/backend structure audit: **20 required architecture files** present.
+- Public asset audit: **17 literal static asset references** resolve.
+- OpenAPI coverage audit: **31 canonical HTTP/WebSocket paths** represented.
+- API DX audit: **32 HTTP operations**, **32 Postman requests**, **32 unique operation IDs**.
+- API generator stale-output check: **33 generated operations** current.
+- OpenAPI `ApiKey` contract uses `X-Api-Key` and global API-key security.
+- Schema snapshot audit: `0002_credits.sql` and `0003_credit_quotes_receipts.sql` exactly mirrored by `api/schema.sql`.
+- Dashboard action-registry audit: **4 governed actions** registered.
+- JSON parsing: passed across repository API/config artifacts.
+- OpenAPI/AsyncAPI YAML parsing: passed.
+- Deterministic mock API smoke tests: `/v1/health`, `/v1/credits`, `/v1/credits/quotes`, `/v1/credits/receipts`, and `/v1/tokens/pwrc` returned valid HTTP 200 JSON envelopes.
+- Mock server and repository validation scripts pass JavaScript syntax checks.
+
+## Billing hardening validated statically
+
+- deterministic quote persisted before reservation
+- canonical SHA-256 quote hash
+- atomic available → reserved transition
+- HTTP 402 before AI generation when credits are insufficient
+- compensating release after AI/provider failure
+- settlement-exception compensation path
+- atomic assistant-response + reserved → spent settlement
+- non-transferable receipt linked to quote/ledger/response evidence
+- stale/abandoned reservation recovery loop using PostgreSQL row locks
+- production unbilled-AI-preview guard
 
 ## Environment limitation
 
-The artifact environment runs Node.js 22 and does not contain the project dependency tree. The repository itself correctly requires Node.js 24.20.0+ and pnpm 11.23.0. Therefore the dependency-backed `pnpm install`, ESLint 10.9.1 execution, `tsc --noEmit`, Turbo build, and Next.js production build must be run in a network-enabled Node 24.20.0 environment before production release.
+The artifact environment runs Node.js 22 and does not contain the project dependency tree. The repository requires Node.js 24.20.0+ and pnpm 11.23.0. Therefore a dependency-backed `pnpm install`, ESLint 10.9.1 execution, full `tsc --noEmit`, Turbo build, and Next.js production build are not claimed here and remain required before production release.
 
-Use:
+Run in a network-enabled Node 24.20.0 environment:
 
 ```bash
 nvm use

@@ -10,6 +10,10 @@ import type {
   ContactRequest,
   CreditAccount,
   CreditLedgerEntry,
+  CreditQuote,
+  CreditReceipt,
+  CreditReservationResult,
+  CreditSettlementResult,
   Membership,
   Message,
   Plan,
@@ -34,6 +38,8 @@ export class MemoryStore implements Store {
   readonly contacts = new Map<string, ContactRequest>();
   readonly creditAccounts = new Map<string, CreditAccount>();
   readonly creditLedger = new Map<string, CreditLedgerEntry>();
+  readonly creditQuotes = new Map<string, CreditQuote>();
+  readonly creditReceipts = new Map<string, CreditReceipt>();
 
   async health() { return { ok: true, adapter: "memory" as const, latencyMs: 0 }; }
 
@@ -146,6 +152,143 @@ export class MemoryStore implements Store {
   async listCreditLedger(workspaceId: string, userId: string, limit = 50): Promise<CreditLedgerEntry[]> {
     return [...this.creditLedger.values()]
       .filter((entry) => entry.workspaceId === workspaceId && entry.userId === userId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .slice(0, Math.max(1, Math.min(limit, 100)));
+  }
+
+  async createCreditQuote(input: Omit<CreditQuote, "id" | "accountId" | "status" | "createdAt" | "updatedAt" | "responseMessageId">): Promise<CreditQuote> {
+    const account = await this.getCreditAccount(input.workspaceId, input.userId);
+    const timestamp = now();
+    const quote: CreditQuote = {
+      id: createId("qt"),
+      accountId: account.id,
+      responseMessageId: null,
+      status: "quoted",
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      ...input,
+    };
+    this.creditQuotes.set(quote.id, quote);
+    return quote;
+  }
+
+  async reserveCreditQuote(quoteId: string, workspaceId: string, userId: string): Promise<CreditReservationResult> {
+    const quote = this.creditQuotes.get(quoteId);
+    if (!quote || quote.workspaceId !== workspaceId || quote.userId !== userId) return { ok: false, reason: "not_found" };
+    if (quote.status !== "quoted") return { ok: false, reason: "invalid_state" };
+    if (Date.parse(quote.expiresAt) <= Date.now()) {
+      this.creditQuotes.set(quote.id, { ...quote, status: "expired", updatedAt: now() });
+      return { ok: false, reason: "expired" };
+    }
+    const account = await this.getCreditAccount(workspaceId, userId);
+    const amount = BigInt(quote.amount);
+    const available = BigInt(account.available);
+    if (available < amount) return { ok: false, reason: "insufficient", available: account.available, required: quote.amount };
+    const timestamp = now();
+    const nextAccount: CreditAccount = {
+      ...account,
+      available: (available - amount).toString(),
+      reserved: (BigInt(account.reserved) + amount).toString(),
+      updatedAt: timestamp,
+    };
+    const ledger: CreditLedgerEntry = {
+      id: createId("clg"), accountId: account.id, workspaceId, userId, kind: "reserve",
+      amount: quote.amount, balanceAfter: nextAccount.available, reference: quote.id, createdAt: timestamp,
+    };
+    const nextQuote: CreditQuote = { ...quote, status: "reserved", updatedAt: timestamp };
+    this.creditAccounts.set(account.id, nextAccount);
+    this.creditLedger.set(ledger.id, ledger);
+    this.creditQuotes.set(quote.id, nextQuote);
+    return { ok: true, quote: nextQuote, account: nextAccount, ledger };
+  }
+
+  async releaseCreditQuote(quoteId: string, workspaceId: string, userId: string, reference: string): Promise<boolean> {
+    const quote = this.creditQuotes.get(quoteId);
+    if (!quote || quote.workspaceId !== workspaceId || quote.userId !== userId || quote.status !== "reserved") return false;
+    const account = await this.getCreditAccount(workspaceId, userId);
+    const amount = BigInt(quote.amount);
+    if (BigInt(account.reserved) < amount) return false;
+    const timestamp = now();
+    const nextAccount: CreditAccount = {
+      ...account,
+      available: (BigInt(account.available) + amount).toString(),
+      reserved: (BigInt(account.reserved) - amount).toString(),
+      updatedAt: timestamp,
+    };
+    const ledger: CreditLedgerEntry = {
+      id: createId("clg"), accountId: account.id, workspaceId, userId, kind: "release",
+      amount: quote.amount, balanceAfter: nextAccount.available, reference: `${quote.id}:${reference.slice(0, 96)}`, createdAt: timestamp,
+    };
+    this.creditAccounts.set(account.id, nextAccount);
+    this.creditLedger.set(ledger.id, ledger);
+    this.creditQuotes.set(quote.id, { ...quote, status: "released", updatedAt: timestamp });
+    return true;
+  }
+
+  async releaseStaleCreditReservations(staleBefore: string, limit = 100): Promise<number> {
+    const cutoff = Date.parse(staleBefore);
+    if (!Number.isFinite(cutoff)) return 0;
+    const stale = [...this.creditQuotes.values()]
+      .filter((quote) => quote.status === "reserved" && Date.parse(quote.updatedAt) <= cutoff)
+      .sort((a, b) => a.updatedAt.localeCompare(b.updatedAt))
+      .slice(0, Math.max(1, Math.min(limit, 500)));
+    let released = 0;
+    for (const quote of stale) {
+      if (await this.releaseCreditQuote(quote.id, quote.workspaceId, quote.userId, "stale_reservation_recovery")) released += 1;
+    }
+    return released;
+  }
+
+  async completeCreditSettledMessage(input: { quoteId: string; chatId: string; workspaceId: string; userId: string; content: string }): Promise<CreditSettlementResult> {
+    const quote = this.creditQuotes.get(input.quoteId);
+    if (!quote || quote.workspaceId !== input.workspaceId || quote.userId !== input.userId) return { ok: false, reason: "not_found" };
+    if (quote.status !== "reserved" || quote.chatId !== input.chatId) return { ok: false, reason: "invalid_state" };
+    const account = await this.getCreditAccount(input.workspaceId, input.userId);
+    const amount = BigInt(quote.amount);
+    if (BigInt(account.reserved) < amount) return { ok: false, reason: "invalid_state" };
+    const reservationLedger = [...this.creditLedger.values()]
+      .find((entry) => entry.reference === quote.id && entry.kind === "reserve");
+    if (!reservationLedger) return { ok: false, reason: "invalid_state" };
+    const timestamp = now();
+    const message: Message = {
+      id: createId("msg"), chatId: input.chatId, workspaceId: input.workspaceId, userId: input.userId, role: "assistant", content: input.content, createdAt: timestamp,
+    };
+    const nextAccount: CreditAccount = {
+      ...account,
+      reserved: (BigInt(account.reserved) - amount).toString(),
+      spent: (BigInt(account.spent) + amount).toString(),
+      updatedAt: timestamp,
+    };
+    const ledger: CreditLedgerEntry = {
+      id: createId("clg"), accountId: account.id, workspaceId: input.workspaceId, userId: input.userId, kind: "settle",
+      amount: quote.amount, balanceAfter: nextAccount.available, reference: quote.id, createdAt: timestamp,
+    };
+    const nextQuote: CreditQuote = { ...quote, status: "settled", responseMessageId: message.id, updatedAt: timestamp };
+    const receipt: CreditReceipt = {
+      id: createId("rcp"), quoteId: quote.id, accountId: account.id, workspaceId: input.workspaceId, userId: input.userId,
+      chatId: input.chatId, responseMessageId: message.id, quoteHash: quote.quoteHash, amount: quote.amount,
+      reservationLedgerId: reservationLedger.id, settlementLedgerId: ledger.id, transferable: false, createdAt: timestamp,
+    };
+    this.messages.set(message.id, message);
+    const chat = this.chats.get(input.chatId);
+    if (chat) this.chats.set(chat.id, { ...chat, updatedAt: timestamp });
+    this.creditAccounts.set(account.id, nextAccount);
+    this.creditLedger.set(ledger.id, ledger);
+    this.creditQuotes.set(quote.id, nextQuote);
+    this.creditReceipts.set(receipt.id, receipt);
+    return { ok: true, quote: nextQuote, account: nextAccount, ledger, receipt, message };
+  }
+
+  async listCreditQuotes(workspaceId: string, userId: string, limit = 50): Promise<CreditQuote[]> {
+    return [...this.creditQuotes.values()]
+      .filter((quote) => quote.workspaceId === workspaceId && quote.userId === userId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .slice(0, Math.max(1, Math.min(limit, 100)));
+  }
+
+  async listCreditReceipts(workspaceId: string, userId: string, limit = 50): Promise<CreditReceipt[]> {
+    return [...this.creditReceipts.values()]
+      .filter((receipt) => receipt.workspaceId === workspaceId && receipt.userId === userId)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       .slice(0, Math.max(1, Math.min(limit, 100)));
   }

@@ -31,6 +31,8 @@ channels:
     messages:
       chatMessage:
         $ref: '#/components/messages/ChatMessage'
+      chatReceipt:
+        $ref: '#/components/messages/ChatReceipt'
       chatUpdated:
         $ref: '#/components/messages/ChatUpdated'
       heartbeat:
@@ -43,6 +45,7 @@ operations:
     summary: Receive persisted chat and heartbeat events.
     messages:
       - $ref: '#/channels/chat/messages/chatMessage'
+      - $ref: '#/channels/chat/messages/chatReceipt'
       - $ref: '#/channels/chat/messages/chatUpdated'
       - $ref: '#/channels/chat/messages/heartbeat'
 components:
@@ -50,6 +53,11 @@ components:
     ChatMessage:
       name: chat.message
       title: Persisted chat message
+      payload:
+        $ref: '#/components/schemas/ChatEvent'
+    ChatReceipt:
+      name: chat.receipt
+      title: Non-transferable PWRC settlement receipt
       payload:
         $ref: '#/components/schemas/ChatEvent'
     ChatUpdated:
@@ -69,7 +77,7 @@ components:
       properties:
         type:
           type: string
-          enum: [chat.message, chat.updated, system.heartbeat]
+          enum: [chat.message, chat.receipt, chat.updated, system.heartbeat]
         chatId:
           type: string
         payload: {}

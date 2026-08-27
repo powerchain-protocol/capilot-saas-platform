@@ -3,6 +3,22 @@
 
 This directory is the repository-owned Postman source for PowerChain Copilot API v1.
 
+## Linked PowerChain workspace
+
+This repository is linked to the supplied PowerChain Postman dataset and Spec Hub specification. The canonical human-readable manifest is [`index.yaml`](./index.yaml); machine sync configuration lives in [`remote.json`](./remote.json), with operational guidance in [`REMOTE.md`](./REMOTE.md). Local OpenAPI remains the deterministic build source; Postman is the collaboration/publishing target.
+
+```bash
+pnpm postman:remote
+pnpm postman:remote:verify
+pnpm postman:dataset
+POSTMAN_API_KEY=... pnpm postman:spec:pull
+POSTMAN_API_KEY=... pnpm postman:spec:push
+```
+
+Canonical Postman specification URL:
+
+<https://crimson-crescent-8585.postman.co/workspace/55a50a8b-cdb7-46f5-807e-3494d0262565/specification/1e9bfbeb-cf59-4af3-a51f-25dce5bbe9c9/file/cc65a18c-43aa-41b0-8fee-bf8f6f18ebea>
+
 ## Import order
 
 1. Import `PowerChain-Copilot.postman_collection.json`.
@@ -20,6 +36,7 @@ The collection stores the `pc_session` HttpOnly cookie in Postman's cookie jar a
 - `approval-actions.json` — explicit governed mutation cases.
 - `market-prices.json` — Pyth/Birdeye/auto provider cases; replace placeholder feed IDs before live execution.
 - `registration.json` — non-production account creation examples.
+- `credits.json` — deterministic quote/receipt expectations for PWRC completed-response billing.
 
 Never point mutation datasets at a production workspace unless the records and approvals are explicitly disposable test data.
 

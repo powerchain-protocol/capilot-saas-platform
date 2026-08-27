@@ -4,7 +4,7 @@ import { wsEndpoints } from "./endpoints";
 import type { ApiMessage } from "./types";
 
 export type ChatWsEvent = {
-  type: "chat.message" | "chat.updated" | "system.heartbeat";
+  type: "chat.message" | "chat.receipt" | "chat.updated" | "system.heartbeat";
   chatId?: string;
   payload: unknown;
   timestamp: string;
@@ -19,7 +19,7 @@ export type ChatRealtimeOptions = {
 function parseEvent(value: string): ChatWsEvent | null {
   try {
     const parsed = JSON.parse(value) as Partial<ChatWsEvent>;
-    if (parsed.type !== "chat.message" && parsed.type !== "chat.updated" && parsed.type !== "system.heartbeat") return null;
+    if (parsed.type !== "chat.message" && parsed.type !== "chat.receipt" && parsed.type !== "chat.updated" && parsed.type !== "system.heartbeat") return null;
     if (typeof parsed.timestamp !== "string") return null;
     return { type: parsed.type, chatId: typeof parsed.chatId === "string" ? parsed.chatId : undefined, payload: parsed.payload, timestamp: parsed.timestamp };
   } catch {

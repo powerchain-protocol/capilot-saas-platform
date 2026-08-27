@@ -20,7 +20,7 @@
     "format:check": "prettier --check .",
     "approve-builds": "pnpm approve-builds",
     "frontend": "pnpm --filter @powerchain/capilot-frontend",
-    "verify": "pnpm api:generate:check && pnpm check:source && pnpm typecheck && pnpm lint && pnpm build",
+    "verify": "pnpm postman:remote:verify && pnpm api:generate:check && pnpm check:api-dx && pnpm check:schema && pnpm check:imports && pnpm check:source && pnpm typecheck && pnpm lint && pnpm build",
     "doctor": "node scripts/doctor.mjs",
     "check:source": "node scripts/check-source.mjs",
     "ui:add": "pnpm dlx shadcn@latest add",
@@ -34,7 +34,17 @@
     "sdk:check": "pnpm --filter @powerchain/copilot-sdk check",
     "api:generate": "node api-generator/generate.mjs",
     "api:generate:check": "node api-generator/generate.mjs --check",
-    "api:key:hash": "node scripts/hash-api-key.mjs"
+    "api:key:hash": "node scripts/hash-api-key.mjs",
+    "check:api-dx": "node scripts/check-api-dx.mjs",
+    "check:schema": "node scripts/check-schema-snapshot.mjs",
+    "check:imports": "node scripts/check-imports.mjs",
+    "postman:remote": "node scripts/postman-remote.mjs info",
+    "postman:remote:verify": "node scripts/postman-remote.mjs verify",
+    "postman:spec:pull": "node scripts/postman-remote.mjs pull-spec",
+    "postman:spec:push": "node scripts/postman-remote.mjs push-spec",
+    "postman:dataset": "node scripts/postman-remote.mjs dataset get",
+    "postman:dataset:sources": "node scripts/postman-remote.mjs dataset sources",
+    "postman:dataset:views": "node scripts/postman-remote.mjs dataset views"
   },
   "devDependencies": {
     "eslint": "10.9.1",

@@ -31,6 +31,8 @@ export const endpoints = {
   marketPrice: `${API_BASE}/market/price`,
   credits: `${API_BASE}/credits`,
   creditLedger: `${API_BASE}/credits/ledger`,
+  creditQuotes: `${API_BASE}/credits/quotes`,
+  creditReceipts: `${API_BASE}/credits/receipts`,
   tokens: `${API_BASE}/tokens`,
   pwrcToken: `${API_BASE}/tokens/pwrc`,
   solanaNetwork: `${API_BASE}/network/solana`,

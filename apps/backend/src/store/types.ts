@@ -27,6 +27,7 @@ export type CreditAccount = {
   updatedAt: string;
 };
 export type CreditLedgerKind = "fund" | "reserve" | "settle" | "release";
+export type CreditQuoteStatus = "quoted" | "reserved" | "settled" | "released" | "expired";
 export type CreditLedgerEntry = {
   id: string;
   accountId: string;
@@ -38,6 +39,47 @@ export type CreditLedgerEntry = {
   reference: string;
   createdAt: string;
 };
+
+
+export type CreditQuote = {
+  id: string;
+  accountId: string;
+  workspaceId: string;
+  userId: string;
+  chatId: string;
+  requestMessageId: string;
+  responseMessageId: string | null;
+  asset: "PWRC";
+  amount: string;
+  pricingVersion: "pwrc-message-v1";
+  canonicalPayload: string;
+  quoteHash: string;
+  status: CreditQuoteStatus;
+  expiresAt: string;
+  createdAt: string;
+  updatedAt: string;
+};
+export type CreditReceipt = {
+  id: string;
+  quoteId: string;
+  accountId: string;
+  workspaceId: string;
+  userId: string;
+  chatId: string;
+  responseMessageId: string;
+  quoteHash: string;
+  amount: string;
+  reservationLedgerId: string;
+  settlementLedgerId: string;
+  transferable: false;
+  createdAt: string;
+};
+export type CreditReservationResult =
+  | { ok: true; quote: CreditQuote; account: CreditAccount; ledger: CreditLedgerEntry }
+  | { ok: false; reason: "not_found" | "invalid_state" | "expired" | "insufficient"; available?: string; required?: string };
+export type CreditSettlementResult =
+  | { ok: true; quote: CreditQuote; account: CreditAccount; ledger: CreditLedgerEntry; receipt: CreditReceipt; message: Message }
+  | { ok: false; reason: "not_found" | "invalid_state" };
 
 export type AccountBundle = { user: User; workspace: Workspace; membership: Membership };
 
@@ -69,4 +111,11 @@ export interface Store {
   addContact(input: Omit<ContactRequest, "id" | "createdAt">): Promise<ContactRequest>;
   getCreditAccount(workspaceId: string, userId: string): Promise<CreditAccount>;
   listCreditLedger(workspaceId: string, userId: string, limit?: number): Promise<CreditLedgerEntry[]>;
+  createCreditQuote(input: Omit<CreditQuote, "id" | "accountId" | "status" | "createdAt" | "updatedAt" | "responseMessageId">): Promise<CreditQuote>;
+  reserveCreditQuote(quoteId: string, workspaceId: string, userId: string): Promise<CreditReservationResult>;
+  releaseCreditQuote(quoteId: string, workspaceId: string, userId: string, reference: string): Promise<boolean>;
+  releaseStaleCreditReservations(staleBefore: string, limit?: number): Promise<number>;
+  completeCreditSettledMessage(input: { quoteId: string; chatId: string; workspaceId: string; userId: string; content: string }): Promise<CreditSettlementResult>;
+  listCreditQuotes(workspaceId: string, userId: string, limit?: number): Promise<CreditQuote[]>;
+  listCreditReceipts(workspaceId: string, userId: string, limit?: number): Promise<CreditReceipt[]>;
 }

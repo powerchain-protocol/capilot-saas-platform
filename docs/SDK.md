@@ -33,9 +33,9 @@ const socket = connectChatSocket({
 
 If WebSocket connectivity fails, applications should fall back to HTTP chat reads. Do not infer missing events.
 
-## Server-side note
+## Authentication model
 
-The v1 auth contract is browser cookie based. The SDK does not invent API-key or bearer-token authentication. A future machine credential should be introduced as an explicit backend contract before server-to-server authenticated use.
+External v1 requests use `X-Api-Key`. User/workspace calls additionally use the signed `pc_session` cookie. Server-side clients should supply `apiKey`; browser applications should normally use the same-origin Next.js gateway so the raw key never reaches browser JavaScript.
 
 ## API-key client
 
@@ -47,4 +47,16 @@ The default API host is `https://api.capilot.powerchain.energy`; SDK methods tar
 
 ## Credits
 
-The TypeScript client includes `credits()`, `creditLedger()`, `tokens()`, and `pwrcToken()`. Supply an API key with `new PowerChainClient({ apiKey })`; the SDK targets `/v1` on the configured base host.
+The TypeScript client includes `credits()`, `creditLedger()`, `creditQuotes()`, `creditReceipts()`, `tokens()`, and `pwrcToken()`. Supply an API key with `new PowerChainClient({ apiKey })`; the SDK targets `/v1` on the configured base host.
+
+### Verify a completed-response receipt
+
+```ts
+const response = await client.sendMessage(chat.id, "Summarize asset health.");
+console.log(response.billing.quote.quoteHash);
+console.log(response.billing.receipt.id);
+
+const receipts = await client.creditReceipts();
+```
+
+Receipts are non-transferable audit evidence.

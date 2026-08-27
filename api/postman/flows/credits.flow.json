@@ -1,7 +1,7 @@
 {
   "name": "PWRC credits and token metadata",
   "version": "1.0.0",
-  "description": "Read-only developer flow for authenticated credits and public token metadata.",
+  "description": "Authenticate, inspect PWRC credits, submit a Copilot message, then verify deterministic quote and non-transferable receipt evidence.",
   "steps": [
     {
       "id": "sign-in",
@@ -27,6 +27,16 @@
     {
       "id": "token",
       "request": "PWRC token"
+    },
+    {
+      "id": "list-quotes",
+      "request": "GET /v1/credits/quotes",
+      "expects": "latest quote status settled and SHA-256 quoteHash"
+    },
+    {
+      "id": "list-receipts",
+      "request": "GET /v1/credits/receipts",
+      "expects": "receipt links quoteHash, reservation ledger, settlement ledger, and response message"
     }
   ]
 }

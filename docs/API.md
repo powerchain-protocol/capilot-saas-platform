@@ -40,6 +40,12 @@ GET    /api/v1/services
 GET    /api/v1/market/price
 GET    /api/v1/network/solana
 POST   /api/v1/contact
+GET    /api/v1/credits
+GET    /api/v1/credits/ledger
+GET    /api/v1/credits/quotes
+GET    /api/v1/credits/receipts
+GET    /api/v1/tokens
+GET    /api/v1/tokens/pwrc
 WS     /ws/v1/chat/:id
 ```
 
@@ -85,7 +91,7 @@ Do not scatter literal API URLs through components.
 }
 ```
 
-Supported event types currently include `chat.message`, `chat.updated`, and `system.heartbeat`.
+Supported event types include `chat.message`, `chat.receipt`, `chat.updated`, and `system.heartbeat`. `chat.receipt` is emitted only after the response message and PWRC settlement are durably committed.
 
 
 ## Developer artifacts
@@ -102,3 +108,18 @@ Supported event types currently include `chat.message`, `chat.updated`, and `sys
 The external v1 surface is available at `https://api.capilot.powerchain.energy/v1` with the app-gateway fallback `https://capilot.powerchain.app/v1`. Requests require `X-Api-Key`. User/workspace endpoints also require the signed `pc_session` HttpOnly cookie. The Next.js frontend uses same-origin `/api/v1` and injects the server-side key in its proxy; the key is never exposed through `NEXT_PUBLIC_*`.
 
 Use `pnpm api:key:hash -- <key>` to create the SHA-256 value stored in `POWERCHAIN_API_KEY_HASHES`.
+
+## Completed-response billing
+
+`POST /v1/chat/{id}/messages` and `POST /v1/copilot` enforce the 10,000 PWRC completed-response lifecycle. The server persists the canonical quote before reservation, uses atomic account updates, and settles the delivered assistant message in the same persistence transaction as the settlement ledger/receipt.
+
+- `402 INSUFFICIENT_CREDITS` means no AI generation was started.
+- Provider/generation failure releases a reservation.
+- Successful responses expose `X-PowerChain-Quote-Id`, `X-PowerChain-Quote-Hash`, and `X-PowerChain-Receipt-Id`.
+- `GET /v1/credits/quotes` exposes deterministic quote evidence.
+- `GET /v1/credits/receipts` exposes non-transferable settlement receipts.
+
+
+## AI preview vs billed chat
+
+`POST /v1/ai/generate` is an optional development/diagnostic preview endpoint. Keep `ALLOW_UNBILLED_AI_PREVIEW=false` in production. Customer-facing completed Copilot responses use `/v1/chat/:id/messages`, which persists the request, creates and hashes a quote, reserves PWRC, generates the response, and atomically settles the delivered message with a non-transferable receipt.

@@ -2,6 +2,7 @@ import type { FastifyInstance, FastifyRequest } from "fastify";
 import { MAX_MESSAGE_LENGTH } from "../../../constants/api";
 import { getStore } from "../../../store";
 import { generateAiReply } from "../../../services/ai";
+import { createCopilotCreditQuote } from "../../../credits";
 import { wsHub } from "../../../ws/hub";
 import { requireAuth } from "../middlewares/auth";
 import { sanitizeText, sendError, sendOk } from "../middlewares/http";
@@ -34,12 +35,72 @@ async function submitMessage(request: FastifyRequest, reply: Parameters<typeof s
   if (!chat) chat = await store.createChat(auth.workspace.id, auth.user.id, titleFromPrompt(prompt));
   const userMessage = await store.addMessage({ chatId: chat.id, workspaceId: auth.workspace.id, userId: auth.user.id, role: "user", content: prompt });
   wsHub.broadcast(chat.id, { type: "chat.message", chatId: chat.id, payload: userMessage, timestamp: new Date().toISOString() });
-  const assets = await store.listAssets(auth.workspace.id);
-  const aiReply = await generateAiReply(prompt, assets);
-  const assistantMessage = await store.addMessage({ chatId: chat.id, workspaceId: auth.workspace.id, userId: auth.user.id, role: "assistant", content: aiReply.text });
-  await store.addActivity(auth.workspace.id, "copilot", "Copilot analysis completed", `${aiReply.mode} response · 10,000 PWRC representative credit`);
-  wsHub.broadcast(chat.id, { type: "chat.message", chatId: chat.id, payload: assistantMessage, timestamp: new Date().toISOString() });
-  return sendOk(reply, { chat, userMessage, message: assistantMessage, mode: aiReply.mode, text: aiReply.text, actions: aiReply.actions });
+
+  // Billing invariant: persist the deterministic server quote before attempting an atomic reservation.
+  const quote = await createCopilotCreditQuote({
+    workspaceId: auth.workspace.id,
+    userId: auth.user.id,
+    chatId: chat.id,
+    requestMessageId: userMessage.id,
+  });
+  const reservation = await store.reserveCreditQuote(quote.id, auth.workspace.id, auth.user.id);
+  if (!reservation.ok) {
+    if (reservation.reason === "insufficient") {
+      reply.header("x-powerchain-quote-id", quote.id);
+      reply.header("x-powerchain-quote-hash", quote.quoteHash);
+      return sendError(reply, "Insufficient PWRC credits for a completed Copilot response.", 402, "INSUFFICIENT_CREDITS");
+    }
+    return sendError(reply, "Unable to reserve PWRC credits for this response.", 409, `CREDIT_${reservation.reason.toUpperCase()}`);
+  }
+
+  let aiReply: Awaited<ReturnType<typeof generateAiReply>>;
+  try {
+    const assets = await store.listAssets(auth.workspace.id);
+    aiReply = await generateAiReply(prompt, assets);
+  } catch (error) {
+    await store.releaseCreditQuote(quote.id, auth.workspace.id, auth.user.id, "ai_generation_failed");
+    throw error;
+  }
+
+  // Persist the delivered assistant message and settle the reservation in one store transaction.
+  // A thrown storage error must not strand a reservation: the settlement transaction rolls
+  // back first, then we attempt an explicit compensating release before returning failure.
+  let settlement: Awaited<ReturnType<typeof store.completeCreditSettledMessage>>;
+  try {
+    settlement = await store.completeCreditSettledMessage({
+      quoteId: quote.id,
+      chatId: chat.id,
+      workspaceId: auth.workspace.id,
+      userId: auth.user.id,
+      content: aiReply.text,
+    });
+  } catch (error) {
+    request.log.error({ err: error, quoteId: quote.id }, "credit settlement transaction failed");
+    await store.releaseCreditQuote(quote.id, auth.workspace.id, auth.user.id, "settlement_exception").catch((releaseError) => {
+      request.log.error({ err: releaseError, quoteId: quote.id }, "credit reservation compensation failed");
+    });
+    return sendError(reply, "The response completed but credit settlement could not be committed. No response was delivered.", 503, "CREDIT_SETTLEMENT_FAILED");
+  }
+  if (!settlement.ok) {
+    await store.releaseCreditQuote(quote.id, auth.workspace.id, auth.user.id, "settlement_failed");
+    return sendError(reply, "The response completed but credit settlement could not be committed. No response was delivered.", 503, "CREDIT_SETTLEMENT_FAILED");
+  }
+
+  await store.addActivity(auth.workspace.id, "billing", "Copilot response settled", `${settlement.receipt.amount} PWRC · receipt ${settlement.receipt.id}`);
+  wsHub.broadcast(chat.id, { type: "chat.message", chatId: chat.id, payload: settlement.message, timestamp: new Date().toISOString() });
+  wsHub.broadcast(chat.id, { type: "chat.receipt", chatId: chat.id, payload: settlement.receipt, timestamp: new Date().toISOString() });
+  reply.header("x-powerchain-quote-id", settlement.quote.id);
+  reply.header("x-powerchain-quote-hash", settlement.quote.quoteHash);
+  reply.header("x-powerchain-receipt-id", settlement.receipt.id);
+  return sendOk(reply, {
+    chat,
+    userMessage,
+    message: settlement.message,
+    mode: aiReply.mode,
+    text: aiReply.text,
+    actions: aiReply.actions,
+    billing: { quote: settlement.quote, receipt: settlement.receipt, account: settlement.account },
+  });
 }
 
 export async function registerChatRoutes(app: FastifyInstance): Promise<void> {

@@ -19,7 +19,7 @@ export function connectChatSocket(options: ChatSocketOptions): WebSocket {
       if (!parsed || typeof parsed !== "object") return;
       const candidate = parsed as Record<string, unknown>;
       if (typeof candidate.type !== "string" || typeof candidate.chatId !== "string" || typeof candidate.timestamp !== "string") return;
-      if (candidate.type !== "chat.message" && candidate.type !== "chat.updated" && candidate.type !== "system.heartbeat") return;
+      if (candidate.type !== "chat.message" && candidate.type !== "chat.receipt" && candidate.type !== "chat.updated" && candidate.type !== "system.heartbeat") return;
       options.onEvent({ type: candidate.type, chatId: candidate.chatId, payload: candidate.payload, timestamp: candidate.timestamp });
     } catch { /* malformed realtime frames are ignored */ }
   });

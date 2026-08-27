@@ -2,16 +2,22 @@
   {
     "case": "credits-summary",
     "endpoint": "/v1/credits",
-    "expectedStatus": 200
+    "expectedStatus": 200,
+    "expectedQuoteAmount": "10000",
+    "expectedPricingVersion": "pwrc-message-v1"
   },
   {
     "case": "credits-ledger",
     "endpoint": "/v1/credits/ledger",
-    "expectedStatus": 200
+    "expectedStatus": 200,
+    "expectedQuoteAmount": "10000",
+    "expectedPricingVersion": "pwrc-message-v1"
   },
   {
     "case": "pwrc-token",
     "endpoint": "/v1/tokens/pwrc",
-    "expectedStatus": 200
+    "expectedStatus": 200,
+    "expectedQuoteAmount": "10000",
+    "expectedPricingVersion": "pwrc-message-v1"
   }
 ]

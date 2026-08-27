@@ -1,8 +1,8 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { monorepoRoot } from "./paths.mjs";
 
-const root = process.cwd();
-const contractPath = path.resolve(root, "../../api/openapi/openapi.yaml");
+const contractPath = path.join(monorepoRoot, "api/openapi/openapi.yaml");
 const contract = await fs.readFile(contractPath, "utf8");
 const documented = new Set([...contract.matchAll(/^  (\/[A-Za-z0-9_{}\-/.]+):\s*$/gm)].map((match) => match[1]));
 const required = [
@@ -32,6 +32,8 @@ const required = [
   "/v1/contact",
   "/v1/credits",
   "/v1/credits/ledger",
+  "/v1/credits/quotes",
+  "/v1/credits/receipts",
   "/v1/tokens",
   "/v1/tokens/pwrc",
   "/ws/v1/chat/{id}",

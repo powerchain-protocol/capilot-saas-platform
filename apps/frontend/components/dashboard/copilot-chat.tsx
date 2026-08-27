@@ -1,15 +1,16 @@
 "use client";
 
-import { CheckCircle2, Radio, ShieldCheck } from "lucide-react";
+import { CheckCircle2, FileCheck2, Radio, ShieldCheck } from "lucide-react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { ChatInterface } from "@/components/chat/chat-interface";
 import { ChatSettings, type ChatSettingsValue } from "@/components/chat/chat-settings";
 import { SavedPrompts } from "@/components/messages/saved-prompts";
 import { PwrcIcon } from "@/components/brand/pwrc-icon";
 import { useToast } from "@/components/ui/toast";
-import { connectChatRealtime, powerChainApi, type ApiMessage, type ChatWsEvent } from "@/lib/powerchain";
+import { connectChatRealtime, powerChainApi, PowerChainApiError, type ApiMessage, type ChatWsEvent } from "@/lib/powerchain";
 import type { ChatMessage, MessageAction } from "@/types/messages";
 import type { PromptDefinition } from "@/types/prompts";
+import type { CreditReceipt } from "@/types/credits";
 
 const defaultSettings: ChatSettingsValue = {
   concise: true,
@@ -51,6 +52,8 @@ export function CopilotChat() {
   const [error, setError] = useState("");
   const [draft, setDraft] = useState("");
   const [settings, setSettings] = useState<ChatSettingsValue>(defaultSettings);
+  const [lastReceipt, setLastReceipt] = useState<CreditReceipt | null>(null);
+  const [creditAvailable, setCreditAvailable] = useState<string | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
@@ -61,9 +64,14 @@ export function CopilotChat() {
       try {
         const chats = await powerChainApi.listChats();
         const chat = chats[0] ?? await powerChainApi.createChat("PowerChain Copilot");
-        const history = await powerChainApi.getChat(chat.id);
+        const [history, credits] = await Promise.all([
+          powerChainApi.getChat(chat.id),
+          powerChainApi.getCredits(),
+        ]);
         if (!active) return;
         setChatId(chat.id);
+        setCreditAvailable(credits.account.available);
+        setLastReceipt(credits.latestReceipt);
         setMessages(history.messages.map(toChatMessage).filter((message): message is ChatMessage => message !== null));
       } catch (reason) {
         if (!active) return;
@@ -81,6 +89,11 @@ export function CopilotChat() {
     return connectChatRealtime(chatId, {
       onStatus: setTransport,
       onEvent: (event: ChatWsEvent) => {
+        if (event.type === "chat.receipt") {
+          const payload = event.payload as CreditReceipt;
+          if (payload && typeof payload.id === "string" && typeof payload.quoteHash === "string") setLastReceipt(payload);
+          return;
+        }
         if (event.type !== "chat.message" || !isApiMessage(event.payload)) return;
         const converted = toChatMessage(event.payload);
         if (converted) setMessages((current) => mergeMessages(current, [converted]));
@@ -117,6 +130,8 @@ export function CopilotChat() {
       const userMessage = toChatMessage(result.userMessage);
       const assistantMessage = toChatMessage(result.message);
       setMode(result.mode);
+      setLastReceipt(result.billing.receipt);
+      setCreditAvailable(result.billing.account.available);
       setActions(settings.includeSuggestedActions ? result.actions.map((action) => ({ label: action.label, href: action.href })) : []);
       setMessages((current) => {
         const withoutLocal = current.filter((item) => item.id !== localId);
@@ -124,9 +139,15 @@ export function CopilotChat() {
       });
     } catch (reason) {
       const messageText = reason instanceof Error ? reason.message : "Copilot request failed.";
+      const insufficientCredits = reason instanceof PowerChainApiError && reason.code === "INSUFFICIENT_CREDITS";
       setMessages((current) => current.map((item) => item.id === localId ? { ...item, status: "failed" } : item));
       setError(messageText);
-      toast({ title: "Copilot unavailable", description: messageText, tone: "error" });
+      toast({
+        title: insufficientCredits ? "PWRC credits required" : "Copilot unavailable",
+        description: messageText,
+        tone: "error",
+        ...(insufficientCredits ? { action: { label: "View credits", onClick: () => { window.location.href = "/dashboard/credits"; } } } : {}),
+      });
     } finally {
       setLoading(false);
     }
@@ -145,7 +166,7 @@ export function CopilotChat() {
       </section>
 
       <aside className="space-y-4">
-        <div className="pc-card p-5"><h2 className="text-xs font-bold">Execution boundary</h2><div className="mt-4 space-y-3 text-[11px] leading-5 text-[var(--muted)]"><p className="flex gap-2"><ShieldCheck className="mt-0.5 size-4 shrink-0 text-[var(--success)]" />Copilot can analyze and recommend. Approval remains explicit.</p><p className="flex gap-2"><PwrcIcon size={17} />Representative completed-response charge: 10,000 PWRC.</p></div></div>
+        <div className="pc-card p-5"><h2 className="text-xs font-bold">Execution boundary</h2><div className="mt-4 space-y-3 text-[11px] leading-5 text-[var(--muted)]"><p className="flex gap-2"><ShieldCheck className="mt-0.5 size-4 shrink-0 text-[var(--success)]" />Copilot can analyze and recommend. Approval remains explicit.</p><p className="flex gap-2"><PwrcIcon size={17} />Completed response: 10,000 PWRC credits.{creditAvailable ? ` ${BigInt(creditAvailable).toLocaleString("en-US")} available.` : ""}</p>{lastReceipt ? <p className="flex gap-2"><FileCheck2 className="mt-0.5 size-4 shrink-0 text-[var(--green)]"/><span>Settled receipt <b className="font-mono text-[var(--ink)]">{lastReceipt.id}</b> · non-transferable audit evidence.</span></p> : null}</div></div>
         <div className="pc-card p-5"><h2 className="text-xs font-bold">Saved prompts</h2><div className="mt-3"><SavedPrompts onSelect={choosePrompt} /></div></div>
         <div className="pc-card p-5"><div className="flex items-center gap-2 text-xs font-bold"><CheckCircle2 className="size-4 text-[var(--success)]" />Context-aware</div><p className="mt-2 text-[10px] leading-5 text-[var(--muted)]">Responses use the authenticated workspace boundary rather than client-supplied balances, approvals, or settlement state.</p></div>
       </aside>

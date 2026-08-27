@@ -1,10 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import process from "node:process";
-
-const root = process.cwd();
-const sourceRoot = root;
-const publicRoot = path.join(root, "public");
+import { frontendRoot, publicRoot } from "./paths.mjs";
 
 async function walk(directory) {
   const output = [];
@@ -16,21 +12,18 @@ async function walk(directory) {
   }
   return output;
 }
-
 const refs = new Set();
-for (const file of await walk(sourceRoot)) {
+for (const file of await walk(frontendRoot)) {
   const text = await fs.readFile(file, "utf8");
   const matches = text.matchAll(/["'`](\/(?:icons|images|apple-icon|favicon|openapi)[^"'`?#]*)["'`]/g);
   for (const match of matches) refs.add(match[1]);
 }
-
 const missing = [];
 for (const ref of refs) {
   const relative = ref === "/favicon.ico" ? "favicon.ico" : ref.slice(1);
   try { await fs.access(path.join(publicRoot, relative)); }
   catch { missing.push(ref); }
 }
-
 if (missing.length) {
   console.error("Missing public assets:\n" + missing.map((item) => `- ${item}`).join("\n"));
   process.exit(1);

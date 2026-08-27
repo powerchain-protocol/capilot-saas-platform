@@ -1,24 +1,7 @@
 {
   "ok": true,
-  "data": {
-    "account": {
-      "id": "crd_0123456789abcdef0123456789abcdef",
-      "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
-      "userId": "usr_0123456789abcdef0123456789abcdef",
-      "asset": "PWRC",
-      "decimals": 9,
-      "available": "990000",
-      "reserved": "0",
-      "spent": "10000",
-      "funded": "1000000",
-      "updatedAt": "2026-08-27T06:00:01.000Z"
-    },
-    "pricing": {
-      "completedResponsePwrc": "10000",
-      "pricingVersion": "pwrc-message-v1"
-    },
-    "lifecycle": ["quote", "reserve", "deliver", "settle", "receipt"],
-    "latestReceipt": {
+  "data": [
+    {
       "id": "rcp_0123456789abcdef0123456789abcdef",
       "quoteId": "qt_0123456789abcdef0123456789abcdef",
       "accountId": "crd_0123456789abcdef0123456789abcdef",
@@ -33,5 +16,5 @@
       "transferable": false,
       "createdAt": "2026-08-27T06:00:01.000Z"
     }
-  }
+  ]
 }

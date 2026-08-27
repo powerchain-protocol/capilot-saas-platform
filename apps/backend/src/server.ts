@@ -1,16 +1,17 @@
-import { resolve } from "node:path";
 import Fastify, { type FastifyInstance } from "fastify";
 import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import websocket from "@fastify/websocket";
 import { env, assertProductionConfiguration } from "./config/env";
-import { API_PREFIX, PUBLIC_API_PREFIX, PUBLIC_API_ORIGIN, APP_API_ORIGIN } from "./constants/api";
+import { openApiBaseDir, openApiPath } from "./config/paths";
+import { API_PREFIX, PUBLIC_API_PREFIX, PUBLIC_API_ORIGIN, APP_API_ORIGIN, APP_VERSION } from "./constants/api";
 import { registerApiV1 } from "./api/v1";
 import { registerWebSocketRoutes } from "./ws/routes";
 import { ApiError, sendError } from "./api/v1/middlewares/http";
 import { createRequestContext } from "./context/request-context";
 import { requireApiKey } from "./api/v1/middlewares/security";
+import { getStore } from "./store";
 
 export async function buildServer(): Promise<FastifyInstance> {
   assertProductionConfiguration();
@@ -35,14 +36,14 @@ export async function buildServer(): Promise<FastifyInstance> {
     credentials: true,
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["content-type", "authorization", "x-request-id", "x-api-key"],
-    exposedHeaders: ["x-request-id"]
+    exposedHeaders: ["x-request-id", "x-powerchain-api-version", "x-powerchain-quote-id", "x-powerchain-quote-hash", "x-powerchain-receipt-id"]
   });
 
   await app.register(swagger, {
     mode: "static",
     specification: {
-      path: resolve(process.cwd(), "../../api/openapi/openapi.yaml"),
-      baseDir: resolve(process.cwd(), "../../api/openapi")
+      path: openApiPath,
+      baseDir: openApiBaseDir
     }
   });
   await app.register(swaggerUi, {
@@ -51,10 +52,31 @@ export async function buildServer(): Promise<FastifyInstance> {
   });
   await app.register(websocket, { options: { maxPayload: 64 * 1024 } });
 
+  let creditReconcileTimer: ReturnType<typeof setInterval> | null = null;
+  const reconcileStaleCredits = async (): Promise<void> => {
+    const staleBefore = new Date(Date.now() - env.creditReservationRecoveryMs).toISOString();
+    try {
+      const released = await getStore().releaseStaleCreditReservations(staleBefore, 100);
+      if (released > 0) app.log.warn({ released, staleBefore }, "released stale PWRC credit reservations");
+    } catch (error) {
+      app.log.error({ err: error, staleBefore }, "PWRC stale-reservation reconciliation failed");
+    }
+  };
+  app.addHook("onReady", async () => {
+    await reconcileStaleCredits();
+    creditReconcileTimer = setInterval(() => { void reconcileStaleCredits(); }, env.creditReconcileIntervalMs);
+    creditReconcileTimer.unref?.();
+  });
+  app.addHook("onClose", async () => {
+    if (creditReconcileTimer) clearInterval(creditReconcileTimer);
+    creditReconcileTimer = null;
+  });
+
   app.addHook("onRequest", async (request, reply) => {
     if (request.method !== "OPTIONS" && (request.url.startsWith(`${API_PREFIX}/`) || request.url.startsWith(`${PUBLIC_API_PREFIX}/`))) requireApiKey(request);
     const context = createRequestContext(request);
     reply.header("x-request-id", context.requestId);
+    reply.header("x-powerchain-api-version", APP_VERSION);
     reply.header("x-content-type-options", "nosniff");
     reply.header("referrer-policy", "strict-origin-when-cross-origin");
     reply.header("cache-control", "no-store");
@@ -70,7 +92,7 @@ export async function buildServer(): Promise<FastifyInstance> {
 
   app.get("/", async () => ({
     name: "PowerChain Copilot API",
-    version: "1.0.0",
+    version: APP_VERSION,
     api: API_PREFIX,
     publicApi: `${PUBLIC_API_ORIGIN}${PUBLIC_API_PREFIX}`,
     appGateway: `${APP_API_ORIGIN}${PUBLIC_API_PREFIX}`,

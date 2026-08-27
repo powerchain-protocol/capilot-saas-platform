@@ -36,6 +36,53 @@
         "label": "Open assets",
         "href": "/dashboard/assets"
       }
-    ]
+    ],
+    "billing": {
+      "quote": {
+        "id": "qt_0123456789abcdef0123456789abcdef",
+        "accountId": "crd_0123456789abcdef0123456789abcdef",
+        "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+        "userId": "usr_0123456789abcdef0123456789abcdef",
+        "chatId": "cht_0123456789abcdef0123456789abcdef",
+        "requestMessageId": "msg_11111111111111111111111111111111",
+        "responseMessageId": "msg_22222222222222222222222222222222",
+        "asset": "PWRC",
+        "amount": "10000",
+        "pricingVersion": "pwrc-message-v1",
+        "canonicalPayload": "{\"amount\":\"10000\",\"asset\":\"PWRC\",\"chatId\":\"cht_0123456789abcdef0123456789abcdef\",\"expiresAt\":\"2026-08-27T06:05:00.000Z\",\"issuedAt\":\"2026-08-27T06:00:00.000Z\",\"pricingVersion\":\"pwrc-message-v1\",\"purpose\":\"completed_copilot_response\",\"requestMessageId\":\"msg_11111111111111111111111111111111\",\"userId\":\"usr_0123456789abcdef0123456789abcdef\",\"version\":\"1.0.0\",\"workspaceId\":\"wsp_0123456789abcdef0123456789abcdef\"}",
+        "quoteHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "status": "settled",
+        "expiresAt": "2026-08-27T06:05:00.000Z",
+        "createdAt": "2026-08-27T06:00:00.000Z",
+        "updatedAt": "2026-08-27T06:00:01.000Z"
+      },
+      "receipt": {
+        "id": "rcp_0123456789abcdef0123456789abcdef",
+        "quoteId": "qt_0123456789abcdef0123456789abcdef",
+        "accountId": "crd_0123456789abcdef0123456789abcdef",
+        "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+        "userId": "usr_0123456789abcdef0123456789abcdef",
+        "chatId": "cht_0123456789abcdef0123456789abcdef",
+        "responseMessageId": "msg_22222222222222222222222222222222",
+        "quoteHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "amount": "10000",
+        "reservationLedgerId": "clg_22222222222222222222222222222222",
+        "settlementLedgerId": "clg_33333333333333333333333333333333",
+        "transferable": false,
+        "createdAt": "2026-08-27T06:00:01.000Z"
+      },
+      "account": {
+        "id": "crd_0123456789abcdef0123456789abcdef",
+        "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+        "userId": "usr_0123456789abcdef0123456789abcdef",
+        "asset": "PWRC",
+        "decimals": 9,
+        "available": "990000",
+        "reserved": "0",
+        "spent": "10000",
+        "funded": "1000000",
+        "updatedAt": "2026-08-27T06:00:01.000Z"
+      }
+    }
   }
 }

@@ -1,11 +1,9 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { appRoot, dashboardRoot } from "./paths.mjs";
 
-const root = process.cwd();
-const registryPath = path.resolve(root, "../dashboard/actions.json");
-const appRoot = path.join(root, "app");
+const registryPath = path.join(dashboardRoot, "actions.json");
 const registry = JSON.parse(await fs.readFile(registryPath, "utf8"));
-
 async function walk(directory) {
   const output = [];
   for (const entry of await fs.readdir(directory, { withFileTypes: true })) {
@@ -20,7 +18,6 @@ function routeFromPage(file) {
   return segments.length ? `/${segments.join("/")}` : "/";
 }
 const routes = new Set((await walk(appRoot)).map(routeFromPage));
-
 if (registry.version !== "1.0.0" || !Array.isArray(registry.actions)) {
   console.error("Dashboard action registry must use canonical version 1.0.0 and contain an actions array.");
   process.exit(1);
@@ -36,5 +33,8 @@ for (const action of registry.actions) {
   else if (!routes.has(action.route)) problems.push(`${action.id ?? "unknown"}: route has no page (${action.route})`);
   if (action.risk === "high" && action.requiresApproval !== true) problems.push(`${action.id ?? "unknown"}: high-risk actions must require approval`);
 }
-if (problems.length) { console.error("Action registry audit failed:\n" + problems.map((problem) => `- ${problem}`).join("\n")); process.exit(1); }
+if (problems.length) {
+  console.error("Action registry audit failed:\n" + problems.map((problem) => `- ${problem}`).join("\n"));
+  process.exit(1);
+}
 console.log(`Action registry audit passed (${registry.actions.length} actions).`);

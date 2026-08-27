@@ -1,6 +1,6 @@
 
 import { PowerChainSdkError } from "./errors";
-import type { ApiEnvelope, AiResponse, Approval, Asset, Chat, CreditsSnapshot, CreditLedgerEntry, HealthSnapshot, Message, SendMessageResponse, ServiceHealth, Session, SessionContext, SessionSecurity, TokenDescriptor } from "./types";
+import type { ApiEnvelope, AiResponse, Approval, Asset, Chat, CreditsSnapshot, CreditLedgerEntry, CreditQuote, CreditReceipt, HealthSnapshot, Message, SendMessageResponse, ServiceHealth, Session, SessionContext, SessionSecurity, TokenDescriptor } from "./types";
 
 export type PowerChainClientOptions = {
   baseUrl?: string;
@@ -63,6 +63,8 @@ export class PowerChainClient {
   message(id: string): Promise<Message> { return this.request(`/v1/messages/${pathSegment(id)}`); }
   credits(): Promise<CreditsSnapshot> { return this.request("/v1/credits"); }
   creditLedger(): Promise<CreditLedgerEntry[]> { return this.request("/v1/credits/ledger"); }
+  creditQuotes(): Promise<CreditQuote[]> { return this.request("/v1/credits/quotes"); }
+  creditReceipts(): Promise<CreditReceipt[]> { return this.request("/v1/credits/receipts"); }
   tokens(): Promise<TokenDescriptor[]> { return this.request("/v1/tokens"); }
   pwrcToken(): Promise<TokenDescriptor> { return this.request("/v1/tokens/pwrc"); }
   services(): Promise<ServiceHealth[]> { return this.request("/v1/services"); }

@@ -2,6 +2,12 @@
 
 All notable changes to PowerChain Copilot are documented here. The product remains on the canonical `1.0.0` release line until an intentional release is cut.
 
+## Postman manifest refinement
+
+- Added `api/postman/index.yaml` as the canonical human-readable Postman workspace/specification manifest.
+- Updated the specification URL to the supplied workspace URL without the display-name segment.
+- Extended API DX validation to prevent Postman workspace/specification identifiers and URLs from drifting.
+
 ## [1.0.0] - 2026-08-27
 
 ### Added
@@ -38,6 +44,13 @@ All notable changes to PowerChain Copilot are documented here. The product remai
 - Replaced frontend server-side session coupling with an authenticated session API gate.
 - Updated README, contribution rules, API documentation, setup guidance, and deployment notes for the split frontend/backend architecture.
 
+### Postman workspace linkage
+
+- Linked the repository to the supplied PowerChain Postman workspace, dataset `6c7b04bd-20bf-45b8-8184-eba0156fa433`, specification `1e9bfbeb-cf59-4af3-a51f-25dce5bbe9c9`, and specification file `cc65a18c-43aa-41b0-8fee-bf8f6f18ebea`.
+- Added `api/postman/remote.json` plus safe local validation, cloud-dataset inspection, specification snapshot pull, and explicit specification push commands.
+- Kept repository OpenAPI as the deterministic build-time source while treating Postman Spec Hub as the collaboration/publishing target.
+- Extended API DX validation so remote workspace identifiers and URLs cannot silently drift.
+
 ### Security
 
 - Provider credentials are backend-only.
@@ -58,3 +71,17 @@ All notable changes to PowerChain Copilot are documented here. The product remai
 - Added token-metadata endpoints and typed PWRC token configuration.
 - Added public-key-only Solana wallet registry files with explicit secret-material exclusions.
 - Updated Postman, OpenAPI, AsyncAPI, mock server, SDK, README, architecture, API, security, and flow documentation.
+
+### Completed-response billing hardening
+
+- Added deterministic 10,000 PWRC completed-response quotes with canonical payload hashing and five-minute expiry.
+- Added atomic reservation and atomic response/settlement/receipt transactions with append-oriented ledger evidence.
+- Added compensating reservation release for AI failures and settlement transaction failures so failed delivery does not intentionally consume credits.
+- Added HTTP `402` insufficient-credit behavior before AI generation begins.
+- Added quote and receipt APIs, OpenAPI schemas, Postman requests/datasets/flows, mock fixtures, TypeScript SDK methods, and `chat.receipt` AsyncAPI/WebSocket events.
+- Added `docs/CREDITS.md` as the authoritative billing lifecycle and failure-semantics reference.
+- Hardened repository check scripts so frontend audits are independent of the caller's working directory.
+- Added an internal import-resolution audit for relative, frontend `@/`, and backend `@backend/` aliases.
+- Added API DX drift validation covering API-key security, unique OpenAPI operation IDs, configured public API origins, and complete Postman HTTP-operation coverage.
+- Closed the standalone AI-preview billing bypass by disabling `/v1/ai/generate` by default in production and rate-limiting it when explicitly enabled.
+- Added bounded stale-reservation reconciliation with PostgreSQL row locking and compensating ledger releases for crash recovery.

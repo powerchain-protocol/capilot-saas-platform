@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "qt_0123456789abcdef0123456789abcdef",
+      "accountId": "crd_0123456789abcdef0123456789abcdef",
+      "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+      "userId": "usr_0123456789abcdef0123456789abcdef",
+      "chatId": "cht_0123456789abcdef0123456789abcdef",
+      "requestMessageId": "msg_11111111111111111111111111111111",
+      "responseMessageId": "msg_22222222222222222222222222222222",
+      "asset": "PWRC",
+      "amount": "10000",
+      "pricingVersion": "pwrc-message-v1",
+      "canonicalPayload": "{\"amount\":\"10000\",\"asset\":\"PWRC\",\"chatId\":\"cht_0123456789abcdef0123456789abcdef\",\"expiresAt\":\"2026-08-27T06:05:00.000Z\",\"issuedAt\":\"2026-08-27T06:00:00.000Z\",\"pricingVersion\":\"pwrc-message-v1\",\"purpose\":\"completed_copilot_response\",\"requestMessageId\":\"msg_11111111111111111111111111111111\",\"userId\":\"usr_0123456789abcdef0123456789abcdef\",\"version\":\"1.0.0\",\"workspaceId\":\"wsp_0123456789abcdef0123456789abcdef\"}",
+      "quoteHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "status": "settled",
+      "expiresAt": "2026-08-27T06:05:00.000Z",
+      "createdAt": "2026-08-27T06:00:00.000Z",
+      "updatedAt": "2026-08-27T06:00:01.000Z"
+    }
+  ]
+}

@@ -43,3 +43,7 @@ Runtime implementation lives in `apps/backend/src/api/v1/`. The Next.js frontend
 - Same-origin frontend proxy: `/api/v1`
 
 The canonical OpenAPI security scheme is `ApiKey`, transmitted as `X-Api-Key`. Authenticated workspace operations additionally require `pc_session`. Swagger UI reads `api/openapi/openapi.yaml`; Postman uses the same `/v1` routes.
+
+## Credit evidence
+
+Executable credit migrations are `0002_credits.sql` and `0003_credit_quotes_receipts.sql`. The schema snapshot includes account, append-oriented ledger, deterministic quote, and non-transferable receipt tables.

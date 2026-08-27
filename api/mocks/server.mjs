@@ -62,6 +62,8 @@ const server = createServer(async (req, res) => {
     if (path === "/api/v1/contact" && method === "POST") return json(res, 201, await fixture("contact.json"));
     if (path === "/api/v1/credits" && method === "GET") return json(res, 200, await fixture("credits.json"));
     if (path === "/api/v1/credits/ledger" && method === "GET") return json(res, 200, await fixture("credit-ledger.json"));
+    if (path === "/api/v1/credits/quotes" && method === "GET") return json(res, 200, await fixture("credit-quotes.json"));
+    if (path === "/api/v1/credits/receipts" && method === "GET") return json(res, 200, await fixture("credit-receipts.json"));
     if (path === "/api/v1/tokens" && method === "GET") return json(res, 200, await fixture("tokens.json"));
     if (path === "/api/v1/tokens/pwrc" && method === "GET") { const tokens = await fixture("tokens.json"); return json(res, 200, { ok: true, data: tokens.data[0] }); }
 

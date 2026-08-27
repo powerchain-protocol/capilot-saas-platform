@@ -19,7 +19,7 @@ sequenceDiagram
 
 `rememberMe=true` creates a persistent session cookie; ordinary sessions remain non-persistent. Sign-out/revocation invalidates the persisted session, not only the browser cookie.
 
-## Persisted Copilot chat
+## Persisted Copilot chat and PWRC billing
 
 ```mermaid
 sequenceDiagram
@@ -28,20 +28,28 @@ sequenceDiagram
   participant DB as Store
   participant AI as AI provider
   participant WS as WebSocket hub
-  C->>API: POST /chat
-  API->>DB: create chat
-  API-->>C: chat id + slug
   C->>API: POST /chat/{id}/messages
   API->>DB: persist user message
-  API->>WS: chat.message
-  API->>AI: governed analysis request
-  AI-->>API: analysis + suggested actions
-  API->>DB: persist assistant message
-  API->>WS: chat.message
-  API-->>C: persisted response
+  API->>DB: persist canonical 10,000 PWRC quote + SHA-256 hash
+  API->>DB: atomic reserve available → reserved
+  alt insufficient credits
+    API-->>C: HTTP 402 INSUFFICIENT_CREDITS
+  else reserved
+    API->>AI: governed analysis request
+    alt provider/generation failure
+      API->>DB: release reservation + compensating ledger entry
+      API-->>C: provider error
+    else completed response
+      AI-->>API: analysis + suggested actions
+      API->>DB: atomic assistant message + reserved → spent + settlement ledger + receipt
+      API->>WS: chat.message
+      API->>WS: chat.receipt
+      API-->>C: persisted response + quote + non-transferable receipt
+    end
+  end
 ```
 
-Suggested actions are UI navigation/action proposals. They are not proof that an approval or execution occurred.
+The quote is persisted before reservation. Settlement happens only after generation completes and is committed together with the delivered assistant message. The receipt proves quote hash + reservation + response + settlement linkage but is not transferable tokenized value.
 
 ## Governed approval
 
@@ -74,4 +82,4 @@ Market and Solana endpoints call server-side providers. Missing keys, provider f
 
 ## Credits and token metadata
 
-`GET /v1/credits` returns the authenticated PWRC usage-credit account and the governed completed-response lifecycle. `GET /v1/credits/ledger` returns append-oriented movements. `GET /v1/tokens` and `GET /v1/tokens/pwrc` expose public token metadata only; they never return wallet secrets or signing material.
+`GET /v1/credits` returns the authenticated PWRC usage-credit account and pricing version. `GET /v1/credits/ledger` returns append-oriented movements, `GET /v1/credits/quotes` returns deterministic quote evidence, and `GET /v1/credits/receipts` returns non-transferable settlement receipts. `GET /v1/tokens` and `GET /v1/tokens/pwrc` expose public token metadata only; they never return wallet secrets or signing material.

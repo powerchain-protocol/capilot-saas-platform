@@ -1,0 +1,20 @@
+{
+  "workspace": {
+    "name": "PowerChain",
+    "id": "55a50a8b-cdb7-46f5-807e-3494d0262565",
+    "url": "https://crimson-crescent-8585.postman.co/workspace/55a50a8b-cdb7-46f5-807e-3494d0262565"
+  },
+  "dataset": {
+    "id": "6c7b04bd-20bf-45b8-8184-eba0156fa433",
+    "url": "https://www.getpostman.com/workspace/PowerChain~55a50a8b-cdb7-46f5-807e-3494d0262565/dataset/6c7b04bd-20bf-45b8-8184-eba0156fa433"
+  },
+  "specification": {
+    "id": "1e9bfbeb-cf59-4af3-a51f-25dce5bbe9c9",
+    "fileId": "cc65a18c-43aa-41b0-8fee-bf8f6f18ebea",
+    "url": "https://crimson-crescent-8585.postman.co/workspace/55a50a8b-cdb7-46f5-807e-3494d0262565/specification/1e9bfbeb-cf59-4af3-a51f-25dce5bbe9c9/file/cc65a18c-43aa-41b0-8fee-bf8f6f18ebea"
+  },
+  "repository": {
+    "openapi": "api/openapi/openapi.yaml",
+    "collection": "api/postman/PowerChain-Copilot.postman_collection.json"
+  }
+}

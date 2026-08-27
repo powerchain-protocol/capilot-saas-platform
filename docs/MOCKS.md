@@ -13,3 +13,5 @@ Mocks must always remain visibly non-authoritative. They must not be used to cla
 ## v1 aliases
 
 The mock server accepts both `/v1/*` and the frontend-compatible `/api/v1/*` namespace. Credit and token-metadata fixtures are deterministic and explicitly non-authoritative.
+
+Fixtures include `credit-quotes.json` and `credit-receipts.json` so UI and SDK consumers can exercise the complete quote → reserve → settle → receipt shape without treating mock state as authoritative.

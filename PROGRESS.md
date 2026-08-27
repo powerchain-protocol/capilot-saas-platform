@@ -57,3 +57,22 @@
 ## API security and credits extension
 
 Completed: API-key security scheme/runtime verification, `/v1` external alias, API generator, Postman API-key environment support, PWRC credits/ledger, token metadata, safe Solana public wallet registry, SDK extensions, and dual API-host configuration.
+
+## Completed-response billing hardening
+
+- [x] Persist deterministic server quote before reservation
+- [x] Canonical quote payload + SHA-256 quote hash
+- [x] Atomic available → reserved transition
+- [x] HTTP 402 before AI generation on insufficient credits
+- [x] Compensating release on AI/provider failure
+- [x] Periodic compensating release for stale/abandoned reservations after process failure
+- [x] Atomic delivered response + reserved → spent settlement
+- [x] Append-oriented reservation/release/settlement ledger
+- [x] Non-transferable receipt linked to quote hash and delivered response
+- [x] `chat.receipt` realtime event
+- [x] Quotes/receipts REST API, SDK, OpenAPI, Postman, mock and documentation coverage
+- [x] CWD-independent frontend static quality gates
+- [x] API DX contract-drift audit
+- [x] Link canonical PowerChain Postman workspace dataset/specification IDs and add safe remote sync/verification commands.
+
+- [x] Canonical `api/postman/index.yaml` manifest with supplied PowerChain workspace/specification URL and drift validation.

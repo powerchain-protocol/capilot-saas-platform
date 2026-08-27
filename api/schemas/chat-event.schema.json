@@ -13,6 +13,7 @@
     "type": {
       "enum": [
         "chat.message",
+        "chat.receipt",
         "chat.updated",
         "system.heartbeat"
       ]

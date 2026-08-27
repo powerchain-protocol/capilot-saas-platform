@@ -32,6 +32,7 @@ export const env = {
   cookieSecure: bool(process.env.COOKIE_SECURE, process.env.NODE_ENV === "production"),
   allowMemoryFallback: bool(process.env.ALLOW_MEMORY_FALLBACK, process.env.NODE_ENV !== "production"),
   allowDemoAi: bool(process.env.ALLOW_DEMO_AI, process.env.NODE_ENV !== "production"),
+  allowUnbilledAiPreview: bool(process.env.ALLOW_UNBILLED_AI_PREVIEW, process.env.NODE_ENV !== "production"),
   apiKeyRequired: bool(process.env.API_KEY_REQUIRED, process.env.NODE_ENV === "production"),
   apiKeyHashes: sha256List(process.env.POWERCHAIN_API_KEY_HASHES),
   openAiApiKey: process.env.OPENAI_API_KEY ?? "",
@@ -42,7 +43,9 @@ export const env = {
   pythHermesUrl: process.env.PYTH_HERMES_URL ?? "https://hermes.pyth.network",
   birdeyeApiUrl: process.env.BIRDEYE_API_URL ?? "https://public-api.birdeye.so",
   birdeyeApiKey: process.env.BIRDEYE_API_KEY ?? "",
-  pwrcMintAddress: process.env.PWRC_MINT_ADDRESS ?? ""
+  pwrcMintAddress: process.env.PWRC_MINT_ADDRESS ?? "",
+  creditReservationRecoveryMs: Math.max(60_000, number(process.env.CREDIT_RESERVATION_RECOVERY_MS, 15 * 60 * 1000)),
+  creditReconcileIntervalMs: Math.max(60_000, number(process.env.CREDIT_RECONCILE_INTERVAL_MS, 60_000))
 } as const;
 
 export const isProduction = env.nodeEnv === "production";

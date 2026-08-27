@@ -99,6 +99,16 @@ export const GENERATED_API_OPERATIONS = [
     "path": "/v1/credits/ledger"
   },
   {
+    "operationId": "listCreditQuotes",
+    "method": "GET",
+    "path": "/v1/credits/quotes"
+  },
+  {
+    "operationId": "listCreditReceipts",
+    "method": "GET",
+    "path": "/v1/credits/receipts"
+  },
+  {
     "operationId": "listServices",
     "method": "GET",
     "path": "/v1/services"

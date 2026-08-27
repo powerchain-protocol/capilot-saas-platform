@@ -29,4 +29,19 @@ Set the `apiKey` secret environment variable. The collection applies it as `X-Ap
 
 ## Credits and token metadata requests
 
-The collection now includes Credits and Tokens folders. Set `apiKey` in the selected environment; it is inherited through collection-level API-key authentication.
+The collection includes Credits and Tokens folders. Credits contains snapshot, ledger, deterministic quote, and non-transferable receipt requests. Set `apiKey` in the selected environment; it is inherited through collection-level API-key authentication.
+
+## Contract coverage
+
+Run `pnpm check:api-dx` to verify the `X-Api-Key` OpenAPI security contract, unique operation IDs, public API hosts, and Postman coverage for every `/v1` HTTP operation.
+## PowerChain cloud workspace
+
+The project is explicitly linked to the PowerChain Postman workspace configuration in `api/postman/remote.json`:
+
+- Workspace: `55a50a8b-cdb7-46f5-807e-3494d0262565`
+- Dataset: `6c7b04bd-20bf-45b8-8184-eba0156fa433`
+- Specification: `1e9bfbeb-cf59-4af3-a51f-25dce5bbe9c9`
+- Specification file: `cc65a18c-43aa-41b0-8fee-bf8f6f18ebea`
+
+Use `pnpm postman:dataset` with Postman CLI for the cloud dataset. Use `POSTMAN_API_KEY=... pnpm postman:spec:pull` to create a review snapshot, or `POSTMAN_API_KEY=... pnpm postman:spec:push` to explicitly publish the repository OpenAPI to the linked specification. Remote writes are never part of the default build or verify path.
+

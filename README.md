@@ -6,17 +6,17 @@ PowerChain Copilot is a full-stack SaaS workspace for renewable infrastructure, 
 
 ## Core features
 
-- **Copilot chat** — persisted chats/messages with opaque IDs + human-readable slugs, managed AI, deterministic development fallback, saved prompts, suggested actions, WebSocket updates, and HTTP polling fallback.
+- **Copilot chat** — persisted chats/messages with opaque IDs + human-readable slugs, managed AI, deterministic development fallback, saved prompts, suggested actions, WebSocket updates, HTTP polling fallback, and atomic PWRC completed-response billing.
 - **Command Center** — authenticated workspace metrics, renewable assets, activity, approvals, service health, and responsive desktop/mobile navigation.
 - **Renewable assets** — solar, wind, storage, EV, and metering entities with operational status and verification state.
 - **Governed actions** — role-aware approval mutations and a canonical action registry at `apps/dashboard/actions.json`.
 - **Session security** — signed HttpOnly cookies, optional 30-day Remember Me, persisted/revocable sessions, workspace membership, role context, and masked IP display.
 - **PostgreSQL storage** — `pg` connection pooling, parameterized queries, explicit migrations, and a memory adapter restricted to development fallback.
-- **API v1** — Fastify backend with exact-origin CORS, rate limiting, request IDs, error envelopes, Swagger UI, OpenAPI 3.1, Postman collection, and same-origin frontend proxying.
+- **API v1** — Fastify backend with `X-Api-Key`, exact-origin CORS, request IDs, error envelopes, Swagger UI, OpenAPI 3.1, Postman coverage, generated operation catalog, and same-origin frontend proxying.
 - **Realtime** — authenticated `/ws/v1/chat/:id` WebSocket channel with browser polling fallback when realtime is unavailable.
 - **Energy integrations** — Solana RPC/Helius health and server-only Pyth/Birdeye boundaries.
 - **Cross-platform frontend** — responsive Next.js, PWA metadata, install/setup flows, light/dark/system themes, theme-aware PowerChain app icons, and Lucide interface icons.
-- **Strict engineering gates** — TypeScript strict mode, ESLint `10.9.1`, explicit-`any` rejection, route/API/OpenAPI/action/asset checks, and Turbo build orchestration.
+- **Strict engineering gates** — TypeScript strict mode, ESLint `10.9.1`, explicit-`any` rejection, route/action/asset/API/OpenAPI/Postman checks that are cwd-independent, and Turbo build orchestration.
 
 ## Repository layout
 
@@ -121,10 +121,13 @@ export DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:5432/powerchain_co
 pnpm db:migrate
 ```
 
-The executable migration is:
+Executable migrations are ordered under:
 
 ```text
-apps/backend/src/storage/migrations/0001_initial.sql
+apps/backend/src/storage/migrations/
+├── 0001_initial.sql
+├── 0002_credits.sql
+└── 0003_credit_quotes_receipts.sql
 ```
 
 Database schemas/migrations intentionally live with the backend storage layer, **not** in `utils/`.
@@ -155,13 +158,19 @@ pnpm dev:frontend
 - Backend: `http://localhost:8000`
 - Swagger UI: `http://localhost:8000/docs`
 
+## Postman workspace integration
+
+PowerChain Copilot is linked to the PowerChain Postman workspace through `api/postman/index.yaml` and `api/postman/remote.json`, including the cloud dataset `6c7b04bd-20bf-45b8-8184-eba0156fa433` and Spec Hub specification `1e9bfbeb-cf59-4af3-a51f-25dce5bbe9c9`. Repository OpenAPI remains deterministic and network-independent; Postman sync is explicit through `pnpm postman:*` commands. Canonical specification: <https://crimson-crescent-8585.postman.co/workspace/55a50a8b-cdb7-46f5-807e-3494d0262565/specification/1e9bfbeb-cf59-4af3-a51f-25dce5bbe9c9/file/cc65a18c-43aa-41b0-8fee-bf8f6f18ebea>. See `api/postman/index.yaml` and `api/postman/REMOTE.md`.
+
 ## API
 
-Canonical REST prefix:
+External REST prefix:
 
 ```text
-/api/v1
+https://api.capilot.powerchain.energy/v1
 ```
+
+The browser uses the same-origin gateway `/api/v1`; Fastify exposes both `/v1` and the internal compatibility alias `/api/v1`.
 
 Primary groups:
 
@@ -177,6 +186,12 @@ Primary groups:
 /api/v1/services
 /api/v1/market/price
 /api/v1/network/solana
+/api/v1/credits
+/api/v1/credits/ledger
+/api/v1/credits/quotes
+/api/v1/credits/receipts
+/api/v1/tokens
+/api/v1/tokens/pwrc
 ```
 
 Realtime:
@@ -210,6 +225,26 @@ msg_<32 hex>
 
 Human-readable resources such as workspaces, assets, approvals, and chats also carry slugs. IDs remain the immutable identity; slugs are navigation/readability aids and can be resolved where supported.
 
+
+## PWRC completed-response billing
+
+Copilot chat uses a server-authoritative internal credit lifecycle. A successful completed response follows:
+
+```text
+canonical quote payload
+  → SHA-256 quote hash
+  → persist quote
+  → atomic reservation
+  → AI generation
+  → atomic assistant-message + settlement commit
+  → append-only ledger movement
+  → non-transferable receipt
+```
+
+The receipt links the quote hash, reservation ledger entry, settlement ledger entry, and delivered response message. It is audit evidence only and is **not a transferable financial token**. AI/provider failure releases the reservation with a compensating ledger entry. Insufficient credits return HTTP `402` and do not start AI generation.
+
+Detailed lifecycle, failure semantics, schemas, and reconciliation guidance: [`docs/CREDITS.md`](docs/CREDITS.md).
+
 ## Production boundaries
 
 - `DATABASE_URL` is required in production.
@@ -223,6 +258,9 @@ Human-readable resources such as workspaces, assets, approvals, and chats also c
 
 ```bash
 pnpm check:source
+pnpm check:api-dx
+pnpm check:schema
+pnpm check:imports
 pnpm typecheck
 pnpm lint
 pnpm build
