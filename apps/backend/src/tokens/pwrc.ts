@@ -1,4 +1,4 @@
-import { env } from "../config/env";
+import { env } from "../config/env.ts";
 
 export const PWRC_TOKEN = {
   id: "pwrc",

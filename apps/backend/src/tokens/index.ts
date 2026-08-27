@@ -1,1 +1,1 @@
-export * from "./pwrc";
+export * from "./pwrc.ts";

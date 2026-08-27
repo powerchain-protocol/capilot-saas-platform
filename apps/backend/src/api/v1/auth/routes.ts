@@ -1,13 +1,13 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
-import { getStore } from "../../../store";
-import type { Plan } from "../../../store/types";
-import { createId } from "../../../utils/ids";
-import { hashPassword, signSessionToken, validatePassword, verifyPassword } from "../../../utils/crypto";
-import { REMEMBERED_SESSION_MS, STANDARD_SESSION_MS } from "../../../constants/api";
-import { clearSessionCookieValue, sessionCookieValue } from "../middlewares/cookies";
-import { getAuthContext } from "../middlewares/auth";
-import { asBoolean, sanitizeText, sendError, sendOk } from "../middlewares/http";
-import { rateLimit, sameOriginOrAllowed } from "../middlewares/security";
+import { getStore } from "../../../store/index.ts";
+import type { Plan } from "../../../store/types.ts";
+import { createId } from "../../../utils/ids.ts";
+import { hashPassword, signSessionToken, validatePassword, verifyPassword } from "../../../utils/crypto.ts";
+import { REMEMBERED_SESSION_MS, STANDARD_SESSION_MS } from "../../../constants/api.ts";
+import { clearSessionCookieValue, sessionCookieValue } from "../middlewares/cookies.ts";
+import { getAuthContext } from "../middlewares/auth.ts";
+import { asBoolean, sanitizeText, sendError, sendOk } from "../middlewares/http.ts";
+import { rateLimit, sameOriginOrAllowed } from "../middlewares/security.ts";
 
 function bodyRecord(request: FastifyRequest): Record<string, unknown> {
   return typeof request.body === "object" && request.body !== null ? request.body as Record<string, unknown> : {};

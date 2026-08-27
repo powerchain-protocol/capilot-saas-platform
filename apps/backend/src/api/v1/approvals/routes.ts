@@ -1,8 +1,8 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
-import { getStore } from "../../../store";
-import { requireAuth, requireRole } from "../middlewares/auth";
-import { sanitizeText, sendError, sendOk } from "../middlewares/http";
-import { sameOriginOrAllowed } from "../middlewares/security";
+import { getStore } from "../../../store/index.ts";
+import { requireAuth, requireRole } from "../middlewares/auth.ts";
+import { sanitizeText, sendError, sendOk } from "../middlewares/http.ts";
+import { sameOriginOrAllowed } from "../middlewares/security.ts";
 
 function bodyRecord(request: FastifyRequest): Record<string, unknown> { return typeof request.body === "object" && request.body !== null ? request.body as Record<string, unknown> : {}; }
 

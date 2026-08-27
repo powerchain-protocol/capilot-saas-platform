@@ -1,9 +1,9 @@
 import type { FastifyInstance } from "fastify";
 import type WebSocket from "ws";
-import { WS_PREFIX } from "../constants/api";
-import { getStore } from "../store";
-import { getAuthContext } from "../api/v1/middlewares/auth";
-import { wsHub } from "./hub";
+import { WS_PREFIX } from "../constants/api.ts";
+import { getStore } from "../store/index.ts";
+import { getAuthContext } from "../api/v1/middlewares/auth.ts";
+import { wsHub } from "./hub.ts";
 
 export async function registerWebSocketRoutes(app: FastifyInstance): Promise<void> {
   app.get(`${WS_PREFIX}/chat/:id`, { websocket: true }, async (socket: WebSocket, request) => {

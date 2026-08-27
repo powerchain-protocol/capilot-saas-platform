@@ -5,12 +5,12 @@
   "description": "PowerChain Copilot API v1, PostgreSQL persistence, WebSockets, Swagger/OpenAPI, and governed SaaS services.",
   "license": "MIT",
   "engines": {
-    "node": ">=24.20.0 <25"
+    "node": ">=24.19.0 <25"
   },
   "scripts": {
     "dev": "node --watch --experimental-strip-types src/index.ts",
-    "build": "tsc -p tsconfig.build.json",
-    "start": "node dist/index.js",
+    "build": "tsc --noEmit -p tsconfig.json",
+    "start": "node --experimental-strip-types src/index.ts",
     "lint": "eslint src --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "check": "pnpm typecheck && pnpm lint",
@@ -34,5 +34,6 @@
     "@types/ws": "8.18.1",
     "eslint": "10.9.1",
     "typescript": "7.0.2"
-  }
+  },
+  "type": "module"
 }

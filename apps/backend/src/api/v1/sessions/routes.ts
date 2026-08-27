@@ -1,9 +1,9 @@
 import type { FastifyInstance } from "fastify";
-import { getStore } from "../../../store";
-import { getRequestIp, maskIp } from "../../../context/request-context";
-import { getAuthContext, requireAuth } from "../middlewares/auth";
-import { clearSessionCookieValue } from "../middlewares/cookies";
-import { sendError, sendOk } from "../middlewares/http";
+import { getStore } from "../../../store/index.ts";
+import { getRequestIp, maskIp } from "../../../context/request-context.ts";
+import { getAuthContext, requireAuth } from "../middlewares/auth.ts";
+import { clearSessionCookieValue } from "../middlewares/cookies.ts";
+import { sendError, sendOk } from "../middlewares/http.ts";
 
 export async function registerSessionRoutes(app: FastifyInstance): Promise<void> {
   app.get("/sessions/current", async (request, reply) => {

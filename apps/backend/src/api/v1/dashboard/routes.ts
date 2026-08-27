@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
-import { getStore } from "../../../store";
-import { requireAuth } from "../middlewares/auth";
-import { sendOk } from "../middlewares/http";
+import { getStore } from "../../../store/index.ts";
+import { requireAuth } from "../middlewares/auth.ts";
+import { sendOk } from "../middlewares/http.ts";
 
 export async function registerDashboardRoutes(app: FastifyInstance): Promise<void> {
   app.get("/dashboard", async (request, reply) => {

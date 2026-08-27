@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { env } from "../config/env";
+import { env } from "../config/env.ts";
 
 async function main(): Promise<void> {
   if (!env.databaseUrl) throw new Error("DATABASE_URL is required to check PostgreSQL connectivity.");

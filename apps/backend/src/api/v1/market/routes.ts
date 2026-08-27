@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
-import { getBirdeyePrice, getPythPrice } from "../../../services/market";
-import { requireAuth } from "../middlewares/auth";
-import { ApiError, sendOk } from "../middlewares/http";
+import { getBirdeyePrice, getPythPrice } from "../../../services/market.ts";
+import { requireAuth } from "../middlewares/auth.ts";
+import { ApiError, sendOk } from "../middlewares/http.ts";
 
 export async function registerMarketRoutes(app: FastifyInstance): Promise<void> {
   app.get("/market/price", async (request, reply) => {

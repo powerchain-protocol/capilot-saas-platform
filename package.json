@@ -10,8 +10,8 @@
     "pnpm": ">=11.23.0 <12"
   },
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
+    "dev": "pnpm runtime:check && turbo dev",
+    "build": "pnpm runtime:check && turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "check": "turbo check",
@@ -26,10 +26,10 @@
     "check:source": "node scripts/check-source.mjs",
     "ui:add": "pnpm dlx shadcn@latest add",
     "backend": "pnpm --filter @powerchain/capilot-backend",
-    "dev:frontend": "pnpm --filter @powerchain/capilot-frontend dev",
-    "dev:backend": "pnpm --filter @powerchain/capilot-backend dev",
+    "dev:frontend": "pnpm runtime:check && pnpm --filter @powerchain/capilot-frontend dev",
+    "dev:backend": "pnpm runtime:check && pnpm --filter @powerchain/capilot-backend dev",
     "db:migrate": "pnpm --filter @powerchain/capilot-backend db:migrate",
-    "api:docs": "pnpm --filter @powerchain/capilot-backend dev",
+    "api:docs": "pnpm api:generate:check && pnpm check:api-dx",
     "db:check": "pnpm --filter @powerchain/capilot-backend db:check",
     "api:mock": "node api/mocks/server.mjs",
     "sdk:check": "pnpm --filter @powerchain/copilot-sdk check",
@@ -50,7 +50,8 @@
     "deps:approve": "pnpm approve-builds",
     "deps:rebuild": "pnpm rebuild unrs-resolver sharp",
     "install:verified": "pnpm runtime:check && pnpm install && pnpm deps:rebuild",
-    "deps:policy:check": "node scripts/check-build-policy.mjs"
+    "deps:policy:check": "node scripts/check-build-policy.mjs",
+    "preinstall": "node scripts/check-runtime.mjs"
   },
   "devDependencies": {
     "eslint": "10.9.1",

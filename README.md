@@ -108,12 +108,20 @@ Node `26.8.1` is the current release, but this repository intentionally pins the
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.7/install.sh | bash
 . "$HOME/.nvm/nvm.sh"
 
-# .nvmrc pins the repository runtime.
+# Run these commands from the repository root.
+# .nvmrc is committed at ./.nvmrc and pins the preferred runtime.
+pwd
+test -f .nvmrc
 nvm install
 nvm use
 
+# Some Node/nvm installations do not ship a Corepack binary.
+if ! command -v corepack >/dev/null 2>&1; then npm install -g corepack@latest; fi
 corepack enable
-corepack prepare pnpm@11.23.0 --activate
+corepack install --global pnpm@11.23.0
+
+node --version
+pnpm --version
 pnpm install
 ```
 
@@ -336,9 +344,21 @@ Developer tooling includes OpenAPI 3.1, AsyncAPI 3.0, Postman datasets/flows, a 
 
 Solana wallet configuration under `wallets/solana/` is public-key metadata only. Never commit private keys, mnemonic phrases, seed material, or signing arrays.
 
+## Development and build
+
+The canonical root commands validate the Node runtime before starting Turbo:
+
+```bash
+pnpm dev       # frontend + backend development tasks
+pnpm build     # production build/typecheck tasks
+pnpm verify    # full repository quality gate
+```
+
+The Next.js frontend uses `next dev` (Turbopack is the Next.js 16 default). The backend runs directly from TypeScript on Node 24 using native type stripping, and all backend relative imports use explicit `.ts` specifiers so ESM development does not depend on extension guessing. The backend `build` task is a strict no-emit TypeScript validation gate; deployment executes the same checked TypeScript source under the pinned Node 24 runtime.
+
 ## Runtime troubleshooting
 
-The repository recommends Node `24.20.0` LTS through `.nvmrc` and `.node-version`, while the package engine accepts Node `>=24.19.0 <25`. This keeps `v24.19.0` usable for dependency installation without giving up the canonical LTS pin.
+The repository commits `.nvmrc` and `.node-version` at the repository root with the preferred Node `24.20.0` runtime. All workspace package engines consistently accept Node `>=24.19.0 <25`, so an existing `v24.19.0` checkout is not rejected during installation. Run `nvm install && nvm use` from the directory that contains `package.json`, `pnpm-workspace.yaml`, and `.nvmrc` to move to the preferred runtime.
 
 ```bash
 # From the repository root
@@ -348,7 +368,7 @@ nvm use 24.20.0
 # If Corepack is not present in this Node installation
 npm install -g corepack@latest
 corepack enable
-corepack prepare pnpm@11.23.0 --activate
+corepack install --global pnpm@11.23.0
 
 pnpm install
 ```

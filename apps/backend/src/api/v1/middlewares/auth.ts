@@ -1,10 +1,10 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import { SESSION_COOKIE } from "../../../constants/api";
-import { getStore } from "../../../store";
-import type { Role, SessionRecord, User, Workspace } from "../../../store/types";
-import { verifySessionToken } from "../../../utils/crypto";
-import { parseCookies } from "./cookies";
-import { ApiError } from "./http";
+import { SESSION_COOKIE } from "../../../constants/api.ts";
+import { getStore } from "../../../store/index.ts";
+import type { Role, SessionRecord, User, Workspace } from "../../../store/types.ts";
+import { verifySessionToken } from "../../../utils/crypto.ts";
+import { parseCookies } from "./cookies.ts";
+import { ApiError } from "./http.ts";
 
 export type AuthContext = {
   session: SessionRecord;

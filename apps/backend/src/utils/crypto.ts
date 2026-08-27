@@ -1,6 +1,6 @@
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
-import { env } from "../config/env";
-import type { Role } from "../store/types";
+import { env } from "../config/env.ts";
+import type { Role } from "../store/types.ts";
 
 const PASSWORD_KEY_LENGTH = 64;
 

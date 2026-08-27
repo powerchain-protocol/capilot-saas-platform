@@ -1,8 +1,8 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import type { FastifyRequest } from "fastify";
-import { env } from "../../../config/env";
-import { API_KEY_HEADER } from "../../../constants/api";
-import { ApiError } from "./http";
+import { env } from "../../../config/env.ts";
+import { API_KEY_HEADER } from "../../../constants/api.ts";
+import { ApiError } from "./http.ts";
 
 export function sameOriginOrAllowed(request: FastifyRequest): boolean {
   const originHeader = request.headers.origin;

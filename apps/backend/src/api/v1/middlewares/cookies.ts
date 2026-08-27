@@ -1,5 +1,5 @@
-import { env } from "../../../config/env";
-import { SESSION_COOKIE } from "../../../constants/api";
+import { env } from "../../../config/env.ts";
+import { SESSION_COOKIE } from "../../../constants/api.ts";
 
 export function parseCookies(header: string | undefined): Record<string, string> {
   const output: Record<string, string> = {};

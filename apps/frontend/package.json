@@ -5,10 +5,10 @@
   "description": "PowerChain Copilot full-stack Next.js SaaS frontend",
   "license": "MIT",
   "engines": {
-    "node": ">=24.20.0 <25"
+    "node": ">=24.19.0 <25"
   },
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",

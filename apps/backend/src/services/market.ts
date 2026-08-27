@@ -1,5 +1,5 @@
-import { env } from "../config/env";
-import { ApiError } from "../api/v1/middlewares/http";
+import { env } from "../config/env.ts";
+import { ApiError } from "../api/v1/middlewares/http.ts";
 
 export async function getPythPrice(feedId: string) {
   const normalized = feedId.replace(/^0x/, "");

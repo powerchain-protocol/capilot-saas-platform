@@ -1,5 +1,5 @@
-import { createId } from "../utils/ids";
-import { entitySlug, slugify } from "../utils/slugs";
+import { createId } from "../utils/ids.ts";
+import { entitySlug, slugify } from "../utils/slugs.ts";
 import type {
   AccountBundle,
   Activity,
@@ -21,7 +21,7 @@ import type {
   Store,
   User,
   Workspace
-} from "../store/types";
+} from "../store/types.ts";
 
 function now(): string { return new Date().toISOString(); }
 

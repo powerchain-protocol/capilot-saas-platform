@@ -1,9 +1,9 @@
 import type { FastifyInstance } from "fastify";
 import { getEnvironmentProfile } from "@powerchain/shared";
-import { env } from "../../../config/env";
-import { solanaHealth } from "../../../services/solana";
-import { requireAuth } from "../middlewares/auth";
-import { sendOk } from "../middlewares/http";
+import { env } from "../../../config/env.ts";
+import { solanaHealth } from "../../../services/solana.ts";
+import { requireAuth } from "../middlewares/auth.ts";
+import { sendOk } from "../middlewares/http.ts";
 
 export async function registerNetworkRoutes(app: FastifyInstance): Promise<void> {
   app.get("/network/profile", async (request, reply) => {

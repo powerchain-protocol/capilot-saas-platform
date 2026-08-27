@@ -1,11 +1,11 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
-import { MAX_MESSAGE_LENGTH } from "../../../constants/api";
-import { env } from "../../../config/env";
-import { getStore } from "../../../store";
-import { aiRuntimeModels, generateAiReply } from "../../../services/ai";
-import { requireAuth } from "../middlewares/auth";
-import { sanitizeText, sendError, sendOk } from "../middlewares/http";
-import { rateLimit, sameOriginOrAllowed } from "../middlewares/security";
+import { MAX_MESSAGE_LENGTH } from "../../../constants/api.ts";
+import { env } from "../../../config/env.ts";
+import { getStore } from "../../../store/index.ts";
+import { aiRuntimeModels, generateAiReply } from "../../../services/ai.ts";
+import { requireAuth } from "../middlewares/auth.ts";
+import { sanitizeText, sendError, sendOk } from "../middlewares/http.ts";
+import { rateLimit, sameOriginOrAllowed } from "../middlewares/security.ts";
 
 function bodyRecord(request: FastifyRequest): Record<string, unknown> {
   return typeof request.body === "object" && request.body !== null ? request.body as Record<string, unknown> : {};

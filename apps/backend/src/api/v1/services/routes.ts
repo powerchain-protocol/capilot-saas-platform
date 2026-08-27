@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
-import { env } from "../../../config/env";
-import { requireAuth } from "../middlewares/auth";
-import { sendOk } from "../middlewares/http";
+import { env } from "../../../config/env.ts";
+import { requireAuth } from "../middlewares/auth.ts";
+import { sendOk } from "../middlewares/http.ts";
 
 export async function registerServiceRoutes(app: FastifyInstance): Promise<void> {
   app.get("/services", async (request, reply) => {

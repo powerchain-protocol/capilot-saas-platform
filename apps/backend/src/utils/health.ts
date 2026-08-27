@@ -1,7 +1,7 @@
-import { env } from "../config/env";
-import { APP_VERSION } from "../constants/api";
-import { aiRuntimeModels } from "../services/ai";
-import { getStore } from "../store";
+import { env } from "../config/env.ts";
+import { APP_VERSION } from "../constants/api.ts";
+import { aiRuntimeModels } from "../services/ai.ts";
+import { getStore } from "../store/index.ts";
 
 export type HealthSnapshot = {
   status: "operational" | "degraded";

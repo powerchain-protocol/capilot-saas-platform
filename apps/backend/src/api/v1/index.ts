@@ -1,21 +1,21 @@
 import type { FastifyInstance } from "fastify";
-import { API_PREFIX } from "../../constants/api";
-import { registerApprovalRoutes } from "./approvals/routes";
-import { registerAiRoutes } from "./ai/routes";
-import { registerAssetRoutes } from "./assets/routes";
-import { registerAuthRoutes } from "./auth/routes";
-import { registerChatRoutes } from "./chat/routes";
-import { registerContactRoutes } from "./contact/routes";
-import { registerCreditRoutes } from "./credits/routes";
-import { registerDashboardRoutes } from "./dashboard/routes";
-import { registerHealthRoutes } from "./health/routes";
-import { registerMarketRoutes } from "./market/routes";
-import { registerMessageRoutes } from "./messages/routes";
-import { registerNetworkRoutes } from "./network/routes";
-import { registerProfileRoutes } from "./profile/routes";
-import { registerServiceRoutes } from "./services/routes";
-import { registerSessionRoutes } from "./sessions/routes";
-import { registerTokenRoutes } from "./tokens/routes";
+import { API_PREFIX } from "../../constants/api.ts";
+import { registerApprovalRoutes } from "./approvals/routes.ts";
+import { registerAiRoutes } from "./ai/routes.ts";
+import { registerAssetRoutes } from "./assets/routes.ts";
+import { registerAuthRoutes } from "./auth/routes.ts";
+import { registerChatRoutes } from "./chat/routes.ts";
+import { registerContactRoutes } from "./contact/routes.ts";
+import { registerCreditRoutes } from "./credits/routes.ts";
+import { registerDashboardRoutes } from "./dashboard/routes.ts";
+import { registerHealthRoutes } from "./health/routes.ts";
+import { registerMarketRoutes } from "./market/routes.ts";
+import { registerMessageRoutes } from "./messages/routes.ts";
+import { registerNetworkRoutes } from "./network/routes.ts";
+import { registerProfileRoutes } from "./profile/routes.ts";
+import { registerServiceRoutes } from "./services/routes.ts";
+import { registerSessionRoutes } from "./sessions/routes.ts";
+import { registerTokenRoutes } from "./tokens/routes.ts";
 
 export async function registerApiV1(app: FastifyInstance, prefix: string = API_PREFIX): Promise<void> {
   await app.register(async (v1) => {

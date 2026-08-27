@@ -3,15 +3,15 @@ import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import websocket from "@fastify/websocket";
-import { env, assertProductionConfiguration } from "./config/env";
-import { openApiBaseDir, openApiPath } from "./config/paths";
-import { API_PREFIX, PUBLIC_API_PREFIX, PUBLIC_API_ORIGIN, APP_API_ORIGIN, APP_VERSION } from "./constants/api";
-import { registerApiV1 } from "./api/v1";
-import { registerWebSocketRoutes } from "./ws/routes";
-import { ApiError, sendError } from "./api/v1/middlewares/http";
-import { createRequestContext } from "./context/request-context";
-import { requireApiKey } from "./api/v1/middlewares/security";
-import { getStore } from "./store";
+import { env, assertProductionConfiguration } from "./config/env.ts";
+import { openApiBaseDir, openApiPath } from "./config/paths.ts";
+import { API_PREFIX, PUBLIC_API_PREFIX, PUBLIC_API_ORIGIN, APP_API_ORIGIN, APP_VERSION } from "./constants/api.ts";
+import { registerApiV1 } from "./api/v1/index.ts";
+import { registerWebSocketRoutes } from "./ws/routes.ts";
+import { ApiError, sendError } from "./api/v1/middlewares/http.ts";
+import { createRequestContext } from "./context/request-context.ts";
+import { requireApiKey } from "./api/v1/middlewares/security.ts";
+import { getStore } from "./store/index.ts";
 
 export async function buildServer(): Promise<FastifyInstance> {
   assertProductionConfiguration();

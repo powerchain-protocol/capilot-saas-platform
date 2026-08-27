@@ -9,10 +9,12 @@
 ## Install
 
 ```bash
+test -f .nvmrc
 nvm install
 nvm use
+if ! command -v corepack >/dev/null 2>&1; then npm install -g corepack@latest; fi
 corepack enable
-corepack prepare pnpm@11.23.0 --activate
+corepack install --global pnpm@11.23.0
 pnpm install
 ```
 

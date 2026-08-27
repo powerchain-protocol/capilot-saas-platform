@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
-import { getStore } from "../store";
-import type { CreditQuote } from "../store/types";
+import { getStore } from "../store/index.ts";
+import type { CreditQuote } from "../store/types.ts";
 
 export const COPILOT_RESPONSE_PRICE_PWRC = "10000" as const;
 export const CREDIT_PRICING_VERSION = "pwrc-message-v1" as const;

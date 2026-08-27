@@ -1,6 +1,6 @@
-import type { Asset } from "../store/types";
-import { ApiError } from "../api/v1/middlewares/http";
-import { env } from "../config/env";
+import type { Asset } from "../store/types.ts";
+import { ApiError } from "../api/v1/middlewares/http.ts";
+import { env } from "../config/env.ts";
 
 export type ManagedProviderId = "openai" | "anthropic" | "gemini" | "deepseek" | "ollama";
 

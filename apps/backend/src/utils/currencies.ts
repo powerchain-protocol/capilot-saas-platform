@@ -1,4 +1,4 @@
-import { CURRENCIES, type CurrencyCode } from "../constants/currencies";
+import { CURRENCIES, type CurrencyCode } from "../constants/currencies.ts";
 
 export function currencyDefinition(code: string) {
   return CURRENCIES.find((item) => item.code === code.toUpperCase()) ?? null;

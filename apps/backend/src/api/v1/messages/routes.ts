@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
-import { getStore } from "../../../store";
-import { requireAuth } from "../middlewares/auth";
-import { sendError, sendOk } from "../middlewares/http";
+import { getStore } from "../../../store/index.ts";
+import { requireAuth } from "../middlewares/auth.ts";
+import { sendError, sendOk } from "../middlewares/http.ts";
 
 export async function registerMessageRoutes(app: FastifyInstance): Promise<void> {
   app.get<{ Params: { id: string } }>("/messages/:id", async (request, reply) => {

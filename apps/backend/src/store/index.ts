@@ -1,7 +1,7 @@
-import { env, isProduction } from "../config/env";
-import { MemoryStore } from "../storage/memory";
-import { PostgresStore } from "../storage/postgres";
-import type { Store } from "./types";
+import { env, isProduction } from "../config/env.ts";
+import { MemoryStore } from "../storage/memory.ts";
+import { PostgresStore } from "../storage/postgres.ts";
+import type { Store } from "./types.ts";
 
 let singleton: Store | null = null;
 

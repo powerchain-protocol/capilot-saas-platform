@@ -1,8 +1,8 @@
 import { readdir, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { Pool } from "pg";
-import { env } from "../config/env";
-import { migrationDir } from "../config/paths";
+import { env } from "../config/env.ts";
+import { migrationDir } from "../config/paths.ts";
 
 async function main(): Promise<void> {
   if (!env.databaseUrl) throw new Error("DATABASE_URL is required to run PostgreSQL migrations.");

@@ -1,8 +1,8 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
-import { COPILOT_RESPONSE_PRICE_PWRC, CREDIT_PRICING_VERSION } from "../../../credits";
-import { getStore } from "../../../store";
-import { requireAuth } from "../middlewares/auth";
-import { sendOk } from "../middlewares/http";
+import { COPILOT_RESPONSE_PRICE_PWRC, CREDIT_PRICING_VERSION } from "../../../credits/index.ts";
+import { getStore } from "../../../store/index.ts";
+import { requireAuth } from "../middlewares/auth.ts";
+import { sendOk } from "../middlewares/http.ts";
 
 function boundedLimit(request: FastifyRequest, fallback = 50): number {
   const query = request.query as { limit?: string };

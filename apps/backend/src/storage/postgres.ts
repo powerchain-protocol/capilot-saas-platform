@@ -20,9 +20,9 @@ import type {
   Store,
   User,
   Workspace
-} from "../store/types";
-import { createId } from "../utils/ids";
-import { entitySlug, slugify } from "../utils/slugs";
+} from "../store/types.ts";
+import { createId } from "../utils/ids.ts";
+import { entitySlug, slugify } from "../utils/slugs.ts";
 
 function now(): string { return new Date().toISOString(); }
 function row<T>(value: QueryResultRow): T { return value as T; }

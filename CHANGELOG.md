@@ -102,3 +102,13 @@ All notable changes to PowerChain Copilot are documented here. The product remai
 - Moved the `unrs-resolver` override out of the deprecated `package.json#pnpm` block into `pnpm-workspace.yaml`.
 - Kept Node `24.20.0` LTS as the `.nvmrc`/`.node-version` recommendation while widening the supported Node 24 engine floor to `24.19.0` so an existing `v24.19.0` checkout can install dependencies before upgrading.
 - Added `pnpm setup:runtime` / `scripts/bootstrap.sh` for repeatable nvm + Corepack + pnpm activation.
+
+### Runtime/bootstrap hardening
+
+- Ensured `.nvmrc` and `.node-version` are committed at the repository root and both pin Node `24.20.0`.
+- Unified root, frontend, and backend Node engine ranges at `>=24.19.0 <25` so Node `24.19.0` is no longer rejected by a nested workspace manifest.
+- Replaced the legacy Corepack activation example with `corepack install --global pnpm@11.23.0` and added a Corepack-install fallback to `scripts/bootstrap.sh`.
+- Added root runtime checks before `pnpm dev` and `pnpm build`.
+- Removed the redundant Next.js `--turbopack` development flag; Next.js 16 uses Turbopack by default.
+- Hardened the backend Node 24 TypeScript runtime with ESM package semantics, explicit `.ts` relative imports, and no-emit build validation to avoid generated-ESM extension failures.
+- Release archives are now packaged with repository files at ZIP root so `.nvmrc` is visible immediately after extraction.
