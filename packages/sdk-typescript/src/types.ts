@@ -19,3 +19,8 @@ export type HealthSnapshot = { status: "operational" | "degraded"; version: stri
 export type ServiceHealth = { key: string; name: string; category: string; configured: boolean };
 export type SessionSecurity = { ip: string; masked: boolean; role: Role; persistent: boolean; expiresAt: string; sessionId: string };
 export type ChatSocketEvent = { type: "chat.message" | "chat.updated" | "system.heartbeat"; chatId: string; payload: unknown; timestamp: string };
+
+export type CreditAccount = { id: string; workspaceId: string; userId: string; asset: "PWRC"; decimals: 9; available: string; reserved: string; spent: string; funded: string; updatedAt: string };
+export type CreditLedgerEntry = { id: string; accountId: string; workspaceId: string; userId: string; kind: "fund" | "reserve" | "settle" | "release"; amount: string; balanceAfter: string; reference: string; createdAt: string };
+export type CreditsSnapshot = { account: CreditAccount; pricing: { completedResponsePwrc: string }; lifecycle: readonly ["quote","reserve","deliver","settle","receipt"] };
+export type TokenDescriptor = { id: string; symbol: string; name: string; network: string; standard: string; decimals: number; mintAddress: string | null; transferFeeBps: number; transferableReceipt: boolean };

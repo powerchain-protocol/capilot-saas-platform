@@ -53,3 +53,7 @@
 - [x] JSON Schema contracts
 - [x] TypeScript API/WS SDK
 - [x] API flow, SDK, mock, specification, and Postman documentation
+
+## API security and credits extension
+
+Completed: API-key security scheme/runtime verification, `/v1` external alias, API generator, Postman API-key environment support, PWRC credits/ledger, token metadata, safe Solana public wallet registry, SDK extensions, and dual API-host configuration.

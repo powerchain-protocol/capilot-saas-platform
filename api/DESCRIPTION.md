@@ -15,3 +15,7 @@ PowerChain Copilot API v1 is the authoritative backend boundary for the SaaS pro
 - **Realtime is optional:** WebSockets accelerate chat updates; HTTP remains the authoritative fallback.
 
 See `docs/API.md` for endpoint use, `docs/FLOWS.md` for lifecycle sequences, and `docs/SPECIFICATIONS.md` for machine contracts.
+
+## Client authentication
+
+API clients send `X-Api-Key`. The backend stores only configured SHA-256 hashes (`POWERCHAIN_API_KEY_HASHES`) and compares digests in constant time. Browser code does not receive the key: the Next.js `/api/v1` proxy injects the server-only `POWERCHAIN_API_KEY`.

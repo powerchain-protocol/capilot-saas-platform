@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "data": {
+    "account": {
+      "id": "crd_0123456789abcdef0123456789abcdef",
+      "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+      "userId": "usr_0123456789abcdef0123456789abcdef",
+      "asset": "PWRC",
+      "decimals": 9,
+      "available": "1000000",
+      "reserved": "0",
+      "spent": "0",
+      "funded": "1000000",
+      "updatedAt": "2026-08-27T00:00:00.000Z"
+    },
+    "pricing": {
+      "completedResponsePwrc": "10000"
+    },
+    "lifecycle": [
+      "quote",
+      "reserve",
+      "deliver",
+      "settle",
+      "receipt"
+    ]
+  }
+}

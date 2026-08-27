@@ -3,7 +3,7 @@
   "info": {
     "title": "PowerChain Copilot API",
     "version": "1.0.0",
-    "description": "Canonical HTTP API for PowerChain Copilot 1.0.0. It provides session-authenticated\nworkspace data, renewable assets, governed approvals, persisted Copilot chats,\nmessage retrieval, AI analysis, provider health, market/network adapters, and\npublic contact/health endpoints. The API uses a consistent `{ ok, data | error }`\nenvelope and signed HttpOnly cookie sessions. AI and network responses do not\nconstitute approval, dispatch, financial advice, transaction confirmation, or\nsettlement evidence.\n",
+    "description": "Canonical HTTP API for PowerChain Copilot 1.0.0. Public API traffic uses the versioned /v1 surface and X-Api-Key client authentication. User/workspace operations additionally require the signed HttpOnly session cookie. The web application calls a same-origin /api/v1 gateway that injects the server-side API key; browser code never receives the key. AI and network responses do not constitute approval, dispatch, financial advice, transaction confirmation, or settlement evidence.",
     "license": {
       "name": "MIT"
     },
@@ -11,17 +11,21 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8000",
-      "description": "Local backend"
+      "url": "https://api.capilot.powerchain.energy",
+      "description": "Primary PowerChain Copilot API"
     },
     {
-      "url": "https://api.powerchain.energy",
-      "description": "Production placeholder"
+      "url": "https://capilot.powerchain.app",
+      "description": "PowerChain app API gateway"
+    },
+    {
+      "url": "http://localhost:8000",
+      "description": "Local backend"
     }
   ],
   "security": [
     {
-      "sessionCookie": []
+      "ApiKey": []
     }
   ],
   "tags": [
@@ -80,15 +84,27 @@
     {
       "name": "Contact",
       "description": "Public sales, support, beta, and partnership contact intake."
+    },
+    {
+      "name": "Credits",
+      "description": "PWRC internal usage credits and append-oriented ledger views."
+    },
+    {
+      "name": "Tokens",
+      "description": "Public token metadata configured by the PowerChain service."
     }
   ],
   "paths": {
-    "/api/v1/health": {
+    "/v1/health": {
       "get": {
         "tags": [
           "Health"
         ],
-        "security": [],
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
         "summary": "API and dependency health",
         "responses": {
           "200": {
@@ -100,18 +116,25 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "getHealth",
         "description": "API and dependency health"
       }
     },
-    "/api/v1/auth/sign-in": {
+    "/v1/auth/sign-in": {
       "post": {
         "tags": [
           "Auth"
         ],
-        "security": [],
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
         "summary": "Sign in and issue a signed session cookie",
         "requestBody": {
           "required": true,
@@ -160,12 +183,16 @@
         "description": "Sign in and issue a signed session cookie"
       }
     },
-    "/api/v1/auth/register": {
+    "/v1/auth/register": {
       "post": {
         "tags": [
           "Auth"
         ],
-        "security": [],
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
         "summary": "Create user, workspace, membership, and session",
         "requestBody": {
           "required": true,
@@ -225,29 +252,39 @@
           },
           "422": {
             "$ref": "#/components/responses/Validation"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "registerAccount",
         "description": "Create user, workspace, membership, and session"
       }
     },
-    "/api/v1/auth/demo": {
+    "/v1/auth/demo": {
       "post": {
         "tags": [
           "Auth"
         ],
-        "security": [],
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
         "summary": "Create or enter representative demo workspace",
         "responses": {
           "200": {
             "description": "Demo session created"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "openDemoWorkspace",
         "description": "Create or enter representative demo workspace"
       }
     },
-    "/api/v1/auth/sign-out": {
+    "/v1/auth/sign-out": {
       "post": {
         "tags": [
           "Auth"
@@ -256,13 +293,22 @@
         "responses": {
           "200": {
             "description": "Signed out"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "signOut",
-        "description": "Revoke current session and clear cookie"
+        "description": "Revoke current session and clear cookie",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/sessions/current": {
+    "/v1/sessions/current": {
       "get": {
         "tags": [
           "Sessions"
@@ -284,10 +330,16 @@
           }
         },
         "operationId": "getCurrentSession",
-        "description": "Current authenticated session"
+        "description": "Current authenticated session",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/sessions": {
+    "/v1/sessions": {
       "get": {
         "tags": [
           "Sessions"
@@ -296,13 +348,22 @@
         "responses": {
           "200": {
             "description": "Session list"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "listSessions",
-        "description": "User sessions"
+        "description": "User sessions",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/sessions/{id}": {
+    "/v1/sessions/{id}": {
       "delete": {
         "tags": [
           "Sessions"
@@ -319,13 +380,22 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "revokeSession",
-        "description": "Revoke a session"
+        "description": "Revoke a session",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/security/session": {
+    "/v1/security/session": {
       "get": {
         "tags": [
           "Sessions"
@@ -348,13 +418,22 @@
         "responses": {
           "200": {
             "description": "Session security snapshot"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "getSessionSecurity",
-        "description": "Security details for current session"
+        "description": "Security details for current session",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/dashboard": {
+    "/v1/dashboard": {
       "get": {
         "tags": [
           "Dashboard"
@@ -363,13 +442,22 @@
         "responses": {
           "200": {
             "description": "Dashboard state"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "getDashboard",
-        "description": "Authenticated workspace overview"
+        "description": "Authenticated workspace overview",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/assets": {
+    "/v1/assets": {
       "get": {
         "tags": [
           "Assets"
@@ -400,13 +488,22 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "listAssets",
-        "description": "Workspace assets"
+        "description": "Workspace assets",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/approvals": {
+    "/v1/approvals": {
       "get": {
         "tags": [
           "Approvals"
@@ -415,13 +512,22 @@
         "responses": {
           "200": {
             "description": "Approval list"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "listApprovals",
-        "description": "Workspace approval queue"
+        "description": "Workspace approval queue",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/approvals/{id}": {
+    "/v1/approvals/{id}": {
       "post": {
         "tags": [
           "Approvals"
@@ -463,13 +569,22 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "updateApproval",
-        "description": "Approve or request changes"
+        "description": "Approve or request changes",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/ai/generate": {
+    "/v1/ai/generate": {
       "post": {
         "tags": [
           "AI"
@@ -501,13 +616,22 @@
           },
           "503": {
             "description": "No AI provider or allowed fallback"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "generateAnalysis",
-        "description": "Generate governed analysis without persisting a chat message"
+        "description": "Generate governed analysis without persisting a chat message",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/chat": {
+    "/v1/chat": {
       "get": {
         "tags": [
           "Chat"
@@ -516,10 +640,19 @@
         "responses": {
           "200": {
             "description": "Chat list"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "listChats",
-        "description": "List user chats"
+        "description": "List user chats",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -544,13 +677,22 @@
         "responses": {
           "201": {
             "description": "Chat created"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "createChat",
-        "description": "Create a new chat"
+        "description": "Create a new chat",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/chat/{id}": {
+    "/v1/chat/{id}": {
       "get": {
         "tags": [
           "Chat"
@@ -567,13 +709,22 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "getChat",
-        "description": "Get chat by opaque id or slug"
+        "description": "Get chat by opaque id or slug",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/chat/{id}/messages": {
+    "/v1/chat/{id}/messages": {
       "post": {
         "tags": [
           "Chat"
@@ -609,13 +760,22 @@
             "description": "Assistant message",
             "mode": null,
             "and suggested actions": null
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "sendChatMessage",
-        "description": "Persist user message and generate Copilot response"
+        "description": "Persist user message and generate Copilot response",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/copilot": {
+    "/v1/copilot": {
       "get": {
         "tags": [
           "Chat"
@@ -624,10 +784,19 @@
         "responses": {
           "200": {
             "description": "Default chat messages"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "getDefaultCopilotMessages",
-        "description": "Compatibility endpoint for current default Copilot chat"
+        "description": "Compatibility endpoint for current default Copilot chat",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -657,13 +826,22 @@
         "responses": {
           "200": {
             "description": "Assistant response"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "sendDefaultCopilotMessage",
-        "description": "Compatibility endpoint to send a default Copilot message"
+        "description": "Compatibility endpoint to send a default Copilot message",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/messages/{id}": {
+    "/v1/messages/{id}": {
       "get": {
         "tags": [
           "Messages"
@@ -699,13 +877,22 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "getMessage",
-        "description": "Retrieve one message by opaque message id"
+        "description": "Retrieve one message by opaque message id",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/profile": {
+    "/v1/profile": {
       "patch": {
         "tags": [
           "Profile"
@@ -738,13 +925,22 @@
         "responses": {
           "200": {
             "description": "Profile updated"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "updateProfile",
-        "description": "Update profile and workspace display names"
+        "description": "Update profile and workspace display names",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/services": {
+    "/v1/services": {
       "get": {
         "tags": [
           "Services"
@@ -753,13 +949,22 @@
         "responses": {
           "200": {
             "description": "Service catalog"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "listServices",
-        "description": "Configured integration catalog"
+        "description": "Configured integration catalog",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/market/price": {
+    "/v1/market/price": {
       "get": {
         "tags": [
           "Markets"
@@ -800,13 +1005,22 @@
           },
           "422": {
             "$ref": "#/components/responses/Validation"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "getMarketPrice",
-        "description": "Read price from configured Pyth or Birdeye adapter"
+        "description": "Read price from configured Pyth or Birdeye adapter",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/network/solana": {
+    "/v1/network/solana": {
       "get": {
         "tags": [
           "Network"
@@ -815,18 +1029,31 @@
         "responses": {
           "200": {
             "description": "RPC health"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "getSolanaHealth",
-        "description": "Solana RPC health"
+        "description": "Solana RPC health",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ]
       }
     },
-    "/api/v1/contact": {
+    "/v1/contact": {
       "post": {
         "tags": [
           "Contact"
         ],
-        "security": [],
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
         "summary": "Submit contact, sales, or access request",
         "requestBody": {
           "required": true,
@@ -866,6 +1093,9 @@
         "responses": {
           "201": {
             "description": "Request stored"
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
           }
         },
         "operationId": "createContactRequest",
@@ -889,16 +1119,205 @@
             "description": "Switching Protocols"
           }
         },
-        "operationId": "connectChatWebSocket"
+        "operationId": "connectChatWebSocket",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ]
+      }
+    },
+    "/v1/credits": {
+      "get": {
+        "tags": [
+          "Credits"
+        ],
+        "operationId": "getCredits",
+        "summary": "Current PWRC credit account",
+        "description": "Returns the authenticated user credit-account balances and the configured completed-response lifecycle. Values are integer PWRC accounting units represented as strings.",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Credit account snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditsEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1/credits/ledger": {
+      "get": {
+        "tags": [
+          "Credits"
+        ],
+        "operationId": "listCreditLedger",
+        "summary": "List PWRC credit ledger entries",
+        "description": "Returns append-oriented credit movements for the authenticated workspace user.",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Credit ledger entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "ok",
+                    "data"
+                  ],
+                  "properties": {
+                    "ok": {
+                      "const": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CreditLedgerEntry"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1/tokens": {
+      "get": {
+        "tags": [
+          "Tokens"
+        ],
+        "operationId": "listTokens",
+        "summary": "List supported token metadata",
+        "description": "Returns public token configuration only. It never includes private keys or signing material.",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token descriptors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "ok",
+                    "data"
+                  ],
+                  "properties": {
+                    "ok": {
+                      "const": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TokenDescriptor"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
+          }
+        }
+      }
+    },
+    "/v1/tokens/pwrc": {
+      "get": {
+        "tags": [
+          "Tokens"
+        ],
+        "operationId": "getPwrcToken",
+        "summary": "Get PWRC token metadata",
+        "description": "Returns configured PWRC public metadata. The mint address is null until configured by deployment.",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PWRC token descriptor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "ok",
+                    "data"
+                  ],
+                  "properties": {
+                    "ok": {
+                      "const": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/TokenDescriptor"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidApiKey"
+          }
+        }
       }
     }
   },
   "components": {
     "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Api-Key",
+        "description": "PowerChain client API key. Web clients use the same-origin gateway so the key remains server-side."
+      },
       "sessionCookie": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "pc_session"
+        "name": "pc_session",
+        "description": "Signed HttpOnly user/workspace session cookie."
       }
     },
     "parameters": {
@@ -945,6 +1364,16 @@
       },
       "NotFound": {
         "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorEnvelope"
+            }
+          }
+        }
+      },
+      "InvalidApiKey": {
+        "description": "Missing or invalid PowerChain API key or authenticated session.",
         "content": {
           "application/json": {
             "schema": {
@@ -1251,6 +1680,217 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "CreditAccount": {
+        "type": "object",
+        "required": [
+          "id",
+          "workspaceId",
+          "userId",
+          "asset",
+          "decimals",
+          "available",
+          "reserved",
+          "spent",
+          "funded",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "asset": {
+            "const": "PWRC"
+          },
+          "decimals": {
+            "const": 9
+          },
+          "available": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "reserved": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "spent": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "funded": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreditLedgerEntry": {
+        "type": "object",
+        "required": [
+          "id",
+          "accountId",
+          "workspaceId",
+          "userId",
+          "kind",
+          "amount",
+          "balanceAfter",
+          "reference",
+          "createdAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "accountId": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "fund",
+              "reserve",
+              "settle",
+              "release"
+            ]
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "balanceAfter": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreditsEnvelope": {
+        "type": "object",
+        "required": [
+          "ok",
+          "data"
+        ],
+        "properties": {
+          "ok": {
+            "const": true
+          },
+          "data": {
+            "type": "object",
+            "required": [
+              "account",
+              "pricing",
+              "lifecycle"
+            ],
+            "properties": {
+              "account": {
+                "$ref": "#/components/schemas/CreditAccount"
+              },
+              "pricing": {
+                "type": "object",
+                "required": [
+                  "completedResponsePwrc"
+                ],
+                "properties": {
+                  "completedResponsePwrc": {
+                    "type": "string",
+                    "pattern": "^[0-9]+$"
+                  }
+                }
+              },
+              "lifecycle": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "const": "quote"
+                  },
+                  {
+                    "const": "reserve"
+                  },
+                  {
+                    "const": "deliver"
+                  },
+                  {
+                    "const": "settle"
+                  },
+                  {
+                    "const": "receipt"
+                  }
+                ],
+                "minItems": 5,
+                "maxItems": 5
+              }
+            }
+          }
+        }
+      },
+      "TokenDescriptor": {
+        "type": "object",
+        "required": [
+          "id",
+          "symbol",
+          "name",
+          "network",
+          "standard",
+          "decimals",
+          "mintAddress",
+          "transferFeeBps",
+          "transferableReceipt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "network": {
+            "type": "string"
+          },
+          "standard": {
+            "type": "string"
+          },
+          "decimals": {
+            "type": "integer"
+          },
+          "mintAddress": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "transferFeeBps": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000
+          },
+          "transferableReceipt": {
+            "type": "boolean"
           }
         }
       }

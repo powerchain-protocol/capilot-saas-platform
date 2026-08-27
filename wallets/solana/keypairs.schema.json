@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "version",
+    "keypairs"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "keypairs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "publicKey",
+          "purpose"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "publicKey": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 64
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "network": {
+            "type": "string",
+            "enum": [
+              "mainnet-beta",
+              "devnet",
+              "testnet"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

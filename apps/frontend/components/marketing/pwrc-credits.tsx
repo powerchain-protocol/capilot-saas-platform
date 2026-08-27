@@ -50,7 +50,7 @@ export function PwrcCredits() {
                 <div className="flex items-center gap-3">
                   <PwrcIcon size={46} framed />
                   <div>
-                    <span className="block text-[11px] text-[var(--muted-2)]">Available balance</span>
+                    <span className="block text-[11px] text-[var(--muted-2)]">Representative available balance</span>
                     <b className="mt-1 block text-2xl tracking-[-.035em]">256,721 PWRC</b>
                   </div>
                 </div>

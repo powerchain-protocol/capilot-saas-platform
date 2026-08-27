@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Bot, LayoutDashboard, LogOut, Settings, ShieldCheck, Sun } from "lucide-react";
+import { Bot, Coins, LayoutDashboard, LogOut, Settings, ShieldCheck, Sun } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { useToast } from "@/components/ui/toast";
 import { powerChainApi } from "@/lib/powerchain";
@@ -13,8 +13,10 @@ const items = [
   [/\/copilot/, "Copilot", Bot, "/dashboard/copilot"],
   [/\/assets/, "Assets", Sun, "/dashboard/assets"],
   [/\/approvals/, "Approvals", ShieldCheck, "/dashboard/approvals"],
+  [/\/credits/, "Credits", Coins, "/dashboard/credits"],
   [/\/settings/, "Settings", Settings, "/dashboard/settings"],
 ] as const;
+const mobileItems = items.filter(([, label]) => label !== "Settings");
 
 export function DashboardShell({ children, userName, workspaceName }: { children: React.ReactNode; userName: string; workspaceName: string }) {
   const pathname = usePathname();
@@ -71,14 +73,14 @@ export function DashboardShell({ children, userName, workspaceName }: { children
             <div className="ml-auto flex items-center gap-2">
               <span className="hidden rounded-full border border-[#DDE8E0] bg-[#F2F8F4] px-3 py-1.5 text-[9px] font-bold text-[var(--success)] sm:inline-flex">● Systems operational</span>
               <ThemeToggle compact />
-              <span className="grid size-9 place-items-center rounded-full border border-[#DDE4DF] bg-[var(--canvas)] text-[10px] font-bold text-[#17613F]">{initial}</span>
+              <Link href="/dashboard/settings" aria-label="Open settings" className="grid size-9 place-items-center rounded-full border border-[#DDE4DF] bg-[var(--canvas)] text-[10px] font-bold text-[#17613F]">{initial}</Link>
             </div>
           </header>
 
           <div className="p-4 pb-28 sm:p-6 lg:p-8 lg:pb-8">{children}</div>
 
           <nav className="pc-safe-bottom fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_96%,transparent)] px-2 pt-2 shadow-[0_-10px_35px_rgba(16,21,19,.06)] backdrop-blur-xl lg:hidden" aria-label="Mobile workspace navigation">
-            {items.map(([match, label, Icon, href]) => {
+            {mobileItems.map(([match, label, Icon, href]) => {
               const active = match.test(pathname);
               return (
                 <Link key={href} href={href} aria-current={active ? "page" : undefined} className={`grid min-h-[54px] place-items-center rounded-xl py-1 text-[9px] font-semibold transition ${active ? "bg-[#EDF4EF] text-[#17613F]" : "text-[#6E7872] active:bg-[var(--surface-soft)]"}`}>

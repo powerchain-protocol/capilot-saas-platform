@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "clg_0123456789abcdef0123456789abcdef",
+      "accountId": "crd_0123456789abcdef0123456789abcdef",
+      "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+      "userId": "usr_0123456789abcdef0123456789abcdef",
+      "kind": "fund",
+      "amount": "1000000",
+      "balanceAfter": "1000000",
+      "reference": "demo_grant",
+      "createdAt": "2026-08-27T00:00:00.000Z"
+    }
+  ]
+}

@@ -30,3 +30,7 @@ The collection includes representative example responses for core requests, so i
 ## Flow recipes
 
 `flows/*.flow.json` are portable PowerChain scenario manifests that describe request ordering, captured variables, and expected status codes. They are intentionally **not** presented as proprietary Postman Flows export files because that export format is not treated as a stable repository contract.
+
+## X-Api-Key
+
+The collection is authenticated at collection scope with `X-Api-Key: {{apiKey}}`. Store the real value only in your local Postman environment/secret store. Do not commit populated environment secrets. Requests use `/v1`; the mock server also accepts this namespace.

@@ -7,10 +7,11 @@ export async function registerDashboardRoutes(app: FastifyInstance): Promise<voi
   app.get("/dashboard", async (request, reply) => {
     const auth = await requireAuth(request);
     const store = getStore();
-    const [assets, approvals, activities] = await Promise.all([
+    const [assets, approvals, activities, credits] = await Promise.all([
       store.listAssets(auth.workspace.id),
       store.listApprovals(auth.workspace.id),
-      store.listActivities(auth.workspace.id, 8)
+      store.listActivities(auth.workspace.id, 8),
+      store.getCreditAccount(auth.workspace.id, auth.user.id)
     ]);
     const capacity = assets.reduce((sum, asset) => sum + asset.capacityMw, 0);
     const availability = assets.length ? assets.reduce((sum, asset) => sum + asset.availability, 0) / assets.length : 0;
@@ -23,7 +24,7 @@ export async function registerDashboardRoutes(app: FastifyInstance): Promise<voi
         availability: Number(availability.toFixed(1)),
         verifiedAssets: assets.filter((asset) => asset.verified).length,
         pendingApprovals: approvals.filter((approval) => approval.status === "pending").length,
-        pwrcAvailable: "256,721"
+        pwrcAvailable: credits.available
       },
       assets: assets.slice(0, 4),
       approvals: approvals.slice(0, 4),

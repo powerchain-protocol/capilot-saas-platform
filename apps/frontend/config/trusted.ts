@@ -9,7 +9,9 @@ export const trustedConfig = {
     "hermes.pyth.network",
     "public-api.birdeye.so",
     "api.devnet.solana.com",
-    "api.mainnet-beta.solana.com"
+    "api.mainnet-beta.solana.com",
+    "api.capilot.powerchain.energy",
+    "capilot.powerchain.app"
   ] as const
 } as const;
 

@@ -1,0 +1,6 @@
+{
+  "$schema": "./keypairs.schema.json",
+  "version": "1.0.0",
+  "description": "Public keypair registry metadata only. Private or secret key material must never be committed.",
+  "keypairs": []
+}

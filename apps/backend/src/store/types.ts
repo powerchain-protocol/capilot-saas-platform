@@ -14,6 +14,30 @@ export type Activity = { id: string; workspaceId: string; kind: "asset" | "appro
 export type Chat = { id: string; workspaceId: string; userId: string; slug: string; title: string; createdAt: string; updatedAt: string };
 export type Message = { id: string; chatId: string; workspaceId: string; userId: string; role: MessageRole; content: string; createdAt: string };
 export type ContactRequest = { id: string; name: string; email: string; company: string; message: string; intent: string; createdAt: string };
+export type CreditAccount = {
+  id: string;
+  workspaceId: string;
+  userId: string;
+  asset: "PWRC";
+  decimals: 9;
+  available: string;
+  reserved: string;
+  spent: string;
+  funded: string;
+  updatedAt: string;
+};
+export type CreditLedgerKind = "fund" | "reserve" | "settle" | "release";
+export type CreditLedgerEntry = {
+  id: string;
+  accountId: string;
+  workspaceId: string;
+  userId: string;
+  kind: CreditLedgerKind;
+  amount: string;
+  balanceAfter: string;
+  reference: string;
+  createdAt: string;
+};
 
 export type AccountBundle = { user: User; workspace: Workspace; membership: Membership };
 
@@ -43,4 +67,6 @@ export interface Store {
   listMessages(chatId: string, workspaceId: string, userId: string, limit?: number): Promise<Message[]>;
   getMessage(messageId: string, workspaceId: string, userId: string): Promise<Message | null>;
   addContact(input: Omit<ContactRequest, "id" | "createdAt">): Promise<ContactRequest>;
+  getCreditAccount(workspaceId: string, userId: string): Promise<CreditAccount>;
+  listCreditLedger(workspaceId: string, userId: string, limit?: number): Promise<CreditLedgerEntry[]>;
 }

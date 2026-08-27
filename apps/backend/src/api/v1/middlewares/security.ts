@@ -1,6 +1,8 @@
-import { createHash } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 import type { FastifyRequest } from "fastify";
 import { env } from "../../../config/env";
+import { API_KEY_HEADER } from "../../../constants/api";
+import { ApiError } from "./http";
 
 export function sameOriginOrAllowed(request: FastifyRequest): boolean {
   const originHeader = request.headers.origin;
@@ -13,6 +15,34 @@ export function sameOriginOrAllowed(request: FastifyRequest): boolean {
     return false;
   }
   return env.corsAllowedOrigins.includes(origin);
+}
+
+function digestApiKey(value: string): Buffer {
+  return createHash("sha256").update(value, "utf8").digest();
+}
+
+function digestHex(value: string): Buffer | null {
+  if (!/^[a-f0-9]{64}$/i.test(value)) return null;
+  return Buffer.from(value, "hex");
+}
+
+export function hasValidApiKey(request: FastifyRequest): boolean {
+  if (!env.apiKeyRequired && env.apiKeyHashes.length === 0) return true;
+  const raw = request.headers[API_KEY_HEADER];
+  const supplied = Array.isArray(raw) ? raw[0] : raw;
+  if (typeof supplied !== "string" || supplied.length < 16 || supplied.length > 512) return false;
+  const candidate = digestApiKey(supplied);
+  for (const configured of env.apiKeyHashes) {
+    const expected = digestHex(configured);
+    if (expected && expected.length === candidate.length && timingSafeEqual(candidate, expected)) return true;
+  }
+  return false;
+}
+
+export function requireApiKey(request: FastifyRequest): void {
+  if (!hasValidApiKey(request)) {
+    throw new ApiError("A valid PowerChain API key is required.", { status: 401, code: "INVALID_API_KEY" });
+  }
 }
 
 type RateEntry = { count: number; resetAt: number };

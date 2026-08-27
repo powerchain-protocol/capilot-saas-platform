@@ -1,0 +1,32 @@
+{
+  "name": "PWRC credits and token metadata",
+  "version": "1.0.0",
+  "description": "Read-only developer flow for authenticated credits and public token metadata.",
+  "steps": [
+    {
+      "id": "sign-in",
+      "request": "Sign in",
+      "captures": [
+        "pc_session"
+      ]
+    },
+    {
+      "id": "credits",
+      "request": "Credits snapshot",
+      "dependsOn": [
+        "sign-in"
+      ]
+    },
+    {
+      "id": "ledger",
+      "request": "Credit ledger",
+      "dependsOn": [
+        "sign-in"
+      ]
+    },
+    {
+      "id": "token",
+      "request": "PWRC token"
+    }
+  ]
+}

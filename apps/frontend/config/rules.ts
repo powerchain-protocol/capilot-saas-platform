@@ -30,6 +30,8 @@ export const SECURITY_RULES = {
 export const API_RULES = {
   version: "v1",
   basePath: "/api/v1",
+  publicBasePath: "/v1",
+  requireApiKey: true,
   corsDefault: "same-origin",
   cacheProviderDataMs: 30_000,
   failClosedOnMissingProductionRpc: true,

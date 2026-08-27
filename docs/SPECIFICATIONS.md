@@ -27,3 +27,7 @@ The current realtime channel is `/ws/v1/chat/{id}` and carries `chat.message`, `
 Shared portable schemas are stored under `api/schemas/` for envelopes, realtime events, and repository flow manifests.
 
 OpenAPI owns HTTP semantics. AsyncAPI owns WebSocket semantics. Runtime route source code remains authoritative only when it matches these checked-in contracts; drift should block release.
+
+## Authentication contract
+
+OpenAPI defines `components.securitySchemes.ApiKey` as header `X-Api-Key` and applies it globally. Workspace operations combine that scheme with `sessionCookie`. The realtime AsyncAPI surface uses the authenticated session because browser WebSocket APIs cannot attach arbitrary `X-Api-Key` headers.

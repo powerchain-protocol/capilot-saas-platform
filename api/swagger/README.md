@@ -10,3 +10,7 @@ The Fastify backend serves the canonical OpenAPI 3.1 HTTP contract from `api/ope
 REST semantics are owned by OpenAPI. Realtime WebSocket semantics are owned separately by `api/asyncapi/asyncapi.yaml`; the split avoids pretending a WebSocket subscription is an ordinary HTTP request.
 
 For runnable API examples use the Postman artifacts in `api/postman/`. For deterministic development without PostgreSQL/providers use `pnpm api:mock`.
+
+## Hosted API
+
+Swagger describes the public `/v1` surface. Use the **Authorize** control to set `X-Api-Key`; user/workspace operations also need an authenticated session cookie.

@@ -260,3 +260,11 @@ The root Vercel configuration builds the Next.js frontend. The Fastify backend i
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## API v1 security
+
+PowerChain exposes the external versioned API through `https://api.capilot.powerchain.energy/v1` with `https://capilot.powerchain.app/v1` configured as the app-gateway fallback. The browser application continues to use same-origin `/api/v1`, where the Next.js server proxy injects `X-Api-Key` without exposing it to browser JavaScript. User/workspace endpoints require both the API key and the signed HttpOnly session cookie.
+
+Developer tooling includes OpenAPI 3.1, AsyncAPI 3.0, Postman datasets/flows, a deterministic mock API, the typed TypeScript SDK, and `pnpm api:generate` for a generated operation catalog. PWRC usage-credit and token-metadata APIs are included under `/v1/credits*` and `/v1/tokens*`.
+
+Solana wallet configuration under `wallets/solana/` is public-key metadata only. Never commit private keys, mnemonic phrases, seed material, or signing arrays.

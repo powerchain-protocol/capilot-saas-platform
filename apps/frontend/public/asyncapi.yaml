@@ -14,9 +14,13 @@ servers:
     protocol: ws
     description: Local Fastify backend
   production:
-    host: api.powerchain.energy
+    host: api.capilot.powerchain.energy
     protocol: wss
-    description: Production endpoint when deployed
+    description: Primary production realtime endpoint when deployed
+  gateway:
+    host: capilot.powerchain.app
+    protocol: wss
+    description: App-gateway realtime fallback when enabled
 channels:
   chat:
     address: /ws/v1/chat/{id}

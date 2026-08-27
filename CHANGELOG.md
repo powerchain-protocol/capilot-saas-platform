@@ -47,3 +47,14 @@ All notable changes to PowerChain Copilot are documented here. The product remai
 - IP display remains masked unless the authenticated user explicitly requests reveal.
 - WebSocket channels verify the same workspace/user session boundary as HTTP chat routes.
 - AI analysis remains separate from approval, dispatch, wallet signature, treasury, and settlement execution.
+
+### API key, credits, tokens and generation
+
+- Added OpenAPI `ApiKey` security scheme using `X-Api-Key` and combined API-key/session protection for workspace operations.
+- Added external `/v1` backend alias and configured `api.capilot.powerchain.energy` plus `capilot.powerchain.app` API origins.
+- Added server-only API-key injection in the Next.js same-origin proxy and SHA-256 hash verification in Fastify.
+- Added deterministic API generator with stale-output checks and a frontend `use-api-generator` catalog hook.
+- Added PWRC credit-account and credit-ledger APIs, PostgreSQL migration `0002_credits.sql`, frontend credit UI/hook/types, and SDK methods.
+- Added token-metadata endpoints and typed PWRC token configuration.
+- Added public-key-only Solana wallet registry files with explicit secret-material exclusions.
+- Updated Postman, OpenAPI, AsyncAPI, mock server, SDK, README, architecture, API, security, and flow documentation.

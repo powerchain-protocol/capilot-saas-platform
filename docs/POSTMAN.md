@@ -22,3 +22,11 @@ Use a dataset from `api/postman/datasets/`. Dataset fields override collection/e
 ## Request IDs
 
 The collection adds an `X-Request-Id` per run. Backend responses expose `X-Request-Id`, and failure envelopes may include `error.requestId` for diagnostics.
+
+## API key
+
+Set the `apiKey` secret environment variable. The collection applies it as `X-Api-Key` at collection scope. Production uses `https://api.capilot.powerchain.energy/v1`; the app gateway is `https://capilot.powerchain.app/v1`.
+
+## Credits and token metadata requests
+
+The collection now includes Credits and Tokens folders. Set `apiKey` in the selected environment; it is inherited through collection-level API-key authentication.

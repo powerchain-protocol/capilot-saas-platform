@@ -8,6 +8,8 @@ import type {
   Asset,
   Chat,
   ContactRequest,
+  CreditAccount,
+  CreditLedgerEntry,
   Membership,
   Message,
   Plan,
@@ -30,6 +32,8 @@ export class MemoryStore implements Store {
   readonly chats = new Map<string, Chat>();
   readonly messages = new Map<string, Message>();
   readonly contacts = new Map<string, ContactRequest>();
+  readonly creditAccounts = new Map<string, CreditAccount>();
+  readonly creditLedger = new Map<string, CreditLedgerEntry>();
 
   async health() { return { ok: true, adapter: "memory" as const, latencyMs: 0 }; }
 
@@ -49,6 +53,7 @@ export class MemoryStore implements Store {
     this.workspaces.set(workspace.id, workspace);
     this.memberships.set(membership.id, membership);
     this.seedWorkspace(workspace.id);
+    this.seedCredits(workspace.id, user.id, user.email === "demo@powerchain.energy");
     return { user, workspace, membership };
   }
 
@@ -130,6 +135,36 @@ export class MemoryStore implements Store {
     const item: ContactRequest = { id: createId("cnt"), ...input, createdAt: now() };
     this.contacts.set(item.id, item);
     return item;
+  }
+
+  async getCreditAccount(workspaceId: string, userId: string): Promise<CreditAccount> {
+    const existing = [...this.creditAccounts.values()].find((account) => account.workspaceId === workspaceId && account.userId === userId);
+    if (existing) return existing;
+    return this.seedCredits(workspaceId, userId, false);
+  }
+
+  async listCreditLedger(workspaceId: string, userId: string, limit = 50): Promise<CreditLedgerEntry[]> {
+    return [...this.creditLedger.values()]
+      .filter((entry) => entry.workspaceId === workspaceId && entry.userId === userId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .slice(0, Math.max(1, Math.min(limit, 100)));
+  }
+
+  private seedCredits(workspaceId: string, userId: string, demo: boolean): CreditAccount {
+    const initial = demo ? 1_000_000n : 0n;
+    const account: CreditAccount = {
+      id: createId("crd"), workspaceId, userId, asset: "PWRC", decimals: 9,
+      available: initial.toString(), reserved: "0", spent: "0", funded: initial.toString(), updatedAt: now()
+    };
+    this.creditAccounts.set(account.id, account);
+    if (initial > 0n) {
+      const entry: CreditLedgerEntry = {
+        id: createId("clg"), accountId: account.id, workspaceId, userId, kind: "fund",
+        amount: initial.toString(), balanceAfter: initial.toString(), reference: "demo_grant", createdAt: now()
+      };
+      this.creditLedger.set(entry.id, entry);
+    }
+    return account;
   }
 
   private seedWorkspace(workspaceId: string): void {

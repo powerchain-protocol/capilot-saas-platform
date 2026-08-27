@@ -29,6 +29,10 @@ export const endpoints = {
     revoke: (id: string) => `${API_BASE}/sessions/${encodeURIComponent(id)}`,
   },
   marketPrice: `${API_BASE}/market/price`,
+  credits: `${API_BASE}/credits`,
+  creditLedger: `${API_BASE}/credits/ledger`,
+  tokens: `${API_BASE}/tokens`,
+  pwrcToken: `${API_BASE}/tokens/pwrc`,
   solanaNetwork: `${API_BASE}/network/solana`,
   securitySession: `${API_BASE}/security/session`,
 } as const;

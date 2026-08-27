@@ -71,3 +71,7 @@ Only `owner`, `admin`, and `operator` roles may mutate approval state in v1.
 ## Market and network adapters
 
 Market and Solana endpoints call server-side providers. Missing keys, provider failures, stale responses, or RPC errors are surfaced as failures/degraded status. No client should convert provider failure into fabricated price or network truth.
+
+## Credits and token metadata
+
+`GET /v1/credits` returns the authenticated PWRC usage-credit account and the governed completed-response lifecycle. `GET /v1/credits/ledger` returns append-oriented movements. `GET /v1/tokens` and `GET /v1/tokens/pwrc` expose public token metadata only; they never return wallet secrets or signing material.

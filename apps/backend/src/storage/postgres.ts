@@ -7,6 +7,8 @@ import type {
   Asset,
   Chat,
   ContactRequest,
+  CreditAccount,
+  CreditLedgerEntry,
   Membership,
   Message,
   Plan,
@@ -49,6 +51,12 @@ export class PostgresStore implements Store {
       await client.query("insert into workspaces(id,name,slug,plan,created_at) values($1,$2,$3,$4,$5)", [workspace.id,workspace.name,workspace.slug,workspace.plan,workspace.createdAt]);
       await client.query("insert into memberships(id,user_id,workspace_id,role) values($1,$2,$3,$4)", [membership.id,membership.userId,membership.workspaceId,membership.role]);
       await this.seedWorkspace(client, workspace.id);
+      const initialCredits = user.email === "demo@powerchain.energy" ? "1000000" : "0";
+      const creditAccountId = createId("crd");
+      await client.query("insert into credit_accounts(id,workspace_id,user_id,asset,decimals,available,reserved,spent,funded,updated_at) values($1,$2,$3,'PWRC',9,$4,0,0,$4,now())", [creditAccountId, workspace.id, user.id, initialCredits]);
+      if (initialCredits !== "0") {
+        await client.query("insert into credit_ledger(id,account_id,workspace_id,user_id,kind,amount,balance_after,reference,created_at) values($1,$2,$3,$4,'fund',$5,$5,'demo_grant',now())", [createId("clg"), creditAccountId, workspace.id, user.id, initialCredits]);
+      }
       await client.query("commit");
       return { user, workspace, membership };
     } catch (error) {
@@ -110,6 +118,29 @@ export class PostgresStore implements Store {
   async listMessages(chatId:string,workspaceId:string,userId:string,limit=100){const result=await this.pool.query("select id,chat_id as \"chatId\",workspace_id as \"workspaceId\",user_id as \"userId\",role,content,created_at as \"createdAt\" from messages where chat_id=$1 and workspace_id=$2 and user_id=$3 order by created_at asc limit $4",[chatId,workspaceId,userId,limit]);return result.rows.map((item)=>row<Message>(item));}
   async getMessage(messageId:string,workspaceId:string,userId:string){const result=await this.pool.query("select id,chat_id as \"chatId\",workspace_id as \"workspaceId\",user_id as \"userId\",role,content,created_at as \"createdAt\" from messages where id=$1 and workspace_id=$2 and user_id=$3 limit 1",[messageId,workspaceId,userId]);return result.rows[0]?row<Message>(result.rows[0]):null;}
   async addContact(input:Omit<ContactRequest,"id"|"createdAt">){const item:ContactRequest={id:createId("cnt"),...input,createdAt:now()};await this.pool.query("insert into contacts(id,name,email,company,message,intent,created_at) values($1,$2,$3,$4,$5,$6,$7)",[item.id,item.name,item.email,item.company,item.message,item.intent,item.createdAt]);return item;}
+
+  async getCreditAccount(workspaceId: string, userId: string): Promise<CreditAccount> {
+    await this.pool.query(
+      "insert into credit_accounts(id,workspace_id,user_id,asset,decimals,available,reserved,spent,funded,updated_at) values($1,$2,$3,'PWRC',9,0,0,0,0,now()) on conflict(workspace_id,user_id,asset) do nothing",
+      [createId("crd"), workspaceId, userId]
+    );
+    const result = await this.pool.query(
+      "select id,workspace_id as \"workspaceId\",user_id as \"userId\",asset,decimals,available::text,reserved::text,spent::text,funded::text,updated_at as \"updatedAt\" from credit_accounts where workspace_id=$1 and user_id=$2 and asset='PWRC' limit 1",
+      [workspaceId, userId]
+    );
+    const record = result.rows[0];
+    if (!record) throw new Error("PWRC credit account could not be initialized.");
+    return row<CreditAccount>(record);
+  }
+
+  async listCreditLedger(workspaceId: string, userId: string, limit = 50): Promise<CreditLedgerEntry[]> {
+    const bounded = Math.max(1, Math.min(limit, 100));
+    const result = await this.pool.query(
+      "select id,account_id as \"accountId\",workspace_id as \"workspaceId\",user_id as \"userId\",kind,amount::text,balance_after::text as \"balanceAfter\",reference,created_at as \"createdAt\" from credit_ledger where workspace_id=$1 and user_id=$2 order by created_at desc limit $3",
+      [workspaceId, userId, bounded]
+    );
+    return result.rows.map((item) => row<CreditLedgerEntry>(item));
+  }
 
   private async seedWorkspace(client: PoolClient, workspaceId: string): Promise<void> {
     const assetInputs = [

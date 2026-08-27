@@ -36,3 +36,15 @@ If WebSocket connectivity fails, applications should fall back to HTTP chat read
 ## Server-side note
 
 The v1 auth contract is browser cookie based. The SDK does not invent API-key or bearer-token authentication. A future machine credential should be introduced as an explicit backend contract before server-to-server authenticated use.
+
+## API-key client
+
+```ts
+const client = new PowerChainClient({ apiKey: process.env.POWERCHAIN_API_KEY });
+```
+
+The default API host is `https://api.capilot.powerchain.energy`; SDK methods target `/v1`.
+
+## Credits
+
+The TypeScript client includes `credits()`, `creditLedger()`, `tokens()`, and `pwrcToken()`. Supply an API key with `new PowerChainClient({ apiKey })`; the SDK targets `/v1` on the configured base host.

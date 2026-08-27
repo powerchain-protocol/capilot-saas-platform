@@ -2,32 +2,23 @@ openapi: 3.1.0
 info:
   title: PowerChain Copilot API
   version: 1.0.0
-  description: 'Canonical HTTP API for PowerChain Copilot 1.0.0. It provides session-authenticated
-
-    workspace data, renewable assets, governed approvals, persisted Copilot chats,
-
-    message retrieval, AI analysis, provider health, market/network adapters, and
-
-    public contact/health endpoints. The API uses a consistent `{ ok, data | error
-    }`
-
-    envelope and signed HttpOnly cookie sessions. AI and network responses do not
-
-    constitute approval, dispatch, financial advice, transaction confirmation, or
-
-    settlement evidence.
-
-    '
+  description: Canonical HTTP API for PowerChain Copilot 1.0.0. Public API traffic uses the versioned
+    /v1 surface and X-Api-Key client authentication. User/workspace operations additionally require the
+    signed HttpOnly session cookie. The web application calls a same-origin /api/v1 gateway that injects
+    the server-side API key; browser code never receives the key. AI and network responses do not constitute
+    approval, dispatch, financial advice, transaction confirmation, or settlement evidence.
   license:
     name: MIT
   summary: Governed SaaS API for PowerChain Copilot renewable-infrastructure operations.
 servers:
+- url: https://api.capilot.powerchain.energy
+  description: Primary PowerChain Copilot API
+- url: https://capilot.powerchain.app
+  description: PowerChain app API gateway
 - url: http://localhost:8000
   description: Local backend
-- url: https://api.powerchain.energy
-  description: Production placeholder
 security:
-- sessionCookie: []
+- ApiKey: []
 tags:
 - name: Health
   description: Public API and dependency health.
@@ -57,12 +48,17 @@ tags:
   description: Solana/Helius network adapter health.
 - name: Contact
   description: Public sales, support, beta, and partnership contact intake.
+- name: Credits
+  description: PWRC internal usage credits and append-oriented ledger views.
+- name: Tokens
+  description: Public token metadata configured by the PowerChain service.
 paths:
-  /api/v1/health:
+  /v1/health:
     get:
       tags:
       - Health
-      security: []
+      security:
+      - ApiKey: []
       summary: API and dependency health
       responses:
         '200':
@@ -71,13 +67,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthEnvelope'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: getHealth
       description: API and dependency health
-  /api/v1/auth/sign-in:
+  /v1/auth/sign-in:
     post:
       tags:
       - Auth
-      security: []
+      security:
+      - ApiKey: []
       summary: Sign in and issue a signed session cookie
       requestBody:
         required: true
@@ -109,11 +108,12 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       operationId: signIn
       description: Sign in and issue a signed session cookie
-  /api/v1/auth/register:
+  /v1/auth/register:
     post:
       tags:
       - Auth
-      security: []
+      security:
+      - ApiKey: []
       summary: Create user, workspace, membership, and session
       requestBody:
         required: true
@@ -158,20 +158,25 @@ paths:
           description: Account already exists
         '422':
           $ref: '#/components/responses/Validation'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: registerAccount
       description: Create user, workspace, membership, and session
-  /api/v1/auth/demo:
+  /v1/auth/demo:
     post:
       tags:
       - Auth
-      security: []
+      security:
+      - ApiKey: []
       summary: Create or enter representative demo workspace
       responses:
         '200':
           description: Demo session created
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: openDemoWorkspace
       description: Create or enter representative demo workspace
-  /api/v1/auth/sign-out:
+  /v1/auth/sign-out:
     post:
       tags:
       - Auth
@@ -179,9 +184,14 @@ paths:
       responses:
         '200':
           description: Signed out
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: signOut
       description: Revoke current session and clear cookie
-  /api/v1/sessions/current:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/sessions/current:
     get:
       tags:
       - Sessions
@@ -197,7 +207,10 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       operationId: getCurrentSession
       description: Current authenticated session
-  /api/v1/sessions:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/sessions:
     get:
       tags:
       - Sessions
@@ -205,9 +218,14 @@ paths:
       responses:
         '200':
           description: Session list
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: listSessions
       description: User sessions
-  /api/v1/sessions/{id}:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/sessions/{id}:
     delete:
       tags:
       - Sessions
@@ -219,9 +237,14 @@ paths:
           description: Session revoked
         '404':
           $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: revokeSession
       description: Revoke a session
-  /api/v1/security/session:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/security/session:
     get:
       tags:
       - Sessions
@@ -238,9 +261,14 @@ paths:
       responses:
         '200':
           description: Session security snapshot
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: getSessionSecurity
       description: Security details for current session
-  /api/v1/dashboard:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/dashboard:
     get:
       tags:
       - Dashboard
@@ -248,9 +276,14 @@ paths:
       responses:
         '200':
           description: Dashboard state
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: getDashboard
       description: Authenticated workspace overview
-  /api/v1/assets:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/assets:
     get:
       tags:
       - Assets
@@ -272,9 +305,14 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Asset'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: listAssets
       description: Workspace assets
-  /api/v1/approvals:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/approvals:
     get:
       tags:
       - Approvals
@@ -282,9 +320,14 @@ paths:
       responses:
         '200':
           description: Approval list
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: listApprovals
       description: Workspace approval queue
-  /api/v1/approvals/{id}:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/approvals/{id}:
     post:
       tags:
       - Approvals
@@ -312,9 +355,14 @@ paths:
           description: Role or origin rejected
         '404':
           $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: updateApproval
       description: Approve or request changes
-  /api/v1/ai/generate:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/ai/generate:
     post:
       tags:
       - AI
@@ -337,9 +385,14 @@ paths:
           description: Managed or deterministic AI response
         '503':
           description: No AI provider or allowed fallback
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: generateAnalysis
       description: Generate governed analysis without persisting a chat message
-  /api/v1/chat:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/chat:
     get:
       tags:
       - Chat
@@ -347,8 +400,13 @@ paths:
       responses:
         '200':
           description: Chat list
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: listChats
       description: List user chats
+      security:
+      - ApiKey: []
+        sessionCookie: []
     post:
       tags:
       - Chat
@@ -365,9 +423,14 @@ paths:
       responses:
         '201':
           description: Chat created
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: createChat
       description: Create a new chat
-  /api/v1/chat/{id}:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/chat/{id}:
     get:
       tags:
       - Chat
@@ -379,9 +442,14 @@ paths:
           description: Chat and messages
         '404':
           $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: getChat
       description: Get chat by opaque id or slug
-  /api/v1/chat/{id}/messages:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/chat/{id}/messages:
     post:
       tags:
       - Chat
@@ -406,9 +474,14 @@ paths:
           description: Assistant message
           mode: null
           and suggested actions: null
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: sendChatMessage
       description: Persist user message and generate Copilot response
-  /api/v1/copilot:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/copilot:
     get:
       tags:
       - Chat
@@ -416,8 +489,13 @@ paths:
       responses:
         '200':
           description: Default chat messages
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: getDefaultCopilotMessages
       description: Compatibility endpoint for current default Copilot chat
+      security:
+      - ApiKey: []
+        sessionCookie: []
     post:
       tags:
       - Chat
@@ -438,9 +516,14 @@ paths:
       responses:
         '200':
           description: Assistant response
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: sendDefaultCopilotMessage
       description: Compatibility endpoint to send a default Copilot message
-  /api/v1/messages/{id}:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/messages/{id}:
     get:
       tags:
       - Messages
@@ -464,9 +547,14 @@ paths:
                     $ref: '#/components/schemas/Message'
         '404':
           $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: getMessage
       description: Retrieve one message by opaque message id
-  /api/v1/profile:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/profile:
     patch:
       tags:
       - Profile
@@ -490,9 +578,14 @@ paths:
       responses:
         '200':
           description: Profile updated
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: updateProfile
       description: Update profile and workspace display names
-  /api/v1/services:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/services:
     get:
       tags:
       - Services
@@ -500,9 +593,14 @@ paths:
       responses:
         '200':
           description: Service catalog
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: listServices
       description: Configured integration catalog
-  /api/v1/market/price:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/market/price:
     get:
       tags:
       - Markets
@@ -530,9 +628,14 @@ paths:
           description: Price result
         '422':
           $ref: '#/components/responses/Validation'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: getMarketPrice
       description: Read price from configured Pyth or Birdeye adapter
-  /api/v1/network/solana:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/network/solana:
     get:
       tags:
       - Network
@@ -540,13 +643,19 @@ paths:
       responses:
         '200':
           description: RPC health
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: getSolanaHealth
       description: Solana RPC health
-  /api/v1/contact:
+      security:
+      - ApiKey: []
+        sessionCookie: []
+  /v1/contact:
     post:
       tags:
       - Contact
-      security: []
+      security:
+      - ApiKey: []
       summary: Submit contact, sales, or access request
       requestBody:
         required: true
@@ -575,6 +684,8 @@ paths:
       responses:
         '201':
           description: Request stored
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
       operationId: createContactRequest
       description: Submit contact, sales, or access request
   /ws/v1/chat/{id}:
@@ -582,8 +693,7 @@ paths:
       tags:
       - Chat
       summary: WebSocket endpoint for authenticated chat events
-      description: 'Upgrade this route to WebSocket. Authentication uses the same
-        signed
+      description: 'Upgrade this route to WebSocket. Authentication uses the same signed
 
         pc_session cookie. The client falls back to HTTP polling when a
 
@@ -596,12 +706,135 @@ paths:
         '101':
           description: Switching Protocols
       operationId: connectChatWebSocket
+      security:
+      - sessionCookie: []
+  /v1/credits:
+    get:
+      tags:
+      - Credits
+      operationId: getCredits
+      summary: Current PWRC credit account
+      description: Returns the authenticated user credit-account balances and the configured completed-response
+        lifecycle. Values are integer PWRC accounting units represented as strings.
+      security:
+      - ApiKey: []
+        sessionCookie: []
+      responses:
+        '200':
+          description: Credit account snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditsEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/credits/ledger:
+    get:
+      tags:
+      - Credits
+      operationId: listCreditLedger
+      summary: List PWRC credit ledger entries
+      description: Returns append-oriented credit movements for the authenticated workspace user.
+      security:
+      - ApiKey: []
+        sessionCookie: []
+      parameters:
+      - in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+      responses:
+        '200':
+          description: Credit ledger entries
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - ok
+                - data
+                properties:
+                  ok:
+                    const: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CreditLedgerEntry'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/tokens:
+    get:
+      tags:
+      - Tokens
+      operationId: listTokens
+      summary: List supported token metadata
+      description: Returns public token configuration only. It never includes private keys or signing
+        material.
+      security:
+      - ApiKey: []
+      responses:
+        '200':
+          description: Token descriptors
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - ok
+                - data
+                properties:
+                  ok:
+                    const: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TokenDescriptor'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
+  /v1/tokens/pwrc:
+    get:
+      tags:
+      - Tokens
+      operationId: getPwrcToken
+      summary: Get PWRC token metadata
+      description: Returns configured PWRC public metadata. The mint address is null until configured
+        by deployment.
+      security:
+      - ApiKey: []
+      responses:
+        '200':
+          description: PWRC token descriptor
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - ok
+                - data
+                properties:
+                  ok:
+                    const: true
+                  data:
+                    $ref: '#/components/schemas/TokenDescriptor'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
 components:
   securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: PowerChain client API key. Web clients use the same-origin gateway so the key remains
+        server-side.
     sessionCookie:
       type: apiKey
       in: cookie
       name: pc_session
+      description: Signed HttpOnly user/workspace session cookie.
   parameters:
     EntityId:
       in: path
@@ -633,6 +866,12 @@ components:
             $ref: '#/components/schemas/ErrorEnvelope'
     NotFound:
       description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    InvalidApiKey:
+      description: Missing or invalid PowerChain API key or authenticated session.
       content:
         application/json:
           schema:
@@ -853,6 +1092,154 @@ components:
         createdAt:
           type: string
           format: date-time
+    CreditAccount:
+      type: object
+      required:
+      - id
+      - workspaceId
+      - userId
+      - asset
+      - decimals
+      - available
+      - reserved
+      - spent
+      - funded
+      - updatedAt
+      properties:
+        id:
+          type: string
+        workspaceId:
+          type: string
+        userId:
+          type: string
+        asset:
+          const: PWRC
+        decimals:
+          const: 9
+        available:
+          type: string
+          pattern: ^[0-9]+$
+        reserved:
+          type: string
+          pattern: ^[0-9]+$
+        spent:
+          type: string
+          pattern: ^[0-9]+$
+        funded:
+          type: string
+          pattern: ^[0-9]+$
+        updatedAt:
+          type: string
+          format: date-time
+    CreditLedgerEntry:
+      type: object
+      required:
+      - id
+      - accountId
+      - workspaceId
+      - userId
+      - kind
+      - amount
+      - balanceAfter
+      - reference
+      - createdAt
+      properties:
+        id:
+          type: string
+        accountId:
+          type: string
+        workspaceId:
+          type: string
+        userId:
+          type: string
+        kind:
+          type: string
+          enum:
+          - fund
+          - reserve
+          - settle
+          - release
+        amount:
+          type: string
+          pattern: ^[0-9]+$
+        balanceAfter:
+          type: string
+          pattern: ^[0-9]+$
+        reference:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    CreditsEnvelope:
+      type: object
+      required:
+      - ok
+      - data
+      properties:
+        ok:
+          const: true
+        data:
+          type: object
+          required:
+          - account
+          - pricing
+          - lifecycle
+          properties:
+            account:
+              $ref: '#/components/schemas/CreditAccount'
+            pricing:
+              type: object
+              required:
+              - completedResponsePwrc
+              properties:
+                completedResponsePwrc:
+                  type: string
+                  pattern: ^[0-9]+$
+            lifecycle:
+              type: array
+              prefixItems:
+              - const: quote
+              - const: reserve
+              - const: deliver
+              - const: settle
+              - const: receipt
+              minItems: 5
+              maxItems: 5
+    TokenDescriptor:
+      type: object
+      required:
+      - id
+      - symbol
+      - name
+      - network
+      - standard
+      - decimals
+      - mintAddress
+      - transferFeeBps
+      - transferableReceipt
+      properties:
+        id:
+          type: string
+        symbol:
+          type: string
+        name:
+          type: string
+        network:
+          type: string
+        standard:
+          type: string
+        decimals:
+          type: integer
+        mintAddress:
+          type:
+          - string
+          - 'null'
+        transferFeeBps:
+          type: integer
+          minimum: 0
+          maximum: 10000
+        transferableReceipt:
+          type: boolean
   examples:
     Unauthenticated:
       summary: Authentication required

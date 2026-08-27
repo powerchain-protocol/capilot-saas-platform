@@ -6,6 +6,7 @@ import { registerAssetRoutes } from "./assets/routes";
 import { registerAuthRoutes } from "./auth/routes";
 import { registerChatRoutes } from "./chat/routes";
 import { registerContactRoutes } from "./contact/routes";
+import { registerCreditRoutes } from "./credits/routes";
 import { registerDashboardRoutes } from "./dashboard/routes";
 import { registerHealthRoutes } from "./health/routes";
 import { registerMarketRoutes } from "./market/routes";
@@ -14,8 +15,9 @@ import { registerNetworkRoutes } from "./network/routes";
 import { registerProfileRoutes } from "./profile/routes";
 import { registerServiceRoutes } from "./services/routes";
 import { registerSessionRoutes } from "./sessions/routes";
+import { registerTokenRoutes } from "./tokens/routes";
 
-export async function registerApiV1(app: FastifyInstance): Promise<void> {
+export async function registerApiV1(app: FastifyInstance, prefix: string = API_PREFIX): Promise<void> {
   await app.register(async (v1) => {
     await registerHealthRoutes(v1);
     await registerAuthRoutes(v1);
@@ -31,5 +33,7 @@ export async function registerApiV1(app: FastifyInstance): Promise<void> {
     await registerAiRoutes(v1);
     await registerChatRoutes(v1);
     await registerMessageRoutes(v1);
-  }, { prefix: API_PREFIX });
+    await registerCreditRoutes(v1);
+    await registerTokenRoutes(v1);
+  }, { prefix });
 }

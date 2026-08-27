@@ -21,6 +21,11 @@ async function proxy(request: Request, context: RouteContext): Promise<Response>
   headers.delete("content-length");
   headers.set("x-forwarded-host", incoming.host);
   headers.set("x-forwarded-proto", incoming.protocol.replace(":", ""));
+  const serverApiKey = process.env.POWERCHAIN_API_KEY;
+  if (!serverApiKey && process.env.NODE_ENV === "production") {
+    return NextResponse.json({ ok: false, error: { code: "API_KEY_NOT_CONFIGURED", message: "PowerChain API gateway is not configured." } }, { status: 503 });
+  }
+  if (serverApiKey) headers.set("x-api-key", serverApiKey);
 
   let body: ArrayBuffer | undefined;
   if (METHODS_WITH_BODY.has(request.method)) {

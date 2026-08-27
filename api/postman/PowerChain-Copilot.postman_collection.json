@@ -93,12 +93,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/health",
+              "raw": "{{baseUrl}}/v1/health",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "health"
               ]
@@ -117,12 +116,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/health",
+                  "raw": "{{baseUrl}}/v1/health",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "health"
                   ]
@@ -179,12 +177,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/sign-in",
+              "raw": "{{baseUrl}}/v1/auth/sign-in",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "auth",
                 "sign-in"
@@ -225,12 +222,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/demo",
+              "raw": "{{baseUrl}}/v1/auth/demo",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "auth",
                 "demo"
@@ -267,12 +263,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "raw": "{{baseUrl}}/v1/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "auth",
                 "register"
@@ -313,12 +308,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/sign-out",
+              "raw": "{{baseUrl}}/v1/auth/sign-out",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "auth",
                 "sign-out"
@@ -343,12 +337,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/sessions/current",
+              "raw": "{{baseUrl}}/v1/sessions/current",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "sessions",
                 "current"
@@ -368,12 +361,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/sessions/current",
+                  "raw": "{{baseUrl}}/v1/sessions/current",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "sessions",
                     "current"
@@ -408,12 +400,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/sessions/current",
+                  "raw": "{{baseUrl}}/v1/sessions/current",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "sessions",
                     "current"
@@ -450,12 +441,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/sessions",
+              "raw": "{{baseUrl}}/v1/sessions",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "sessions"
               ]
@@ -474,12 +464,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/security/session",
+              "raw": "{{baseUrl}}/v1/security/session",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "security",
                 "session"
@@ -507,12 +496,11 @@
             ],
             "description": "Revokes the session identified by `sessionId`. Revoking the current session also clears the session cookie.",
             "url": {
-              "raw": "{{baseUrl}}/api/v1/sessions/{{sessionId}}",
+              "raw": "{{baseUrl}}/v1/sessions/{{sessionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "sessions",
                 "{{sessionId}}"
@@ -548,12 +536,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/dashboard",
+              "raw": "{{baseUrl}}/v1/dashboard",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "dashboard"
               ]
@@ -571,12 +558,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/dashboard",
+                  "raw": "{{baseUrl}}/v1/dashboard",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "dashboard"
                   ]
@@ -611,12 +597,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/assets",
+              "raw": "{{baseUrl}}/v1/assets",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "assets"
               ]
@@ -634,12 +619,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/assets",
+                  "raw": "{{baseUrl}}/v1/assets",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "assets"
                   ]
@@ -674,12 +658,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/approvals",
+              "raw": "{{baseUrl}}/v1/approvals",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "approvals"
               ]
@@ -697,12 +680,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/approvals",
+                  "raw": "{{baseUrl}}/v1/approvals",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "approvals"
                   ]
@@ -752,12 +734,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/approvals/{{approvalId}}",
+              "raw": "{{baseUrl}}/v1/approvals/{{approvalId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "approvals",
                 "{{approvalId}}"
@@ -791,12 +772,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/profile",
+              "raw": "{{baseUrl}}/v1/profile",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "profile"
               ]
@@ -833,12 +813,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/ai/generate",
+              "raw": "{{baseUrl}}/v1/ai/generate",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "ai",
                 "generate"
@@ -871,12 +850,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/ai/generate",
+                  "raw": "{{baseUrl}}/v1/ai/generate",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "ai",
                     "generate"
@@ -924,12 +902,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/ai/generate",
+                  "raw": "{{baseUrl}}/v1/ai/generate",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "ai",
                     "generate"
@@ -975,12 +952,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/chat",
+              "raw": "{{baseUrl}}/v1/chat",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "chat"
               ]
@@ -998,12 +974,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/chat",
+                  "raw": "{{baseUrl}}/v1/chat",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "chat"
                   ]
@@ -1042,12 +1017,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/chat",
+              "raw": "{{baseUrl}}/v1/chat",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "chat"
               ]
@@ -1078,12 +1052,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/chat",
+                  "raw": "{{baseUrl}}/v1/chat",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "chat"
                   ]
@@ -1139,12 +1112,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/chat/{{chatId}}",
+              "raw": "{{baseUrl}}/v1/chat/{{chatId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "chat",
                 "{{chatId}}"
@@ -1163,12 +1135,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/chat/{{chatId}}",
+                  "raw": "{{baseUrl}}/v1/chat/{{chatId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "chat",
                     "{{chatId}}"
@@ -1208,12 +1179,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/chat/{{chatId}}/messages",
+              "raw": "{{baseUrl}}/v1/chat/{{chatId}}/messages",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "chat",
                 "{{chatId}}",
@@ -1247,12 +1217,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/chat/{{chatId}}/messages",
+                  "raw": "{{baseUrl}}/v1/chat/{{chatId}}/messages",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "chat",
                     "{{chatId}}",
@@ -1301,12 +1270,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/chat/{{chatId}}/messages",
+                  "raw": "{{baseUrl}}/v1/chat/{{chatId}}/messages",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "chat",
                     "{{chatId}}",
@@ -1365,12 +1333,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/messages/{{messageId}}",
+              "raw": "{{baseUrl}}/v1/messages/{{messageId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "messages",
                 "{{messageId}}"
@@ -1389,12 +1356,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/messages/{{messageId}}",
+                  "raw": "{{baseUrl}}/v1/messages/{{messageId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "messages",
                     "{{messageId}}"
@@ -1430,12 +1396,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/copilot",
+              "raw": "{{baseUrl}}/v1/copilot",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "copilot"
               ]
@@ -1458,12 +1423,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/copilot",
+              "raw": "{{baseUrl}}/v1/copilot",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "copilot"
               ]
@@ -1496,12 +1460,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/services",
+              "raw": "{{baseUrl}}/v1/services",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "services"
               ]
@@ -1519,12 +1482,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/services",
+                  "raw": "{{baseUrl}}/v1/services",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "services"
                   ]
@@ -1559,12 +1521,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/network/solana",
+              "raw": "{{baseUrl}}/v1/network/solana",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "network",
                 "solana"
@@ -1584,12 +1545,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/network/solana",
+                  "raw": "{{baseUrl}}/v1/network/solana",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "network",
                     "solana"
@@ -1626,12 +1586,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/market/price?provider={{marketProvider}}&feedId={{pythFeedId}}&address={{tokenAddress}}",
+              "raw": "{{baseUrl}}/v1/market/price?provider={{marketProvider}}&feedId={{pythFeedId}}&address={{tokenAddress}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "market",
                 "price"
@@ -1665,12 +1624,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/market/price?provider={{marketProvider}}&feedId={{pythFeedId}}&address={{tokenAddress}}",
+                  "raw": "{{baseUrl}}/v1/market/price?provider={{marketProvider}}&feedId={{pythFeedId}}&address={{tokenAddress}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
-                    "api",
                     "v1",
                     "market",
                     "price"
@@ -1730,12 +1688,11 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/contact",
+              "raw": "{{baseUrl}}/v1/contact",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "api",
                 "v1",
                 "contact"
               ]
@@ -1751,6 +1708,98 @@
             }
           },
           "response": []
+        }
+      ]
+    },
+    {
+      "name": "Credits",
+      "description": "PWRC internal usage credits.",
+      "item": [
+        {
+          "name": "Credits snapshot",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/credits",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "credits"
+              ]
+            },
+            "description": "Get the current authenticated PWRC credit account and lifecycle."
+          }
+        },
+        {
+          "name": "Credit ledger",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/credits/ledger?limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "credits",
+                "ledger"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "List append-oriented credit movements."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tokens",
+      "description": "Public token metadata; no signing material.",
+      "item": [
+        {
+          "name": "List tokens",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/tokens",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "tokens"
+              ]
+            },
+            "description": "List supported token metadata."
+          }
+        },
+        {
+          "name": "PWRC token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/tokens/pwrc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "tokens",
+                "pwrc"
+              ]
+            },
+            "description": "Get PWRC token metadata."
+          }
         }
       ]
     }
@@ -1782,5 +1831,25 @@
         ]
       }
     }
-  ]
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "X-Api-Key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{apiKey}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  }
 }

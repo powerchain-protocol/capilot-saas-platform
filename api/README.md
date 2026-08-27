@@ -34,3 +34,12 @@ api/
 - Executable PostgreSQL migrations remain owned by `apps/backend/src/storage/migrations/`.
 
 Runtime implementation lives in `apps/backend/src/api/v1/`. The Next.js frontend exposes only a thin same-origin `/api/v1/*` proxy and consumes the backend through `apps/frontend/lib/powerchain/`.
+
+## Public v1 surface
+
+- Primary: `https://api.capilot.powerchain.energy/v1`
+- App gateway fallback: `https://capilot.powerchain.app/v1`
+- Local backend: `http://localhost:8000/v1`
+- Same-origin frontend proxy: `/api/v1`
+
+The canonical OpenAPI security scheme is `ApiKey`, transmitted as `X-Api-Key`. Authenticated workspace operations additionally require `pc_session`. Swagger UI reads `api/openapi/openapi.yaml`; Postman uses the same `/v1` routes.

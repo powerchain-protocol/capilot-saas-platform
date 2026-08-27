@@ -45,3 +45,9 @@ Production startup fails when:
 - `SESSION_SECRET` is shorter than 32 characters
 
 The memory store is not an automatic production fallback.
+
+## API keys
+
+External HTTP v1 requests use `X-Api-Key`. Production stores only SHA-256 digests in `POWERCHAIN_API_KEY_HASHES`; the raw key belongs in a secrets manager or deployment environment. The frontend's `POWERCHAIN_API_KEY` is server-only and is injected by the same-origin API proxy. Logs redact `x-api-key`, cookies, authorization headers, and set-cookie values.
+
+Solana signing material is explicitly out of repository scope. `wallets/solana/keypairs.json` contains only public registry metadata and must remain free of private key arrays, seeds, or mnemonics.

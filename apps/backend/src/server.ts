@@ -5,17 +5,19 @@ import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import websocket from "@fastify/websocket";
 import { env, assertProductionConfiguration } from "./config/env";
+import { API_PREFIX, PUBLIC_API_PREFIX, PUBLIC_API_ORIGIN, APP_API_ORIGIN } from "./constants/api";
 import { registerApiV1 } from "./api/v1";
 import { registerWebSocketRoutes } from "./ws/routes";
 import { ApiError, sendError } from "./api/v1/middlewares/http";
 import { createRequestContext } from "./context/request-context";
+import { requireApiKey } from "./api/v1/middlewares/security";
 
 export async function buildServer(): Promise<FastifyInstance> {
   assertProductionConfiguration();
   const app = Fastify({
     logger: {
       level: env.nodeEnv === "production" ? "info" : "debug",
-      redact: ["req.headers.authorization", "req.headers.cookie", "res.headers.set-cookie"]
+      redact: ["req.headers.authorization", "req.headers.cookie", "req.headers.x-api-key", "res.headers.set-cookie"]
     },
     trustProxy: true,
     bodyLimit: 512 * 1024,
@@ -32,7 +34,7 @@ export async function buildServer(): Promise<FastifyInstance> {
     origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["content-type", "authorization", "x-request-id"],
+    allowedHeaders: ["content-type", "authorization", "x-request-id", "x-api-key"],
     exposedHeaders: ["x-request-id"]
   });
 
@@ -50,6 +52,7 @@ export async function buildServer(): Promise<FastifyInstance> {
   await app.register(websocket, { options: { maxPayload: 64 * 1024 } });
 
   app.addHook("onRequest", async (request, reply) => {
+    if (request.method !== "OPTIONS" && (request.url.startsWith(`${API_PREFIX}/`) || request.url.startsWith(`${PUBLIC_API_PREFIX}/`))) requireApiKey(request);
     const context = createRequestContext(request);
     reply.header("x-request-id", context.requestId);
     reply.header("x-content-type-options", "nosniff");
@@ -68,13 +71,16 @@ export async function buildServer(): Promise<FastifyInstance> {
   app.get("/", async () => ({
     name: "PowerChain Copilot API",
     version: "1.0.0",
-    api: "/api/v1",
+    api: API_PREFIX,
+    publicApi: `${PUBLIC_API_ORIGIN}${PUBLIC_API_PREFIX}`,
+    appGateway: `${APP_API_ORIGIN}${PUBLIC_API_PREFIX}`,
     docs: "/docs",
     openapi: "/docs/json",
     websocket: "/ws/v1"
   }));
 
-  await registerApiV1(app);
+  await registerApiV1(app, API_PREFIX);
+  await registerApiV1(app, PUBLIC_API_PREFIX);
   await registerWebSocketRoutes(app);
   return app;
 }

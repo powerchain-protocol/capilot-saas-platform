@@ -11,3 +11,7 @@ PowerChain Copilot keeps protocol contracts separate from implementation:
 - `../schemas/api-flow.schema.json` — repository flow-manifest schema.
 
 HTTP business logic lives in `apps/backend/src/api/v1/`; realtime implementation lives in `apps/backend/src/ws/`.
+
+## Versioned API host
+
+The public OpenAPI surface uses `/v1` on `api.capilot.powerchain.energy`; the application gateway can expose the same surface on `capilot.powerchain.app`. Internal frontend transport remains `/api/v1` for same-origin proxying.

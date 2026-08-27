@@ -1,0 +1,6 @@
+{
+  "source": "api/openapi/openapi.json",
+  "output": "apps/frontend/generators/api/generated.ts",
+  "publicBaseUrl": "https://api.capilot.powerchain.energy/v1",
+  "appGatewayBaseUrl": "https://capilot.powerchain.app/v1"
+}

@@ -96,3 +96,9 @@ Supported event types currently include `chat.message`, `chat.updated`, and `sys
 - OpenAPI/AsyncAPI/JSON Schemas: `api/openapi/`, `api/asyncapi/`, `api/schemas/`
 - TypeScript SDK: `packages/sdk-typescript/`
 - API lifecycle flows: `docs/FLOWS.md`
+
+## API authentication and URLs
+
+The external v1 surface is available at `https://api.capilot.powerchain.energy/v1` with the app-gateway fallback `https://capilot.powerchain.app/v1`. Requests require `X-Api-Key`. User/workspace endpoints also require the signed `pc_session` HttpOnly cookie. The Next.js frontend uses same-origin `/api/v1` and injects the server-side key in its proxy; the key is never exposed through `NEXT_PUBLIC_*`.
+
+Use `pnpm api:key:hash -- <key>` to create the SHA-256 value stored in `POWERCHAIN_API_KEY_HASHES`.

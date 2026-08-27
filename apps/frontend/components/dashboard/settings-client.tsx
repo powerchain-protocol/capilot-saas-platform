@@ -26,7 +26,7 @@ export function SettingsClient() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(apiRoutes.auth.session)
+    fetch(apiRoutes.sessions.current)
       .then((response) => response.json())
       .then((json) => json.ok ? setData(json.data) : setError(json.error.message));
     powerChainApi.getSecuritySession(false).then(setSecuritySession).catch(() => null);

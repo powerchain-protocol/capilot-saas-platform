@@ -108,3 +108,13 @@ The browser transport in `apps/frontend/lib/powerchain/ws.ts` falls back to poll
 ## AI boundary
 
 Copilot receives authenticated workspace asset context. It may analyze and recommend, but it cannot convert analysis into approval, dispatch, wallet signature, treasury action, or settlement completion. Provider errors may fall back to deterministic representative analysis only when explicitly allowed by backend configuration.
+
+## External API topology
+
+```text
+Browser → /api/v1 (Next.js same-origin proxy) → backend /api/v1
+External SDK/Postman → https://api.capilot.powerchain.energy/v1 → backend /v1
+Fallback gateway → https://capilot.powerchain.app/v1 → backend /v1
+```
+
+Both backend prefixes resolve the same route modules. `/v1` is the external developer surface; `/api/v1` remains the internal browser-compatible transport namespace.

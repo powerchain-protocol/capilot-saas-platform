@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-export type EntityPrefix = "usr" | "wsp" | "mem" | "ses" | "ast" | "apr" | "act" | "cht" | "msg" | "cnt" | "leg";
+export type EntityPrefix = "usr" | "wsp" | "mem" | "ses" | "ast" | "apr" | "act" | "cht" | "msg" | "cnt" | "leg" | "crd" | "clg";
 
 export function createId(prefix: EntityPrefix): string {
   return `${prefix}_${randomUUID().replaceAll("-", "")}`;

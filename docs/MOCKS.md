@@ -9,3 +9,7 @@ PowerChain ships two mock paths:
 The local mock API starts on port `8010` and reads fixtures from `api/mocks/fixtures/`.
 
 Mocks must always remain visibly non-authoritative. They must not be used to claim live renewable generation, meter evidence, prices, provider availability, signatures, transaction finality, approval status, or settlement completion.
+
+## v1 aliases
+
+The mock server accepts both `/v1/*` and the frontend-compatible `/api/v1/*` namespace. Credit and token-metadata fixtures are deterministic and explicitly non-authoritative.

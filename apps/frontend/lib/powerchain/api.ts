@@ -1,6 +1,8 @@
 import { withQuery } from "@/queries/queries";
 import { endpoints } from "./endpoints";
 import type { ApiEnvelope, ApiMessage, ChatSummary, HealthSnapshot, SecuritySession, ServiceHealth, SessionContext } from "./types";
+import type { CreditsSnapshot, CreditLedgerEntry } from "@/types/credits";
+import type { TokenDescriptor } from "@/types/tokens";
 
 export class PowerChainApiError extends Error {
   constructor(message: string, readonly code = "API_ERROR", readonly status = 500, readonly requestId?: string) {
@@ -34,6 +36,10 @@ export async function apiFetch<T>(input: RequestInfo | URL, init: RequestInit = 
 export const powerChainApi = {
   health: () => apiFetch<HealthSnapshot>(endpoints.health),
   getServices: () => apiFetch<ServiceHealth[]>(endpoints.services),
+  getCredits: () => apiFetch<CreditsSnapshot>(endpoints.credits),
+  getCreditLedger: () => apiFetch<CreditLedgerEntry[]>(endpoints.creditLedger),
+  getTokens: () => apiFetch<TokenDescriptor[]>(endpoints.tokens),
+  getPwrcToken: () => apiFetch<TokenDescriptor>(endpoints.pwrcToken),
   getSecuritySession: (reveal = false) => apiFetch<SecuritySession>(withQuery(endpoints.securitySession, { reveal: reveal ? 1 : undefined })),
   currentSession: () => apiFetch<SessionContext>(endpoints.sessions.current),
   listSessions: () => apiFetch<Array<SessionContext["session"] & { current: boolean }>>(endpoints.sessions.list),

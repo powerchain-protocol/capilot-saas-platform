@@ -23,9 +23,9 @@ const readBody = async (req) => {
 const server = createServer(async (req, res) => {
   const method = req.method ?? "GET";
   const url = new URL(req.url ?? "/", `http://${req.headers.host ?? `${host}:${port}`}`);
-  const path = url.pathname;
+  const path = url.pathname.startsWith("/v1/") ? `/api${url.pathname}` : url.pathname;
   if (method === "OPTIONS") {
-    res.writeHead(204, { "access-control-allow-origin": req.headers.origin ?? "http://localhost:3000", "access-control-allow-credentials": "true", "access-control-allow-methods": "GET,POST,PATCH,DELETE,OPTIONS", "access-control-allow-headers": "content-type,x-request-id" });
+    res.writeHead(204, { "access-control-allow-origin": req.headers.origin ?? "http://localhost:3000", "access-control-allow-credentials": "true", "access-control-allow-methods": "GET,POST,PATCH,DELETE,OPTIONS", "access-control-allow-headers": "content-type,x-request-id,x-api-key" });
     return res.end();
   }
   try {
@@ -60,6 +60,11 @@ const server = createServer(async (req, res) => {
     if (path === "/api/v1/market/price" && method === "GET") return json(res, 200, await fixture("market-price.json"));
     if (path === "/api/v1/network/solana" && method === "GET") return json(res, 200, await fixture("solana-network.json"));
     if (path === "/api/v1/contact" && method === "POST") return json(res, 201, await fixture("contact.json"));
+    if (path === "/api/v1/credits" && method === "GET") return json(res, 200, await fixture("credits.json"));
+    if (path === "/api/v1/credits/ledger" && method === "GET") return json(res, 200, await fixture("credit-ledger.json"));
+    if (path === "/api/v1/tokens" && method === "GET") return json(res, 200, await fixture("tokens.json"));
+    if (path === "/api/v1/tokens/pwrc" && method === "GET") { const tokens = await fixture("tokens.json"); return json(res, 200, { ok: true, data: tokens.data[0] }); }
+
     return json(res, 404, { ok: false, error: { message: "Mock route not found.", code: "MOCK_NOT_FOUND", requestId: "req_mock_not_found" } });
   } catch (error) {
     return json(res, 500, { ok: false, error: { message: error instanceof Error ? error.message : "Mock server error.", code: "MOCK_ERROR" } });
