@@ -40,3 +40,16 @@
 - [ ] Validate frontend preview deployment
 - [ ] Deploy backend to a WebSocket-capable long-lived runtime
 - [ ] Configure production `DATABASE_URL`, strong `SESSION_SECRET`, allowed origins, and intended provider credentials
+
+
+## API developer experience
+
+- [x] Postman environments and Runner datasets
+- [x] Postman request tests and captured session/chat/message/approval IDs
+- [x] Postman example responses suitable for mock-server creation
+- [x] Local deterministic mock API with representative fixtures
+- [x] OpenAPI YAML + JSON mirrors
+- [x] AsyncAPI WebSocket specification
+- [x] JSON Schema contracts
+- [x] TypeScript API/WS SDK
+- [x] API flow, SDK, mock, specification, and Postman documentation

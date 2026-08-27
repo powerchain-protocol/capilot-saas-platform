@@ -53,11 +53,16 @@ PowerChain Copilot is a full-stack SaaS workspace for renewable infrastructure, 
 │   └── dashboard/                 # canonical action registry
 ├── packages/
 │   ├── ai/
-│   └── shared/
+│   ├── shared/
+│   └── sdk-typescript/             # typed API v1 client + WebSocket helper
 ├── api/
-│   ├── openapi/openapi.yaml
-│   ├── postman/PowerChain-Copilot.postman_collection.json
-│   ├── swagger/README.md
+│   ├── openapi/                    # OpenAPI 3.1 YAML + JSON
+│   ├── asyncapi/                   # WebSocket contract
+│   ├── postman/                    # collection, environments, datasets, flows
+│   ├── mocks/                      # local deterministic mock API + fixtures
+│   ├── schemas/                    # JSON Schema contracts
+│   ├── sdks/                       # SDK index/documentation
+│   ├── swagger/
 │   └── schema.sql
 ├── docs/
 ├── turbo.json
@@ -71,7 +76,7 @@ PowerChain Copilot is a full-stack SaaS workspace for renewable infrastructure, 
 
 - `apps/frontend` owns rendering, browser interaction, PWA/install UX, and the same-origin `/api/v1` proxy.
 - `apps/backend` owns authentication, sessions, API policy, PostgreSQL, AI/provider execution, WebSockets, and authoritative mutations.
-- `api/` owns portable API artifacts (OpenAPI, Postman, Swagger notes, and schema reference).
+- `api/` owns portable developer contracts and tooling: OpenAPI, AsyncAPI, Postman environments/datasets/flows, deterministic mocks, JSON Schemas, SDK documentation, Swagger notes, and the schema snapshot.
 
 The frontend does not contain a second database/repository implementation; this avoids drift between browser-facing code and the authoritative backend.
 
@@ -184,6 +189,10 @@ Artifacts:
 
 - OpenAPI: `api/openapi/openapi.yaml`
 - Postman: `api/postman/PowerChain-Copilot.postman_collection.json`
+- Postman environments/datasets: `api/postman/environments/`, `api/postman/datasets/`
+- AsyncAPI: `api/asyncapi/asyncapi.yaml`
+- Local mock API: `pnpm api:mock` → `http://127.0.0.1:8010`
+- TypeScript SDK: `packages/sdk-typescript/`
 - Swagger: `http://localhost:8000/docs`
 
 Browser code should use `apps/frontend/lib/powerchain/api.ts` rather than hard-coding endpoints. `apps/frontend/lib/powerchain/ws.ts` connects to WebSockets and automatically falls back to HTTP polling.
@@ -236,6 +245,11 @@ The root Vercel configuration builds the Next.js frontend. The Fastify backend i
 
 - [Architecture](docs/ARCHITECTURE.md)
 - [API](docs/API.md)
+- [Postman](docs/POSTMAN.md)
+- [Mocks](docs/MOCKS.md)
+- [Specifications](docs/SPECIFICATIONS.md)
+- [SDK](docs/SDK.md)
+- [API flows](docs/FLOWS.md)
 - [Security](docs/SECURITY.md)
 - [Setup](docs/SETUP.md)
 - [Integrations](docs/INTEGRATIONS.md)

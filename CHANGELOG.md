@@ -17,6 +17,10 @@ All notable changes to PowerChain Copilot are documented here. The product remai
 - Authenticated WebSocket chat events at `/ws/v1/chat/:id` with frontend HTTP polling fallback.
 - `apps/frontend/lib/powerchain/` API client, endpoint registry, WebSocket transport, and fallback layer.
 - Root `api/` documentation workspace with canonical OpenAPI, Postman collection, Swagger notes, and PostgreSQL schema snapshot.
+- Postman environments, Collection Runner datasets, request tests, captured IDs, example responses, and portable API flow recipes.
+- Deterministic local mock API and fixtures for frontend, SDK, Postman, and failure-state development.
+- AsyncAPI 3.0 realtime specification plus portable JSON Schemas for API envelopes, chat events, and flow manifests.
+- First-party `@powerchain/copilot-sdk` TypeScript client with typed REST methods and browser WebSocket helper.
 - Next.js route groups for public pages and dashboard pages without changing public URLs.
 - Frontend `context/`, `constants/`, `data/`, `storage/`, `store/`, `utils/epoch.ts`, and explorer/currency definitions.
 - Light/dark/system themes with persisted preference and theme-aware PowerChain app icons.

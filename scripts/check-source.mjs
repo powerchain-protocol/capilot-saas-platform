@@ -56,6 +56,13 @@ const required = [
   "apps/backend/src/data/explorers.ts",
   "api/openapi/openapi.yaml",
   "api/postman/PowerChain-Copilot.postman_collection.json",
+  "api/postman/environments/PowerChain-Local.postman_environment.json",
+  "api/postman/datasets/smoke.json",
+  "api/mocks/server.mjs",
+  "api/asyncapi/asyncapi.yaml",
+  "api/schemas/api-envelope.schema.json",
+  "packages/sdk-typescript/src/client.ts",
+  "packages/sdk-typescript/src/websocket.ts",
   "vercel.json",
 ];
 
