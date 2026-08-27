@@ -4,19 +4,13 @@
     "status": "operational",
     "version": "1.0.0",
     "timestamp": "2026-08-27T06:00:00.000Z",
-    "database": {
-      "ok": true,
-      "adapter": "memory",
-      "latencyMs": 1
-    },
-    "sessions": "operational",
-    "ai": "demo",
-    "websocket": "operational",
-    "providers": {
-      "pyth": true,
-      "birdeye": false,
-      "helius": true,
-      "solanaRpc": true
-    }
+    "environment": "development",
+    "networks": { "solana": "devnet", "sui": "devnet" },
+    "database": { "ok": true, "adapter": "memory", "latencyMs": 1 },
+    "sessions": "configured",
+    "ai": "managed",
+    "aiProvidersConfigured": 1,
+    "websocket": "enabled",
+    "providers": { "pyth": true, "birdeye": false, "helius": true, "solanaRpc": true }
   }
 }

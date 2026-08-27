@@ -1,6 +1,6 @@
 import { withQuery } from "@/queries/queries";
 import { endpoints } from "./endpoints";
-import type { ApiEnvelope, ApiMessage, ChatSummary, HealthSnapshot, SecuritySession, ServiceHealth, SessionContext } from "./types";
+import type { AiModelsSnapshot, ApiEnvelope, ApiMessage, ChatSummary, HealthSnapshot, NetworkProfile, SecuritySession, ServiceHealth, SessionContext } from "./types";
 import type { CreditsSnapshot, CreditLedgerEntry, CreditQuote, CreditReceipt } from "@/types/credits";
 import type { TokenDescriptor } from "@/types/tokens";
 
@@ -36,6 +36,8 @@ export async function apiFetch<T>(input: RequestInfo | URL, init: RequestInit = 
 export const powerChainApi = {
   health: () => apiFetch<HealthSnapshot>(endpoints.health),
   getServices: () => apiFetch<ServiceHealth[]>(endpoints.services),
+  getAiModels: () => apiFetch<AiModelsSnapshot>(endpoints.ai.models),
+  getNetworkProfile: () => apiFetch<NetworkProfile>(endpoints.networkProfile),
   getCredits: () => apiFetch<CreditsSnapshot>(endpoints.credits),
   getCreditLedger: () => apiFetch<CreditLedgerEntry[]>(endpoints.creditLedger),
   getCreditQuotes: () => apiFetch<CreditQuote[]>(endpoints.creditQuotes),

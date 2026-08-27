@@ -6,7 +6,7 @@
   "license": "MIT",
   "packageManager": "pnpm@11.23.0",
   "engines": {
-    "node": ">=24.20.0 <27",
+    "node": ">=24.20.0 <25",
     "pnpm": ">=11.23.0 <12"
   },
   "scripts": {
@@ -20,7 +20,7 @@
     "format:check": "prettier --check .",
     "approve-builds": "pnpm approve-builds",
     "frontend": "pnpm --filter @powerchain/capilot-frontend",
-    "verify": "pnpm postman:remote:verify && pnpm api:generate:check && pnpm check:api-dx && pnpm check:schema && pnpm check:imports && pnpm check:source && pnpm typecheck && pnpm lint && pnpm build",
+    "verify": "pnpm runtime:check && pnpm deps:policy:check && pnpm postman:remote:verify && pnpm api:generate:check && pnpm check:api-dx && pnpm check:schema && pnpm check:imports && pnpm check:source && pnpm typecheck && pnpm lint && pnpm build",
     "doctor": "node scripts/doctor.mjs",
     "check:source": "node scripts/check-source.mjs",
     "ui:add": "pnpm dlx shadcn@latest add",
@@ -44,7 +44,12 @@
     "postman:spec:push": "node scripts/postman-remote.mjs push-spec",
     "postman:dataset": "node scripts/postman-remote.mjs dataset get",
     "postman:dataset:sources": "node scripts/postman-remote.mjs dataset sources",
-    "postman:dataset:views": "node scripts/postman-remote.mjs dataset views"
+    "postman:dataset:views": "node scripts/postman-remote.mjs dataset views",
+    "runtime:check": "node scripts/check-runtime.mjs",
+    "deps:approve": "pnpm approve-builds",
+    "deps:rebuild": "pnpm rebuild unrs-resolver sharp",
+    "install:verified": "pnpm runtime:check && pnpm install && pnpm deps:rebuild",
+    "deps:policy:check": "node scripts/check-build-policy.mjs"
   },
   "devDependencies": {
     "eslint": "10.9.1",
@@ -57,10 +62,6 @@
   "pnpm": {
     "overrides": {
       "unrs-resolver": "1.12.2"
-    },
-    "onlyBuiltDependencies": [
-      "sharp",
-      "unrs-resolver"
-    ]
+    }
   }
 }

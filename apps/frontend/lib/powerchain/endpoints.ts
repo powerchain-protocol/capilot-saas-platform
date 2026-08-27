@@ -7,7 +7,7 @@ export const endpoints = {
   assets: `${API_BASE}/assets`,
   approvals: `${API_BASE}/approvals`,
   approval: (id: string) => `${API_BASE}/approvals/${encodeURIComponent(id)}`,
-  ai: { generate: `${API_BASE}/ai/generate` },
+  ai: { generate: `${API_BASE}/ai/generate`, models: `${API_BASE}/ai/models` },
   chat: {
     list: `${API_BASE}/chat`,
     byId: (idOrSlug: string) => `${API_BASE}/chat/${encodeURIComponent(idOrSlug)}`,
@@ -35,6 +35,7 @@ export const endpoints = {
   creditReceipts: `${API_BASE}/credits/receipts`,
   tokens: `${API_BASE}/tokens`,
   pwrcToken: `${API_BASE}/tokens/pwrc`,
+  networkProfile: `${API_BASE}/network/profile`,
   solanaNetwork: `${API_BASE}/network/solana`,
   securitySession: `${API_BASE}/security/session`,
 } as const;

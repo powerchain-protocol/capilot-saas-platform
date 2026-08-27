@@ -4,22 +4,19 @@ Changes must preserve operational truth, tenant/workspace boundaries, explicit a
 
 ## Requirements
 
-- Node.js `24.20.0` LTS
+- Node.js `24.20.0`
 - pnpm `11.23.0`
 - PostgreSQL for backend integration testing
 
 ```bash
+nvm install
 nvm use
 corepack enable
 corepack prepare pnpm@11.23.0 --activate
 pnpm install
 ```
 
-Review dependency lifecycle scripts before running:
-
-```bash
-pnpm approve-builds
-```
+pnpm 11 build scripts are fail-closed. `unrs-resolver` and `sharp` are already reviewed in `pnpm-workspace.yaml` via `allowBuilds`. Run `pnpm approve-builds` only after reviewing any newly reported dependency.
 
 ## Development
 

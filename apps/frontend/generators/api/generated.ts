@@ -64,6 +64,11 @@ export const GENERATED_API_OPERATIONS = [
     "path": "/v1/messages/{id}"
   },
   {
+    "operationId": "getNetworkProfile",
+    "method": "GET",
+    "path": "/v1/network/profile"
+  },
+  {
     "operationId": "getPwrcToken",
     "method": "GET",
     "path": "/v1/tokens/pwrc"
@@ -77,6 +82,11 @@ export const GENERATED_API_OPERATIONS = [
     "operationId": "getSolanaHealth",
     "method": "GET",
     "path": "/v1/network/solana"
+  },
+  {
+    "operationId": "listAiModels",
+    "method": "GET",
+    "path": "/v1/ai/models"
   },
   {
     "operationId": "listApprovals",

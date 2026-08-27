@@ -4,3 +4,4 @@ export * from "./uploads";
 export * from "./types/prompts";
 export * from "./types/messages";
 export * from "./types/actions";
+export * from "./config/environments";

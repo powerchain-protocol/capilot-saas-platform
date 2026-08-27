@@ -2,6 +2,17 @@ packages:
   - "apps/*"
   - "packages/*"
 
-onlyBuiltDependencies:
-  - sharp
-  - unrs-resolver
+# pnpm 11 build-script trust policy. Unlisted dependency build scripts fail
+# closed under strictDepBuilds instead of executing implicitly.
+strictDepBuilds: true
+allowBuilds:
+  unrs-resolver: true
+  sharp: true
+
+engineStrict: true
+saveExact: true
+preferWorkspacePackages: true
+linkWorkspacePackages: true
+sharedWorkspaceLockfile: true
+autoInstallPeers: true
+strictPeerDependencies: false

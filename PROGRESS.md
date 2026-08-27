@@ -28,6 +28,10 @@
 - [x] strict TypeScript + ESLint 10.9.1 + no-explicit-any policy
 - [x] light/dark/system themes and app icons
 - [x] responsive marketing/dashboard/install UX
+- [x] explicit development/mainnet environment profiles with Solana/Sui network policy
+- [x] multi-provider AI model registry and managed fallback routing
+- [x] pnpm 11 `allowBuilds` migration for `unrs-resolver`/`sharp`
+- [x] Node.js 24.20.0 runtime pin and runtime doctor
 
 ## Release gates
 

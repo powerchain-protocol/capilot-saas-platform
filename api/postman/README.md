@@ -23,9 +23,10 @@ Canonical Postman specification URL:
 
 1. Import `PowerChain-Copilot.postman_collection.json`.
 2. Import one environment from `environments/`.
-3. For a live local backend, select **PowerChain Copilot — Local**.
-4. For deterministic mock responses, run `pnpm api:mock` and select **PowerChain Copilot — Local Mock**.
-5. Use Collection Runner with a JSON or CSV file from `datasets/`.
+3. For the explicit development profile, select **PowerChain Copilot — Development** (`devnet` / `devnet`).
+4. For mainnet, select **PowerChain Copilot — Mainnet** (`mainnet-beta` / `mainnet`) and provide secrets only through Postman secret variables.
+5. For deterministic mock responses, run `pnpm api:mock` and select **PowerChain Copilot — Local Mock**.
+6. Use Collection Runner with a JSON or CSV file from `datasets/`.
 
 The collection stores the `pc_session` HttpOnly cookie in Postman's cookie jar automatically. It also captures `sessionId`, `chatId`, `messageId`, and `approvalId` when responses provide them.
 

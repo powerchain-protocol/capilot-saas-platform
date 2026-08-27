@@ -9,17 +9,14 @@
 ## Install
 
 ```bash
+nvm install
 nvm use
 corepack enable
 corepack prepare pnpm@11.23.0 --activate
 pnpm install
 ```
 
-Review blocked lifecycle scripts before approving:
-
-```bash
-pnpm approve-builds
-```
+The workspace uses pnpm 11 `allowBuilds` with `strictDepBuilds: true`. `unrs-resolver@1.12.2` and `sharp` are pre-approved; new build-script dependencies remain blocked until explicitly reviewed.
 
 ## PostgreSQL
 
@@ -31,10 +28,21 @@ pnpm db:migrate
 
 ## Environment
 
+Development:
+
 ```bash
 cp apps/backend/.env.example apps/backend/.env
 cp apps/frontend/.env.example apps/frontend/.env.local
 ```
+
+Mainnet templates:
+
+```bash
+cp apps/backend/.env.mainnet.example apps/backend/.env
+cp apps/frontend/.env.mainnet.example apps/frontend/.env.local
+```
+
+See `docs/ENVIRONMENTS.md` and `docs/AI_MODELS.md`.
 
 Backend production-critical settings:
 

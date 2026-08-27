@@ -27,3 +27,24 @@ export type CreditQuote = { id: string; accountId: string; workspaceId: string; 
 export type CreditReceipt = { id: string; quoteId: string; accountId: string; workspaceId: string; userId: string; chatId: string; responseMessageId: string; quoteHash: string; amount: string; reservationLedgerId: string; settlementLedgerId: string; transferable: false; createdAt: string };
 export type CreditsSnapshot = { account: CreditAccount; pricing: { completedResponsePwrc: string; pricingVersion: "pwrc-message-v1" }; lifecycle: readonly ["quote","reserve","deliver","settle","receipt"]; latestReceipt: CreditReceipt | null };
 export type TokenDescriptor = { id: string; symbol: string; name: string; network: string; standard: string; decimals: number; mintAddress: string | null; transferFeeBps: number; transferableReceipt: boolean };
+
+export type AiModelStatus = {
+  provider: "openai" | "anthropic" | "gemini" | "deepseek" | "ollama";
+  model: string;
+  configured: boolean;
+  local: boolean;
+};
+
+export type AiModelsSnapshot = {
+  environment: "development" | "mainnet";
+  providerOrder: string[];
+  models: AiModelStatus[];
+};
+
+export type NetworkProfile = {
+  environment: "development" | "mainnet";
+  production: boolean;
+  solanaCluster: "devnet" | "mainnet-beta";
+  suiNetwork: "devnet" | "mainnet";
+  representativeDataAllowed: boolean;
+};

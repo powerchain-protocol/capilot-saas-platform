@@ -799,6 +799,71 @@
       "name": "AI and Chat",
       "item": [
         {
+          "name": "AI models",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/ai/models",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "ai",
+                "models"
+              ]
+            },
+            "description": "Lists the server-configured AI model aliases and provider availability without exposing provider credentials."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/ai/models",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "ai",
+                    "models"
+                  ]
+                },
+                "description": "Lists the server-configured AI model aliases and provider availability without exposing provider credentials."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"environment\": \"development\",\n    \"providerOrder\": [\n      \"openai\",\n      \"anthropic\",\n      \"gemini\",\n      \"deepseek\",\n      \"ollama\"\n    ],\n    \"models\": [\n      {\n        \"provider\": \"openai\",\n        \"model\": \"gpt-5.6-mini\",\n        \"configured\": true,\n        \"local\": false\n      },\n      {\n        \"provider\": \"anthropic\",\n        \"model\": \"claude-sonnet-4-5\",\n        \"configured\": false,\n        \"local\": false\n      },\n      {\n        \"provider\": \"gemini\",\n        \"model\": \"gemini-2.5-pro\",\n        \"configured\": false,\n        \"local\": false\n      },\n      {\n        \"provider\": \"deepseek\",\n        \"model\": \"deepseek-chat\",\n        \"configured\": false,\n        \"local\": false\n      },\n      {\n        \"provider\": \"ollama\",\n        \"model\": \"llama3.3\",\n        \"configured\": false,\n        \"local\": true\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
           "name": "Generate analysis",
           "request": {
             "method": "POST",
@@ -1507,6 +1572,71 @@
               ],
               "cookie": [],
               "body": "{\n  \"ok\": true,\n  \"data\": [\n    {\n      \"key\": \"solana-rpc\",\n      \"name\": \"Solana RPC\",\n      \"category\": \"network\",\n      \"configured\": true\n    },\n    {\n      \"key\": \"helius\",\n      \"name\": \"Helius\",\n      \"category\": \"network\",\n      \"configured\": true\n    },\n    {\n      \"key\": \"pyth\",\n      \"name\": \"Pyth\",\n      \"category\": \"market\",\n      \"configured\": true\n    },\n    {\n      \"key\": \"birdeye\",\n      \"name\": \"Birdeye\",\n      \"category\": \"market\",\n      \"configured\": false\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Network profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/network/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "network",
+                "profile"
+              ]
+            },
+            "description": "Returns the sanitized development/mainnet profile and selected Solana/Sui networks. No RPC URLs or secrets are returned."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/network/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "network",
+                    "profile"
+                  ]
+                },
+                "description": "Returns the sanitized development/mainnet profile and selected Solana/Sui networks. No RPC URLs or secrets are returned."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"environment\": \"development\",\n    \"production\": false,\n    \"solanaCluster\": \"devnet\",\n    \"suiNetwork\": \"devnet\",\n    \"representativeDataAllowed\": true\n  }\n}"
             }
           ]
         },

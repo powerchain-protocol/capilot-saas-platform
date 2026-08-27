@@ -5,7 +5,7 @@
   "description": "PowerChain Copilot API v1, PostgreSQL persistence, WebSockets, Swagger/OpenAPI, and governed SaaS services.",
   "license": "MIT",
   "engines": {
-    "node": ">=24.20.0 <27"
+    "node": ">=24.20.0 <25"
   },
   "scripts": {
     "dev": "node --watch --experimental-strip-types src/index.ts",
@@ -25,7 +25,8 @@
     "@fastify/websocket": "11.3.0",
     "fastify": "5.12.1",
     "pg": "8.23.0",
-    "ws": "8.21.3"
+    "ws": "8.21.3",
+    "@powerchain/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "24.13.3",

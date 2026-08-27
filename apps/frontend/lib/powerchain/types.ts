@@ -61,9 +61,33 @@ export type HealthSnapshot = {
   status: "operational" | "degraded";
   version: string;
   timestamp: string;
+  environment?: "development" | "mainnet";
+  networks?: { solana: "devnet" | "mainnet-beta"; sui: "devnet" | "mainnet" };
   database: { ok: boolean; adapter: string; latencyMs: number };
   sessions: string;
   ai: string;
+  aiProvidersConfigured?: number;
   websocket: string;
   providers: { pyth: boolean; birdeye: boolean; helius: boolean; solanaRpc: boolean };
+};
+
+export type AiModelStatus = {
+  provider: "openai" | "anthropic" | "gemini" | "deepseek" | "ollama";
+  model: string;
+  configured: boolean;
+  local: boolean;
+};
+
+export type AiModelsSnapshot = {
+  environment: "development" | "mainnet";
+  providerOrder: string[];
+  models: AiModelStatus[];
+};
+
+export type NetworkProfile = {
+  environment: "development" | "mainnet";
+  production: boolean;
+  solanaCluster: "devnet" | "mainnet-beta";
+  suiNetwork: "devnet" | "mainnet";
+  representativeDataAllowed: boolean;
 };

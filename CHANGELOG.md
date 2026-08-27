@@ -2,6 +2,15 @@
 
 All notable changes to PowerChain Copilot are documented here. The product remains on the canonical `1.0.0` release line until an intentional release is cut.
 
+## Runtime, network profiles and AI model routing
+
+- Pinned the repository to Node.js `24.20.0` LTS through `.nvmrc`, `.node-version`, package engines, and a runtime check; pnpm remains `11.23.0` and setup docs use nvm `0.40.7`.
+- Migrated pnpm build-script trust from removed `onlyBuiltDependencies` configuration to pnpm 11 `allowBuilds`, explicitly approving only `unrs-resolver@1.12.2` and `sharp` while keeping `strictDepBuilds` fail-closed.
+- Added explicit `development` and `mainnet` profiles with Solana devnet/mainnet-beta and Sui devnet/mainnet selections plus production consistency validation.
+- Added server-side provider/model routing for OpenAI, Anthropic, Gemini, DeepSeek, and Ollama with ordered fallback inside one governed AI request.
+- Added sanitized `GET /v1/ai/models` and `GET /v1/network/profile` endpoints, frontend/SDK helpers, OpenAPI definitions, Postman requests, and mock responses.
+- Added development/mainnet environment templates and `docs/ENVIRONMENTS.md` plus `docs/AI_MODELS.md`.
+
 ## Postman manifest refinement
 
 - Added `api/postman/index.yaml` as the canonical human-readable Postman workspace/specification manifest.
@@ -13,7 +22,7 @@ All notable changes to PowerChain Copilot are documented here. The product remai
 ### Added
 
 - pnpm + Turborepo monorepo with `apps/frontend`, `apps/backend`, `apps/dashboard`, `packages/ai`, and `packages/shared`.
-- Node.js `24.20.0` LTS, pnpm `11.23.0`, TypeScript `7.0.2`, and ESLint `10.9.1` toolchain pinning.
+- Node.js `24.20.0`, pnpm `11.23.0`, TypeScript `7.0.2`, and ESLint `10.9.1` toolchain pinning.
 - Fastify `5.12.1` backend with exact-origin CORS, request IDs, secure error envelopes, Swagger UI, and OpenAPI 3.1.
 - PostgreSQL persistence through `pg` `8.23.0`, connection pooling, parameterized queries, and canonical migration under `apps/backend/src/storage/migrations/`.
 - Production fail-closed persistence with development-only memory fallback.

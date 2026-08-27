@@ -1,27 +1,60 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalDependencies": [".env", ".env.local", "tsconfig.base.json"],
-  "globalEnv": ["NODE_ENV", "VERCEL", "VERCEL_ENV"],
+  "globalDependencies": [
+    ".env",
+    ".env.local",
+    "tsconfig.base.json"
+  ],
+  "globalEnv": [
+    "NODE_ENV",
+    "POWERCHAIN_ENV",
+    "SOLANA_CLUSTER",
+    "SUI_NETWORK",
+    "NEXT_PUBLIC_POWERCHAIN_ENV",
+    "NEXT_PUBLIC_SOLANA_CLUSTER",
+    "NEXT_PUBLIC_SUI_NETWORK",
+    "NEXT_PUBLIC_POWERCHAIN_API_URL",
+    "NEXT_PUBLIC_POWERCHAIN_APP_API_URL",
+    "NEXT_PUBLIC_POWERCHAIN_WS_URL",
+    "VERCEL",
+    "VERCEL_ENV"
+  ],
   "tasks": {
     "dev": {
       "cache": false,
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**"
+      ]
     },
     "lint": {
-      "dependsOn": ["^lint"],
+      "dependsOn": [
+        "^lint"
+      ],
       "outputs": []
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"],
-      "outputs": ["*.tsbuildinfo", "dist/*.tsbuildinfo"]
+      "dependsOn": [
+        "^typecheck"
+      ],
+      "outputs": [
+        "*.tsbuildinfo",
+        "dist/*.tsbuildinfo"
+      ]
     },
     "check": {
-      "dependsOn": ["lint", "typecheck"],
+      "dependsOn": [
+        "lint",
+        "typecheck"
+      ],
       "outputs": []
     },
     "clean": {

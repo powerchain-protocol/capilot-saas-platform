@@ -14,6 +14,8 @@ PowerChain Copilot is a full-stack SaaS workspace for renewable infrastructure, 
 - **PostgreSQL storage** — `pg` connection pooling, parameterized queries, explicit migrations, and a memory adapter restricted to development fallback.
 - **API v1** — Fastify backend with `X-Api-Key`, exact-origin CORS, request IDs, error envelopes, Swagger UI, OpenAPI 3.1, Postman coverage, generated operation catalog, and same-origin frontend proxying.
 - **Realtime** — authenticated `/ws/v1/chat/:id` WebSocket channel with browser polling fallback when realtime is unavailable.
+- **Environment profiles** — explicit `development` and `mainnet` modes with Solana devnet/mainnet-beta and Sui devnet/mainnet fail-closed network policy.
+- **AI model routing** — server-side OpenAI, Anthropic, Gemini, DeepSeek, and Ollama model configuration with ordered fallback inside a single governed PWRC reservation.
 - **Energy integrations** — Solana RPC/Helius health and server-only Pyth/Birdeye boundaries.
 - **Cross-platform frontend** — responsive Next.js, PWA metadata, install/setup flows, light/dark/system themes, theme-aware PowerChain app icons, and Lucide interface icons.
 - **Strict engineering gates** — TypeScript strict mode, ESLint `10.9.1`, explicit-`any` rejection, route/action/asset/API/OpenAPI/Postman checks that are cwd-independent, and Turbo build orchestration.
@@ -82,8 +84,9 @@ The frontend does not contain a second database/repository implementation; this 
 
 ## Toolchain
 
-- Node.js `24.20.0` LTS
+- Node.js `24.20.0`
 - pnpm `11.23.0`
+- nvm `0.40.7` for local Node activation
 - Turborepo `2.10.11`
 - Next.js `16.3.3`
 - React `19.2.8`
@@ -94,22 +97,36 @@ The frontend does not contain a second database/repository implementation; this 
 - Fastify `5.12.1`
 - PostgreSQL client `pg` `8.23.0`
 
+Node `26.8.1` is the current release, but this repository intentionally pins the latest Node 24 LTS (`24.20.0`) so local, CI, and Vercel runtimes stay aligned.
+
 ## Quick start
 
 ### 1. Runtime and dependencies
 
 ```bash
+# Install nvm v0.40.7 if nvm is not already installed.
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.7/install.sh | bash
+. "$HOME/.nvm/nvm.sh"
+
+# .nvmrc pins the repository runtime.
+nvm install
 nvm use
+
 corepack enable
 corepack prepare pnpm@11.23.0 --activate
 pnpm install
 ```
 
-If pnpm reports blocked lifecycle scripts, review them before approval:
+pnpm 11 uses the `allowBuilds` map in `pnpm-workspace.yaml`. The reviewed native/build dependencies are explicitly allowed:
 
-```bash
-pnpm approve-builds
+```yaml
+strictDepBuilds: true
+allowBuilds:
+  unrs-resolver: true
+  sharp: true
 ```
+
+This resolves `ERR_PNPM_IGNORED_BUILDS` for the pinned `unrs-resolver@1.12.2` without enabling lifecycle scripts globally. If a future dependency introduces a build script, review it first and then run `pnpm approve-builds`.
 
 ### 2. PostgreSQL
 
@@ -134,12 +151,23 @@ Database schemas/migrations intentionally live with the backend storage layer, *
 
 ### 3. Environment files
 
+Development:
+
 ```bash
 cp apps/backend/.env.example apps/backend/.env
 cp apps/frontend/.env.example apps/frontend/.env.local
 ```
 
-For local development use the same hostname for frontend and backend (`localhost` is recommended) so the session cookie can also authenticate the WebSocket connection.
+Mainnet deployment templates:
+
+```bash
+cp apps/backend/.env.mainnet.example apps/backend/.env
+cp apps/frontend/.env.mainnet.example apps/frontend/.env.local
+```
+
+Development defaults to `POWERCHAIN_ENV=development`, Solana `devnet`, and Sui `devnet`. Mainnet uses `POWERCHAIN_ENV=mainnet`, Solana `mainnet-beta`, and Sui `mainnet`; production validation rejects mismatched network settings and demo/memory fallbacks.
+
+For local development use the same hostname for frontend and backend (`localhost` is recommended) so the session cookie can also authenticate the WebSocket connection. See `docs/ENVIRONMENTS.md` and `docs/AI_MODELS.md`.
 
 ### 4. Run the monorepo
 
@@ -177,7 +205,7 @@ Primary groups:
 ```text
 /api/v1/auth/*
 /api/v1/sessions/*
-/api/v1/ai/*
+/api/v1/ai/* (`GET /ai/models`, development-only preview when enabled)
 /api/v1/chat/*
 /api/v1/messages/:id
 /api/v1/assets
@@ -185,6 +213,7 @@ Primary groups:
 /api/v1/dashboard
 /api/v1/services
 /api/v1/market/price
+/api/v1/network/profile
 /api/v1/network/solana
 /api/v1/credits
 /api/v1/credits/ledger

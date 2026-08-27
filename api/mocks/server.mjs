@@ -47,6 +47,7 @@ const server = createServer(async (req, res) => {
       const status = body.action === "request_changes" ? "changes_requested" : "approved";
       return json(res, 200, { ok: true, data: { ...current, id: path.split("/").at(-1), status } });
     }
+    if (path === "/api/v1/ai/models" && method === "GET") return json(res, 200, await fixture("ai-models.json"));
     if (path === "/api/v1/ai/generate" && method === "POST") return json(res, 200, await fixture("ai-generate.json"));
     if (path === "/api/v1/chat" && method === "GET") return json(res, 200, await fixture("chat-list.json"));
     if (path === "/api/v1/chat" && method === "POST") return json(res, 201, { ok: true, data: (await fixture("chat-list.json")).data[0] });
@@ -58,6 +59,7 @@ const server = createServer(async (req, res) => {
     if (path === "/api/v1/profile" && method === "PATCH") return json(res, 200, { ok: true, data: { user: (await fixture("session.json")).data.user, workspace: (await fixture("session.json")).data.workspace } });
     if (path === "/api/v1/services" && method === "GET") return json(res, 200, await fixture("services.json"));
     if (path === "/api/v1/market/price" && method === "GET") return json(res, 200, await fixture("market-price.json"));
+    if (path === "/api/v1/network/profile" && method === "GET") return json(res, 200, await fixture("network-profile.json"));
     if (path === "/api/v1/network/solana" && method === "GET") return json(res, 200, await fixture("solana-network.json"));
     if (path === "/api/v1/contact" && method === "POST") return json(res, 201, await fixture("contact.json"));
     if (path === "/api/v1/credits" && method === "GET") return json(res, 200, await fixture("credits.json"));

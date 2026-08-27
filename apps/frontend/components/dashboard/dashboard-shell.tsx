@@ -7,6 +7,7 @@ import { Logo } from "@/components/brand/logo";
 import { useToast } from "@/components/ui/toast";
 import { powerChainApi } from "@/lib/powerchain";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { EnvironmentBadge } from "@/components/common/environment-badge";
 
 const items = [
   [/^\/dashboard$/, "Overview", LayoutDashboard, "/dashboard"],
@@ -71,6 +72,7 @@ export function DashboardShell({ children, userName, workspaceName }: { children
             <div className="lg:hidden"><Logo compact /></div>
             <div className="hidden min-w-0 lg:block"><p className="text-[10px] font-semibold uppercase tracking-[.12em] text-[#8A938D]">{workspaceName}</p><p className="truncate text-sm font-bold text-[var(--ink-soft)]">{current?.[1] ?? "Workspace"}</p></div>
             <div className="ml-auto flex items-center gap-2">
+              <EnvironmentBadge compact />
               <span className="hidden rounded-full border border-[#DDE8E0] bg-[#F2F8F4] px-3 py-1.5 text-[9px] font-bold text-[var(--success)] sm:inline-flex">● Systems operational</span>
               <ThemeToggle compact />
               <Link href="/dashboard/settings" aria-label="Open settings" className="grid size-9 place-items-center rounded-full border border-[#DDE4DF] bg-[var(--canvas)] text-[10px] font-bold text-[#17613F]">{initial}</Link>

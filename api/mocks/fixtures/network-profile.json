@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "data": {
+    "environment": "development",
+    "production": false,
+    "solanaCluster": "devnet",
+    "suiNetwork": "devnet",
+    "representativeDataAllowed": true
+  }
+}

@@ -1,11 +1,11 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { CheckCircle2, Clock3, Eye, EyeOff, Loader2, ShieldCheck, Wifi } from "lucide-react";
+import { Bot, CheckCircle2, Clock3, Eye, EyeOff, Loader2, Network, ShieldCheck, Wifi } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { ServiceHealth } from "@/components/services/service-health";
 import { apiRoutes } from "@/config/api";
-import { powerChainApi, type SecuritySession } from "@/lib/powerchain";
+import { powerChainApi, type AiModelsSnapshot, type NetworkProfile, type SecuritySession } from "@/lib/powerchain";
 import { formatDateTime } from "@/utils/formats";
 
 type SessionData = {
@@ -20,6 +20,8 @@ export function SettingsClient() {
   const { toast } = useToast();
   const [data, setData] = useState<SessionData | null>(null);
   const [securitySession, setSecuritySession] = useState<SecuritySession | null>(null);
+  const [networkProfile, setNetworkProfile] = useState<NetworkProfile | null>(null);
+  const [aiModels, setAiModels] = useState<AiModelsSnapshot | null>(null);
   const [revealedIp, setRevealedIp] = useState(false);
   const [ipLoading, setIpLoading] = useState(false);
   const [state, setState] = useState<"idle" | "saving" | "saved">("idle");
@@ -30,6 +32,8 @@ export function SettingsClient() {
       .then((response) => response.json())
       .then((json) => json.ok ? setData(json.data) : setError(json.error.message));
     powerChainApi.getSecuritySession(false).then(setSecuritySession).catch(() => null);
+    powerChainApi.getNetworkProfile().then(setNetworkProfile).catch(() => null);
+    powerChainApi.getAiModels().then(setAiModels).catch(() => null);
   }, []);
 
   async function save(event: FormEvent<HTMLFormElement>) {
@@ -101,6 +105,25 @@ export function SettingsClient() {
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-raised)] p-4"><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.1em] text-[#939C96]"><Wifi className="size-3.5" />Current IP</div><div className="mt-3 flex items-center justify-between gap-2"><span className="truncate font-mono text-xs font-semibold text-[#354039]">{securitySession?.ip || "Loading…"}</span><button type="button" onClick={() => void toggleIp()} disabled={ipLoading || !securitySession} className="grid size-9 shrink-0 place-items-center rounded-lg border border-[#DDE4DF] bg-white text-[var(--muted)] hover:text-[#143C2E] disabled:opacity-50" aria-label={revealedIp ? "Hide IP address" : "Show IP address"}>{ipLoading ? <Loader2 className="size-3.5 animate-spin" /> : revealedIp ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}</button></div></div>
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-raised)] p-4"><p className="text-[10px] font-bold uppercase tracking-[.1em] text-[#939C96]">Session mode</p><p className="mt-3 text-xs font-bold text-[#354039]">{securitySession?.persistent ? "Remembered · 30 days" : "Browser session"}</p><p className="mt-1 text-[10px] text-[#8C958F]">Role: {securitySession?.role || data.role}</p></div>
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-raised)] p-4"><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.1em] text-[#939C96]"><Clock3 className="size-3.5" />Expires</div><p className="mt-3 text-xs font-bold text-[#354039]">{securitySession?.expiresAt ? formatDateTime(securitySession.expiresAt) : data.expiresAt ? formatDateTime(data.expiresAt) : "Session limited"}</p></div>
+        </div>
+      </section>
+
+      <section className="pc-card mt-4 p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div><h2 className="flex items-center gap-2 text-sm font-bold"><Network className="size-4 text-[var(--green)]" />Runtime environment</h2><p className="mt-1 text-xs leading-5 text-[var(--muted-2)]">Sanitized network and AI configuration reported by the backend. Provider keys and RPC URLs are never exposed here.</p></div>
+          {networkProfile ? <span className={`inline-flex w-fit rounded-full px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.1em] ${networkProfile.production ? "bg-[#E6F2EA] text-[#17613F]" : "bg-[#F1F3F1] text-[#657069]"}`}>{networkProfile.environment}</span> : null}
+        </div>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-raised)] p-4"><p className="text-[10px] font-bold uppercase tracking-[.1em] text-[#939C96]">Solana</p><p className="mt-2 text-xs font-bold text-[#354039]">{networkProfile?.solanaCluster ?? "Unavailable"}</p></div>
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-raised)] p-4"><p className="text-[10px] font-bold uppercase tracking-[.1em] text-[#939C96]">Sui</p><p className="mt-2 text-xs font-bold text-[#354039]">{networkProfile?.suiNetwork ?? "Unavailable"}</p></div>
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-raised)] p-4"><p className="text-[10px] font-bold uppercase tracking-[.1em] text-[#939C96]">Representative data</p><p className="mt-2 text-xs font-bold text-[#354039]">{networkProfile ? networkProfile.representativeDataAllowed ? "Allowed in development" : "Disabled" : "Unavailable"}</p></div>
+        </div>
+        <div className="mt-5 border-t border-[var(--border)] pt-5">
+          <h3 className="flex items-center gap-2 text-xs font-bold"><Bot className="size-4 text-[var(--green)]" />AI models</h3>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {(aiModels?.models ?? []).map((model) => <div key={model.provider} className="flex items-center justify-between gap-3 rounded-xl bg-[var(--surface-soft)] p-3"><div className="min-w-0"><p className="truncate text-xs font-bold capitalize">{model.provider}</p><p className="truncate text-[10px] text-[var(--muted-2)]">{model.model}</p></div><span className={`shrink-0 rounded-full px-2 py-1 text-[9px] font-bold ${model.configured ? "bg-[#E6F2EA] text-[#17613F]" : "bg-[var(--surface-raised)] text-[#87908A]"}`}>{model.configured ? "Configured" : "Not configured"}</span></div>)}
+            {!aiModels ? <p className="text-xs text-[var(--muted-2)]">AI model status is unavailable.</p> : null}
+          </div>
         </div>
       </section>
 

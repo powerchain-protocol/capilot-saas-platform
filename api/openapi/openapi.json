@@ -1459,6 +1459,54 @@
           }
         }
       }
+    },
+    "/v1/ai/models": {
+      "get": {
+        "tags": [
+          "AI"
+        ],
+        "summary": "List configured AI model aliases and provider availability",
+        "description": "Returns non-secret AI provider/model configuration for the authenticated workspace runtime. A configured flag means server credentials or a local runtime are present; it does not guarantee provider health.",
+        "operationId": "listAiModels",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "AI runtime model registry"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1/network/profile": {
+      "get": {
+        "tags": [
+          "Network"
+        ],
+        "summary": "Get the active development or mainnet network profile",
+        "description": "Returns the sanitized PowerChain environment and chain selections. RPC URLs and credentials are never returned.",
+        "operationId": "getNetworkProfile",
+        "security": [
+          {
+            "ApiKey": [],
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sanitized environment profile"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
     }
   },
   "components": {
