@@ -8,9 +8,9 @@
     "node": ">=24.19.0 <25"
   },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "node scripts/run-next.mjs dev",
+    "build": "node scripts/run-next.mjs build",
+    "start": "node scripts/run-next.mjs start",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "check:links": "node scripts/check-links.mjs",
@@ -20,12 +20,14 @@
     "clean": "node -e \"Promise.all(['.next','.turbo'].map(p=>require('fs/promises').rm(p,{recursive:true,force:true})))\"",
     "check:assets": "node scripts/check-assets.mjs",
     "check:openapi": "node scripts/check-openapi.mjs",
-    "check:registry": "node scripts/check-action-registry.mjs"
+    "check:registry": "node scripts/check-action-registry.mjs",
+    "telemetry:disable": "next telemetry disable"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
     "@powerchain/ai": "workspace:*",
     "@powerchain/shared": "workspace:*",
+    "@powerchain/supabase": "workspace:*",
     "@tailwindcss/postcss": "4.3.3",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",

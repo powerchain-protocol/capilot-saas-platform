@@ -90,8 +90,8 @@ The REST response remains authoritative for the sender. The WebSocket event supp
 
 ## Migrations
 
-- `0002_credits.sql` — credit account and ledger
-- `0003_credit_quotes_receipts.sql` — deterministic quotes and non-transferable receipts
+- `20260827000200_credits.sql` — credit account and ledger
+- `20260827000300_credit_quotes_receipts.sql` — deterministic quotes and non-transferable receipts
 
 Apply migrations with:
 

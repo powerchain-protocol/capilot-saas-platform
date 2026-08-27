@@ -25,6 +25,10 @@ const required = [
   "apps/frontend/utils/epoch.ts",
   "apps/frontend/ai/providers.tsx",
   "apps/frontend/ai/generic/index.ts",
+  "apps/frontend/ai/generic/renewables/renewables.tsx",
+  "apps/frontend/ai/solana/solana.tsx",
+  "apps/frontend/ai/powerchain/powerchain.tsx",
+  "apps/frontend/ai/powerchain/powerchan.tsx",
   "apps/frontend/ai/solana/index.ts",
   "apps/frontend/ai/powerchain/index.ts",
   "apps/frontend/components/common/cta.tsx",
@@ -52,16 +56,19 @@ const required = [
   "apps/backend/src/api/v1/sessions/routes.ts",
   "apps/backend/src/api/v1/middlewares/auth.ts",
   "apps/backend/src/api/v1/ai/routes.ts",
+  "apps/backend/src/api/v1/network/routes.ts",
+  "apps/backend/src/api/v1/health/routes.ts",
+  "apps/backend/src/services/solana.ts",
   "apps/backend/src/api/v1/chat/routes.ts",
   "apps/backend/src/api/v1/messages/routes.ts",
   "apps/backend/src/api/v1/credits/routes.ts",
   "apps/backend/src/api/v1/tokens/routes.ts",
-  "apps/backend/src/storage/migrations/0002_credits.sql",
+  "supabase/migrations/20260827000200_credits.sql",
   "wallets/solana/keypairs.json",
   "wallets/solana/trusted-wallets.ts",
   "api/api-generator/generate.mjs",
   "apps/backend/src/storage/postgres.ts",
-  "apps/backend/src/storage/migrations/0001_initial.sql",
+  "supabase/migrations/20260827000100_initial.sql",
   "apps/backend/src/ws/routes.ts",
   "apps/backend/src/utils/health.ts",
   "apps/backend/src/constants/currencies.ts",
@@ -100,6 +107,7 @@ const sourceFiles = (await Promise.all(["apps", "packages"].map((directory) => w
   .filter((file) => /\.(ts|tsx)$/.test(file));
 
 const explicitAny = [];
+const forbiddenImports = [];
 const anyPatterns = [
   /:\s*any\b/,
   /\bas\s+any\b/,
@@ -112,14 +120,15 @@ const anyPatterns = [
 for (const file of sourceFiles) {
   const text = await fs.readFile(file, "utf8");
   for (const [index, line] of text.split("\n").entries()) {
-    if (!anyPatterns.some((pattern) => pattern.test(line))) continue;
-    explicitAny.push(`${path.relative(root, file)}:${index + 1}: ${line.trim()}`);
+    if (anyPatterns.some((pattern) => pattern.test(line))) explicitAny.push(`${path.relative(root, file)}:${index + 1}: ${line.trim()}`);
+    if (/import\s*\{[^}]*\bGithub\b[^}]*\}\s*from\s*["']lucide-react["']/.test(line)) forbiddenImports.push(`${path.relative(root, file)}:${index + 1}: use FaGithub from react-icons/fa6; lucide-react does not provide the branded GitHub export in this build.`);
   }
 }
 
-if (missing.length || explicitAny.length) {
+if (missing.length || explicitAny.length || forbiddenImports.length) {
   if (missing.length) console.error("Missing required architecture files:\n" + missing.map((file) => `- ${file}`).join("\n"));
   if (explicitAny.length) console.error("Explicit any/source violations:\n" + explicitAny.join("\n"));
+  if (forbiddenImports.length) console.error("Forbidden build-sensitive imports:\n" + forbiddenImports.join("\n"));
   process.exit(1);
 }
 

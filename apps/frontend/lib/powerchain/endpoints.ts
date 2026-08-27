@@ -2,12 +2,14 @@ export const API_BASE = "/api/v1" as const;
 
 export const endpoints = {
   health: `${API_BASE}/health`,
+  healthLive: `${API_BASE}/health/live`,
+  healthReady: `${API_BASE}/health/ready`,
   services: `${API_BASE}/services`,
   dashboard: `${API_BASE}/dashboard`,
   assets: `${API_BASE}/assets`,
   approvals: `${API_BASE}/approvals`,
   approval: (id: string) => `${API_BASE}/approvals/${encodeURIComponent(id)}`,
-  ai: { generate: `${API_BASE}/ai/generate`, models: `${API_BASE}/ai/models` },
+  ai: { generate: `${API_BASE}/ai/generate`, models: `${API_BASE}/ai/models`, providers: `${API_BASE}/ai/providers` },
   chat: {
     list: `${API_BASE}/chat`,
     byId: (idOrSlug: string) => `${API_BASE}/chat/${encodeURIComponent(idOrSlug)}`,
@@ -37,6 +39,8 @@ export const endpoints = {
   pwrcToken: `${API_BASE}/tokens/pwrc`,
   networkProfile: `${API_BASE}/network/profile`,
   solanaNetwork: `${API_BASE}/network/solana`,
+  solanaAccount: (address: string) => `${API_BASE}/network/solana/accounts/${encodeURIComponent(address)}`,
+  solanaTransaction: (signature: string) => `${API_BASE}/network/solana/transactions/${encodeURIComponent(signature)}`,
   securitySession: `${API_BASE}/security/session`,
 } as const;
 

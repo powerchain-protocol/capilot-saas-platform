@@ -68,3 +68,11 @@ The standalone `/v1/ai/generate` diagnostic endpoint is controlled by `ALLOW_UNB
 ## Stale credit reservation recovery
 
 The server periodically releases PWRC reservations left behind by crashed or abandoned response attempts after a configurable recovery window. PostgreSQL reconciliation uses `FOR UPDATE SKIP LOCKED`, adjusts the account under lock, appends a compensating release ledger record, and marks the quote released. The canonical quote payload and hash are not modified.
+
+## Solana read boundary
+
+Solana integration is intentionally read-only at the HTTP API boundary. Addresses and signatures are base58/length validated, read endpoints require the normal API/session controls, and dedicated request buckets constrain RPC amplification. RPC origins and provider credentials are never returned to clients. Mainnet still fails closed when no configured RPC provider is available.
+
+## Supabase / Turbo secret boundary
+
+Only `NEXT_PUBLIC_SUPABASE_*` values may appear in frontend/global Turbo environment allowlists. `SUPABASE_SECRET_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL`, and `DIRECT_URL` remain backend-scoped and are explicitly rejected from global/frontend Turbo configuration by `pnpm supabase:doctor`.

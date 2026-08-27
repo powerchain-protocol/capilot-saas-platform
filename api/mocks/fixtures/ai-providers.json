@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "data": {
+    "environment": "development",
+    "providerOrder": ["openai", "anthropic", "gemini", "deepseek", "ollama"],
+    "fallbackEnabled": true,
+    "providers": [
+      { "provider": "openai", "model": "gpt-5.6-mini", "configured": true, "local": false, "priority": 1, "fallbackEligible": true },
+      { "provider": "anthropic", "model": "claude-sonnet-4-5", "configured": false, "local": false, "priority": 2, "fallbackEligible": true },
+      { "provider": "gemini", "model": "gemini-2.5-pro", "configured": false, "local": false, "priority": 3, "fallbackEligible": true },
+      { "provider": "deepseek", "model": "deepseek-chat", "configured": false, "local": false, "priority": 4, "fallbackEligible": true },
+      { "provider": "ollama", "model": "llama3.3", "configured": false, "local": true, "priority": 5, "fallbackEligible": true }
+    ]
+  }
+}

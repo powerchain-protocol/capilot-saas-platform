@@ -123,7 +123,7 @@ create index if not exists activities_workspace_idx on activities(workspace_id, 
 create index if not exists chats_workspace_user_idx on chats(workspace_id, user_id, updated_at desc);
 create index if not exists messages_chat_idx on messages(chat_id, created_at);
 
--- BEGIN SNAPSHOT 0002_credits.sql
+-- BEGIN SNAPSHOT 20260827000200_credits.sql
 -- PowerChain Copilot 1.0.0 PWRC internal credit accounting.
 -- Amounts are integer PWRC units in the configured credit schedule; no private keys are stored here.
 
@@ -155,9 +155,9 @@ create table if not exists credit_ledger (
 
 create index if not exists credit_accounts_workspace_user_idx on credit_accounts(workspace_id, user_id);
 create index if not exists credit_ledger_workspace_user_idx on credit_ledger(workspace_id, user_id, created_at desc);
--- END SNAPSHOT 0002_credits.sql
+-- END SNAPSHOT 20260827000200_credits.sql
 
--- BEGIN SNAPSHOT 0003_credit_quotes_receipts.sql
+-- BEGIN SNAPSHOT 20260827000300_credit_quotes_receipts.sql
 -- PowerChain Copilot 1.0.0 deterministic PWRC quote / reservation / settlement evidence.
 -- Receipts are internal, non-transferable audit records and are not financial tokens.
 
@@ -201,5 +201,5 @@ create table if not exists credit_receipts (
 );
 
 create index if not exists credit_receipts_workspace_user_idx on credit_receipts(workspace_id, user_id, created_at desc);
--- END SNAPSHOT 0003_credit_quotes_receipts.sql
+-- END SNAPSHOT 20260827000300_credit_quotes_receipts.sql
 

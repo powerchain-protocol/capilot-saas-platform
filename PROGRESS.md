@@ -32,18 +32,23 @@
 - [x] multi-provider AI model registry and managed fallback routing
 - [x] pnpm 11 `allowBuilds` migration for `unrs-resolver`/`sharp`
 - [x] Node.js 24.20.0 runtime pin and runtime doctor
+- [x] Supabase CLI-compatible `supabase/config.toml` and canonical timestamped migrations
+- [x] `DATABASE_URL` runtime pooler + `DIRECT_URL` migration split
+- [x] package-scoped Turbo env allowlists for Supabase/database/provider secrets
+- [x] optional typed `@powerchain/supabase` browser/server integration boundary
+- [x] root `.env.example` / `.env.mainnet.example` with Turbo env-file loading
 
 ## Release gates
 
-- [ ] Install dependencies on Node 24.20.0 with pnpm 11.23.0 in a network-enabled environment
+- [ ] Install dependencies on Node 24.20.0 with pnpm 11.24.0 in a network-enabled environment
 - [ ] Generate and commit `pnpm-lock.yaml`
-- [ ] Apply PostgreSQL migration against staging
+- [ ] Link/configure the staging Supabase/PostgreSQL project and apply `supabase/migrations/`
 - [ ] Run `pnpm verify`
 - [ ] Exercise auth/session revocation and Remember Me integration tests
 - [ ] Exercise WebSocket auth/reconnect/polling fallback tests
 - [ ] Validate frontend preview deployment
 - [ ] Deploy backend to a WebSocket-capable long-lived runtime
-- [ ] Configure production `DATABASE_URL`, strong `SESSION_SECRET`, allowed origins, and intended provider credentials
+- [ ] Configure production `DATABASE_URL`, `DIRECT_URL`, Supabase keys (if enabled), strong `SESSION_SECRET`, allowed origins, and intended provider credentials
 
 
 ## API developer experience
@@ -80,3 +85,15 @@ Completed: API-key security scheme/runtime verification, `/v1` external alias, A
 - [x] Link canonical PowerChain Postman workspace dataset/specification IDs and add safe remote sync/verification commands.
 
 - [x] Canonical `api/postman/index.yaml` manifest with supplied PowerChain workspace/specification URL and drift validation.
+
+## Next.js / backend / Solana integration pass
+
+- [x] Replace unsupported `lucide-react` `Github` export with `FaGithub` across installer, setup, install and marketing surfaces.
+- [x] Disable Next.js telemetry in local, Turbo and Vercel build paths.
+- [x] Add `@powerchain/supabase` to Next workspace transpilation and preserve private Supabase keys as backend-only Turbo environment state.
+- [x] Add `/v1/health/live` and `/v1/health/ready` plus `/api/v1` aliases.
+- [x] Add `/v1/ai/providers` sanitized provider-order/configuration endpoint.
+- [x] Expand Solana read-only integration with network, account and transaction-confirmation snapshots.
+- [x] Add frontend renewable/Solana/PowerChain AI context modules and wire runtime status into Settings.
+- [x] Update OpenAPI, Postman, mocks, SDK and generated API catalog.
+- [ ] Run dependency-backed `pnpm install --frozen-lockfile`, `pnpm verify`, and the production Next.js build under Node 24.20.0 once the lockfile/dependency tree is available.

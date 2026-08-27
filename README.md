@@ -85,7 +85,7 @@ The frontend does not contain a second database/repository implementation; this 
 ## Toolchain
 
 - Node.js `24.20.0`
-- pnpm `11.23.0`
+- pnpm `11.24.0`
 - nvm `0.40.7` for local Node activation
 - Turborepo `2.10.11`
 - Next.js `16.3.3`
@@ -118,7 +118,7 @@ nvm use
 # Some Node/nvm installations do not ship a Corepack binary.
 if ! command -v corepack >/dev/null 2>&1; then npm install -g corepack@latest; fi
 corepack enable
-corepack install --global pnpm@11.23.0
+corepack install --global pnpm@11.24.0
 
 node --version
 pnpm --version
@@ -136,42 +136,45 @@ allowBuilds:
 
 This resolves `ERR_PNPM_IGNORED_BUILDS` for the pinned `unrs-resolver@1.12.2` without enabling lifecycle scripts globally. If a future dependency introduces a build script, review it first and then run `pnpm approve-builds`.
 
-### 2. PostgreSQL
+### 2. PostgreSQL / Supabase
 
-Create a database and export the connection string:
+Local Supabase is the default database workflow; standalone PostgreSQL remains supported:
 
 ```bash
-createdb powerchain_copilot
-export DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:5432/powerchain_copilot'
+pnpm supabase:start
+cp .env.example .env.local
 pnpm db:migrate
+pnpm db:check
 ```
+
+`DATABASE_URL` is the pooled runtime connection. `DIRECT_URL` is preferred for migrations so schema changes do not run through a transaction pooler.
 
 Executable migrations are ordered under:
 
 ```text
-apps/backend/src/storage/migrations/
-├── 0001_initial.sql
-├── 0002_credits.sql
-└── 0003_credit_quotes_receipts.sql
+supabase/migrations/
+├── 20260827000100_initial.sql
+├── 20260827000200_credits.sql
+└── 20260827000300_credit_quotes_receipts.sql
 ```
 
-Database schemas/migrations intentionally live with the backend storage layer, **not** in `utils/`.
+`supabase/migrations/` is the single executable migration owner. `api/schema.sql` remains a review snapshot rather than a duplicate migration source.
 
 ### 3. Environment files
 
 Development:
 
 ```bash
-cp apps/backend/.env.example apps/backend/.env
-cp apps/frontend/.env.example apps/frontend/.env.local
+cp .env.example .env.local
 ```
 
-Mainnet deployment templates:
+Mainnet deployment template:
 
 ```bash
-cp apps/backend/.env.mainnet.example apps/backend/.env
-cp apps/frontend/.env.mainnet.example apps/frontend/.env.local
+cp .env.mainnet.example .env.local
 ```
+
+Package-specific examples remain available under `apps/backend/` and `apps/frontend/` for isolated service development.
 
 Development defaults to `POWERCHAIN_ENV=development`, Solana `devnet`, and Sui `devnet`. Mainnet uses `POWERCHAIN_ENV=mainnet`, Solana `mainnet-beta`, and Sui `mainnet`; production validation rejects mismatched network settings and demo/memory fallbacks.
 
@@ -368,7 +371,7 @@ nvm use 24.20.0
 # If Corepack is not present in this Node installation
 npm install -g corepack@latest
 corepack enable
-corepack install --global pnpm@11.23.0
+corepack install --global pnpm@11.24.0
 
 pnpm install
 ```
@@ -386,4 +389,57 @@ The API generator is organized with the API contracts at `api/api-generator/`:
 ```bash
 pnpm api:generate
 pnpm api:generate:check
+```
+
+
+## Supabase integration
+
+Supabase is an optional production integration and the canonical migration layout now follows the Supabase CLI convention under `supabase/`. Runtime PostgreSQL traffic uses `DATABASE_URL`; migration tooling prefers `DIRECT_URL` so migrations are not forced through a transaction pooler. Supabase browser configuration uses publishable keys only. Secret/service-role keys remain backend-only and are intentionally excluded from root Turbo `globalEnv` and frontend task env allowlists.
+
+```bash
+pnpm supabase:doctor
+pnpm supabase:start
+pnpm db:migrate
+pnpm db:check
+```
+
+The existing PowerChain session/revocation model remains authoritative; enabling Supabase Auth requires a deliberate migration rather than silently introducing a second authentication authority.
+
+## Vercel / Next.js 16 deployment
+
+The frontend is deployed from the monorepo with Turbo filtering:
+
+```bash
+NEXT_TELEMETRY_DISABLED=1 pnpm turbo build --filter=@powerchain/capilot-frontend
+```
+
+`vercel.json` installs pnpm `11.24.0`, targets `apps/frontend/.next`, uses `fra1`, and marks `/api/*` responses `no-store`. The frontend also disables Next telemetry through its cross-platform `scripts/run-next.mjs` wrapper.
+
+GitHub is a brand icon and is intentionally imported from `react-icons/fa6` (`FaGithub`), not from `lucide-react`. This avoids the static-export failure seen with `lucide-react@1.34.0` under Turbopack.
+
+## API v1 runtime surfaces
+
+Both `/api/v1/*` and `/v1/*` register the same backend modules. New read-only operational endpoints include:
+
+```text
+GET /v1/health/live
+GET /v1/health/ready
+GET /v1/ai/models
+GET /v1/ai/providers
+GET /v1/network/profile
+GET /v1/network/solana
+GET /v1/network/solana/accounts/:address
+GET /v1/network/solana/transactions/:signature
+```
+
+Solana account and transaction endpoints are authenticated, rate-limited and restricted to fixed read methods; they never expose the configured RPC URL, API keys, arbitrary JSON-RPC forwarding, wallet signing, or transaction dispatch.
+
+Frontend AI domain composition lives under:
+
+```text
+apps/frontend/ai/providers.tsx
+apps/frontend/ai/generic/renewables/
+apps/frontend/ai/solana/solana.tsx
+apps/frontend/ai/powerchain/powerchain.tsx
+apps/frontend/ai/powerchain/powerchan.tsx   # compatibility alias
 ```

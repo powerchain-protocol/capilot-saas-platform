@@ -24,6 +24,12 @@
       "name": "Birdeye",
       "category": "market",
       "configured": false
+    },
+    {
+      "key": "supabase",
+      "name": "Supabase",
+      "category": "realtime-storage",
+      "configured": true
     }
   ]
 }

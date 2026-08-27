@@ -31,7 +31,7 @@ api/
 - Postman includes environments, runner datasets, tests, example responses, and portable flow recipes.
 - `api/mocks` supplies a deterministic local mock server (`pnpm api:mock`).
 - `packages/sdk-typescript` is the first-party typed TypeScript reference SDK.
-- Executable PostgreSQL migrations remain owned by `apps/backend/src/storage/migrations/`.
+- Executable PostgreSQL migrations remain owned by `supabase/migrations/`.
 
 Runtime implementation lives in `apps/backend/src/api/v1/`. The Next.js frontend exposes only a thin same-origin `/api/v1/*` proxy and consumes the backend through `apps/frontend/lib/powerchain/`.
 
@@ -46,4 +46,4 @@ The canonical OpenAPI security scheme is `ApiKey`, transmitted as `X-Api-Key`. A
 
 ## Credit evidence
 
-Executable credit migrations are `0002_credits.sql` and `0003_credit_quotes_receipts.sql`. The schema snapshot includes account, append-oriented ledger, deterministic quote, and non-transferable receipt tables.
+Executable credit migrations are `20260827000200_credits.sql` and `20260827000300_credit_quotes_receipts.sql`. The schema snapshot includes account, append-oriented ledger, deterministic quote, and non-transferable receipt tables.

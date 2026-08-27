@@ -2,7 +2,7 @@ import type { FastifyInstance, FastifyRequest } from "fastify";
 import { MAX_MESSAGE_LENGTH } from "../../../constants/api.ts";
 import { env } from "../../../config/env.ts";
 import { getStore } from "../../../store/index.ts";
-import { aiRuntimeModels, generateAiReply } from "../../../services/ai.ts";
+import { aiRuntimeModels, aiRuntimeProviders, generateAiReply } from "../../../services/ai.ts";
 import { requireAuth } from "../middlewares/auth.ts";
 import { sanitizeText, sendError, sendOk } from "../middlewares/http.ts";
 import { rateLimit, sameOriginOrAllowed } from "../middlewares/security.ts";
@@ -18,6 +18,16 @@ export async function registerAiRoutes(app: FastifyInstance): Promise<void> {
       environment: env.powerChainEnvironment,
       providerOrder: env.aiProviderOrder,
       models: aiRuntimeModels()
+    });
+  });
+
+  app.get("/ai/providers", async (request, reply) => {
+    await requireAuth(request);
+    return sendOk(reply, {
+      environment: env.powerChainEnvironment,
+      providerOrder: env.aiProviderOrder,
+      fallbackEnabled: env.aiProviderOrder.length > 1,
+      providers: aiRuntimeProviders()
     });
   });
 

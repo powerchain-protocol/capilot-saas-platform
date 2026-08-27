@@ -15,7 +15,7 @@ Validated in the artifact build environment on 2026-08-27.
 - API DX audit: **34 HTTP operations**, **34 Postman requests**, **34 unique operation IDs**.
 - API generator stale-output check: **35 generated operations** current.
 - OpenAPI `ApiKey` contract uses `X-Api-Key` and global API-key security.
-- Schema snapshot audit: `0002_credits.sql` and `0003_credit_quotes_receipts.sql` exactly mirrored by `api/schema.sql`.
+- Schema snapshot audit: `20260827000200_credits.sql` and `20260827000300_credit_quotes_receipts.sql` exactly mirrored by `api/schema.sql`.
 - Dashboard action-registry audit: **4 governed actions** registered.
 - JSON parsing: passed across repository API/config artifacts.
 - OpenAPI/AsyncAPI YAML parsing: passed.
@@ -37,14 +37,14 @@ Validated in the artifact build environment on 2026-08-27.
 
 ## Environment limitation
 
-The artifact environment runs Node.js 22 and does not contain the project dependency tree. The repository supports Node.js >=24.19.0 <25, pins Node.js 24.20.0 in `.nvmrc`, and uses pnpm 11.23.0. Therefore a dependency-backed `pnpm install`, ESLint 10.9.1 execution, full `tsc --noEmit`, Turbo build, and Next.js production build are not claimed here and remain required before production release.
+The artifact environment runs Node.js 22 and does not contain the project dependency tree. The repository supports Node.js >=24.19.0 <25, pins Node.js 24.20.0 in `.nvmrc`, and uses pnpm 11.24.0. Therefore a dependency-backed `pnpm install`, ESLint 10.9.1 execution, full `tsc --noEmit`, Turbo build, and Next.js production build are not claimed here and remain required before production release.
 
 Run in a network-enabled Node 24.20.0 environment:
 
 ```bash
 nvm use
 corepack enable
-corepack install --global pnpm@11.23.0
+corepack install --global pnpm@11.24.0
 pnpm install
 pnpm approve-builds
 pnpm db:check

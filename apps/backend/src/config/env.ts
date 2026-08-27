@@ -17,6 +17,11 @@ function list(value: string | undefined): string[] {
     .filter(Boolean);
 }
 
+
+function solanaCommitment(value: string | undefined): "processed" | "confirmed" | "finalized" {
+  return value === "processed" || value === "finalized" ? value : "confirmed";
+}
+
 function sha256List(value: string | undefined): string[] {
   return list(value)
     .map((item) => item.toLowerCase())
@@ -32,6 +37,11 @@ export const env = {
   host: process.env.HOST ?? "127.0.0.1",
   port: number(process.env.PORT, 8000),
   databaseUrl: process.env.DATABASE_URL ?? "",
+  directDatabaseUrl: process.env.DIRECT_URL ?? "",
+  supabaseUrl: process.env.SUPABASE_URL ?? "",
+  supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_ANON_KEY ?? "",
+  supabaseSecretKey: process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+  supabaseRealtimeEnabled: bool(process.env.SUPABASE_REALTIME_ENABLED, false),
   sessionSecret: process.env.SESSION_SECRET ?? "",
   corsAllowedOrigins: list(process.env.CORS_ALLOWED_ORIGINS),
   cookieDomain: process.env.COOKIE_DOMAIN ?? "",
@@ -59,6 +69,7 @@ export const env = {
   solanaCluster: (process.env.SOLANA_CLUSTER ?? environmentProfile.solanaCluster) as SolanaCluster,
   suiNetwork: (process.env.SUI_NETWORK ?? environmentProfile.suiNetwork) as SuiNetwork,
   solanaRpcUrl: process.env.SOLANA_RPC_URL ?? "",
+  solanaCommitment: solanaCommitment(process.env.SOLANA_COMMITMENT),
   heliusRpcUrl: process.env.HELIUS_RPC_URL ?? "",
   heliusApiKey: process.env.HELIUS_API_KEY ?? "",
   pythHermesUrl: process.env.PYTH_HERMES_URL ?? "https://hermes.pyth.network",
@@ -78,6 +89,7 @@ export function assertProductionConfiguration(): void {
   if (env.solanaCluster !== "mainnet-beta") throw new Error("SOLANA_CLUSTER must be mainnet-beta in production.");
   if (env.suiNetwork !== "mainnet") throw new Error("SUI_NETWORK must be mainnet in production.");
   if (!env.databaseUrl) throw new Error("DATABASE_URL is required in production.");
+  if (env.supabaseRealtimeEnabled && (!env.supabaseUrl || !env.supabasePublishableKey)) throw new Error("SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY are required when SUPABASE_REALTIME_ENABLED=true.");
   if (env.sessionSecret.length < 32) throw new Error("SESSION_SECRET must be at least 32 characters in production.");
   if (env.apiKeyRequired && env.apiKeyHashes.length === 0) throw new Error("POWERCHAIN_API_KEY_HASHES must include at least one SHA-256 API key hash in production.");
   if (env.allowMemoryFallback) throw new Error("ALLOW_MEMORY_FALLBACK must be false in production.");

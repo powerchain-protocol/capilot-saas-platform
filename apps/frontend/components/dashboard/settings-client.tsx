@@ -5,8 +5,10 @@ import { Bot, CheckCircle2, Clock3, Eye, EyeOff, Loader2, Network, ShieldCheck, 
 import { useToast } from "@/components/ui/toast";
 import { ServiceHealth } from "@/components/services/service-health";
 import { apiRoutes } from "@/config/api";
-import { powerChainApi, type AiModelsSnapshot, type NetworkProfile, type SecuritySession } from "@/lib/powerchain";
+import { powerChainApi, type AiModelsSnapshot, type AiProvidersSnapshot, type NetworkProfile, type SecuritySession, type SolanaNetworkSnapshot } from "@/lib/powerchain";
 import { formatDateTime } from "@/utils/formats";
+import { PowerChainAiContextCard } from "@/ai/powerchain";
+import { SolanaAiContextCard } from "@/ai/solana";
 
 type SessionData = {
   user: { name: string; email: string };
@@ -22,6 +24,8 @@ export function SettingsClient() {
   const [securitySession, setSecuritySession] = useState<SecuritySession | null>(null);
   const [networkProfile, setNetworkProfile] = useState<NetworkProfile | null>(null);
   const [aiModels, setAiModels] = useState<AiModelsSnapshot | null>(null);
+  const [aiProviders, setAiProviders] = useState<AiProvidersSnapshot | null>(null);
+  const [solanaNetwork, setSolanaNetwork] = useState<SolanaNetworkSnapshot | null>(null);
   const [revealedIp, setRevealedIp] = useState(false);
   const [ipLoading, setIpLoading] = useState(false);
   const [state, setState] = useState<"idle" | "saving" | "saved">("idle");
@@ -34,6 +38,8 @@ export function SettingsClient() {
     powerChainApi.getSecuritySession(false).then(setSecuritySession).catch(() => null);
     powerChainApi.getNetworkProfile().then(setNetworkProfile).catch(() => null);
     powerChainApi.getAiModels().then(setAiModels).catch(() => null);
+    powerChainApi.getAiProviders().then(setAiProviders).catch(() => null);
+    powerChainApi.getSolanaNetwork().then(setSolanaNetwork).catch(() => null);
   }, []);
 
   async function save(event: FormEvent<HTMLFormElement>) {
@@ -118,6 +124,11 @@ export function SettingsClient() {
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-raised)] p-4"><p className="text-[10px] font-bold uppercase tracking-[.1em] text-[#939C96]">Sui</p><p className="mt-2 text-xs font-bold text-[#354039]">{networkProfile?.suiNetwork ?? "Unavailable"}</p></div>
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-raised)] p-4"><p className="text-[10px] font-bold uppercase tracking-[.1em] text-[#939C96]">Representative data</p><p className="mt-2 text-xs font-bold text-[#354039]">{networkProfile ? networkProfile.representativeDataAllowed ? "Allowed in development" : "Disabled" : "Unavailable"}</p></div>
         </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {solanaNetwork ? <SolanaAiContextCard runtime={{ cluster: solanaNetwork.cluster, status: solanaNetwork.status, provider: solanaNetwork.provider, slot: solanaNetwork.slot ?? undefined, blockHeight: solanaNetwork.blockHeight ?? undefined, commitment: solanaNetwork.commitment }} /> : null}
+          {aiProviders ? <PowerChainAiContextCard runtime={{ environment: aiProviders.environment, providerOrder: aiProviders.providerOrder, configuredProviders: aiProviders.providers.filter((provider) => provider.configured).length, workspaceLabel: data.workspace.name }} /> : null}
+        </div>
+
         <div className="mt-5 border-t border-[var(--border)] pt-5">
           <h3 className="flex items-center gap-2 text-xs font-bold"><Bot className="size-4 text-[var(--green)]" />AI models</h3>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">

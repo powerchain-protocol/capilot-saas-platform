@@ -8,25 +8,26 @@
     "node": ">=24.19.0 <25"
   },
   "scripts": {
-    "dev": "node --watch --experimental-strip-types src/index.ts",
+    "dev": "node --env-file-if-exists=.env --env-file-if-exists=.env.local --watch --experimental-strip-types src/index.ts",
     "build": "tsc --noEmit -p tsconfig.json",
-    "start": "node --experimental-strip-types src/index.ts",
+    "start": "node --env-file-if-exists=.env --env-file-if-exists=.env.local --experimental-strip-types src/index.ts",
     "lint": "eslint src --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "check": "pnpm typecheck && pnpm lint",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
-    "db:migrate": "node --experimental-strip-types src/storage/migrate.ts",
-    "db:check": "node --experimental-strip-types src/storage/check.ts"
+    "db:migrate": "node --env-file-if-exists=.env --env-file-if-exists=.env.local --experimental-strip-types src/storage/migrate.ts",
+    "db:check": "node --env-file-if-exists=.env --env-file-if-exists=.env.local --experimental-strip-types src/storage/check.ts"
   },
   "dependencies": {
     "@fastify/cors": "11.3.0",
     "@fastify/swagger": "9.8.1",
     "@fastify/swagger-ui": "6.1.1",
     "@fastify/websocket": "11.3.0",
+    "@powerchain/shared": "workspace:*",
+    "@powerchain/supabase": "workspace:*",
     "fastify": "5.12.1",
     "pg": "8.23.0",
-    "ws": "8.21.3",
-    "@powerchain/shared": "workspace:*"
+    "ws": "8.21.3"
   },
   "devDependencies": {
     "@types/node": "24.13.3",

@@ -19,6 +19,15 @@ export type AiRuntimeModel = {
   local: boolean;
 };
 
+export type AiProviderSnapshot = {
+  provider: ManagedProviderId;
+  model: string;
+  configured: boolean;
+  local: boolean;
+  priority: number | null;
+  fallbackEligible: boolean;
+};
+
 const managedProviders: readonly ManagedProviderId[] = ["openai", "anthropic", "gemini", "deepseek", "ollama"];
 
 function isManagedProvider(value: string): value is ManagedProviderId {
@@ -196,6 +205,18 @@ export function aiRuntimeModels(): readonly AiRuntimeModel[] {
     { provider: "deepseek", model: env.deepSeekModel, configured: Boolean(env.deepSeekApiKey), local: false },
     { provider: "ollama", model: env.ollamaModel, configured: Boolean(env.ollamaApiUrl), local: true }
   ];
+}
+
+export function aiRuntimeProviders(): readonly AiProviderSnapshot[] {
+  const order = env.aiProviderOrder.filter(isManagedProvider);
+  return aiRuntimeModels().map((model) => {
+    const priorityIndex = order.indexOf(model.provider);
+    return {
+      ...model,
+      priority: priorityIndex >= 0 ? priorityIndex + 1 : null,
+      fallbackEligible: priorityIndex >= 0
+    };
+  });
 }
 
 async function generateWithProvider(provider: ManagedProviderId, prompt: string, assets: Asset[]): Promise<AiReply> {

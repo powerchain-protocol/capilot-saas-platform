@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
+// Next.js telemetry is intentionally disabled for local, CI and Vercel builds.
+// Vercel also receives NEXT_TELEMETRY_DISABLED=1 from vercel.json/build env.
+process.env.NEXT_TELEMETRY_DISABLED = "1";
+
 const allowedDevOrigins = ["localhost", "127.0.0.1"];
+
 function toServerActionOrigin(value: string): string {
   const trimmed = value.trim();
   if (!trimmed) return "";
@@ -35,7 +40,7 @@ const nextConfig: NextConfig = {
   compress: true,
   productionBrowserSourceMaps: false,
   allowedDevOrigins,
-  transpilePackages: ["@powerchain/ai", "@powerchain/shared"],
+  transpilePackages: ["@powerchain/ai", "@powerchain/shared", "@powerchain/supabase"],
   images: {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 60 * 60 * 24 * 7
@@ -45,7 +50,10 @@ const nextConfig: NextConfig = {
     serverActions: serverActionOrigins.length > 0 ? { allowedOrigins: serverActionOrigins } : undefined
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/api/:path*", headers: [{ key: "Cache-Control", value: "no-store, max-age=0" }, { key: "X-Content-Type-Options", value: "nosniff" }] },
+      { source: "/:path*", headers: securityHeaders }
+    ];
   }
 };
 

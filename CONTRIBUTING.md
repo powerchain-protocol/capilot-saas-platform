@@ -5,14 +5,14 @@ Changes must preserve operational truth, tenant/workspace boundaries, explicit a
 ## Requirements
 
 - Node.js `24.20.0`
-- pnpm `11.23.0`
+- pnpm `11.24.0`
 - PostgreSQL for backend integration testing
 
 ```bash
 nvm install
 nvm use
 corepack enable
-corepack prepare pnpm@11.23.0 --activate
+corepack install --global pnpm@11.24.0
 pnpm install
 ```
 
@@ -60,7 +60,7 @@ pnpm --filter @powerchain/capilot-frontend check
 2. `apps/frontend/app/api/v1/[...path]/route.ts` is a thin same-origin proxy only.
 3. New REST operations must be documented in `api/openapi/openapi.yaml` and the Postman collection when useful.
 4. WebSocket operations belong under `/ws/v1` and require the same authenticated workspace boundary as HTTP routes.
-5. PostgreSQL migrations belong in `apps/backend/src/storage/migrations/`; they do not belong in `utils/`.
+5. PostgreSQL migrations belong in `supabase/migrations/`; they do not belong in `utils/`.
 6. IDs are immutable opaque identifiers. Slugs are readable locators and must not replace identity/authorization checks.
 7. Provider keys must never enter frontend bundles or `NEXT_PUBLIC_*` values.
 8. Copilot analysis cannot imply approval or execution.

@@ -1,6 +1,6 @@
 import { withQuery } from "@/queries/queries";
 import { endpoints } from "./endpoints";
-import type { AiModelsSnapshot, ApiEnvelope, ApiMessage, ChatSummary, HealthSnapshot, NetworkProfile, SecuritySession, ServiceHealth, SessionContext } from "./types";
+import type { AiModelsSnapshot, AiProvidersSnapshot, ApiEnvelope, ApiMessage, ChatSummary, HealthSnapshot, NetworkProfile, SecuritySession, ServiceHealth, SessionContext, SolanaAccountSnapshot, SolanaNetworkSnapshot, SolanaTransactionSnapshot } from "./types";
 import type { CreditsSnapshot, CreditLedgerEntry, CreditQuote, CreditReceipt } from "@/types/credits";
 import type { TokenDescriptor } from "@/types/tokens";
 
@@ -37,7 +37,11 @@ export const powerChainApi = {
   health: () => apiFetch<HealthSnapshot>(endpoints.health),
   getServices: () => apiFetch<ServiceHealth[]>(endpoints.services),
   getAiModels: () => apiFetch<AiModelsSnapshot>(endpoints.ai.models),
+  getAiProviders: () => apiFetch<AiProvidersSnapshot>(endpoints.ai.providers),
   getNetworkProfile: () => apiFetch<NetworkProfile>(endpoints.networkProfile),
+  getSolanaNetwork: () => apiFetch<SolanaNetworkSnapshot>(endpoints.solanaNetwork),
+  getSolanaAccount: (address: string) => apiFetch<SolanaAccountSnapshot>(endpoints.solanaAccount(address)),
+  getSolanaTransaction: (signature: string) => apiFetch<SolanaTransactionSnapshot>(endpoints.solanaTransaction(signature)),
   getCredits: () => apiFetch<CreditsSnapshot>(endpoints.credits),
   getCreditLedger: () => apiFetch<CreditLedgerEntry[]>(endpoints.creditLedger),
   getCreditQuotes: () => apiFetch<CreditQuote[]>(endpoints.creditQuotes),

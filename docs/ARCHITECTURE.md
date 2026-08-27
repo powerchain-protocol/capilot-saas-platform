@@ -90,7 +90,7 @@ Production requires PostgreSQL through `DATABASE_URL`. Development can use the m
 Migrations are located at:
 
 ```text
-apps/backend/src/storage/migrations/
+supabase/migrations/
 ```
 
 Database schemas do not belong in frontend utilities or generic `utils/` directories.

@@ -4,23 +4,23 @@
   "private": true,
   "description": "PowerChain Copilot monorepo for renewable-infrastructure AI, SaaS operations, governed actions, and onchain integrations.",
   "license": "MIT",
-  "packageManager": "pnpm@11.23.0",
+  "packageManager": "pnpm@11.24.0",
   "engines": {
     "node": ">=24.19.0 <25",
-    "pnpm": ">=11.23.0 <12"
+    "pnpm": ">=11.24.0 <12"
   },
   "scripts": {
-    "dev": "pnpm runtime:check && turbo dev",
-    "build": "pnpm runtime:check && turbo build",
-    "lint": "turbo lint",
-    "typecheck": "turbo typecheck",
-    "check": "turbo check",
+    "dev": "pnpm runtime:check && node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/turbo-runner.mjs dev",
+    "build": "pnpm runtime:check && node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/turbo-runner.mjs build",
+    "lint": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/turbo-runner.mjs lint",
+    "typecheck": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/turbo-runner.mjs typecheck",
+    "check": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/turbo-runner.mjs check",
     "clean": "turbo clean && node scripts/clean.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "approve-builds": "pnpm approve-builds",
     "frontend": "pnpm --filter @powerchain/capilot-frontend",
-    "verify": "pnpm runtime:check && pnpm deps:policy:check && pnpm postman:remote:verify && pnpm api:generate:check && pnpm check:api-dx && pnpm check:schema && pnpm check:imports && pnpm check:source && pnpm typecheck && pnpm lint && pnpm build",
+    "verify": "pnpm runtime:check && pnpm deps:policy:check && pnpm supabase:doctor && pnpm postman:remote:verify && pnpm api:generate:check && pnpm check:api-dx && pnpm check:schema && pnpm check:imports && pnpm check:source && pnpm typecheck && pnpm lint && pnpm build",
     "doctor": "node scripts/doctor.mjs",
     "setup:runtime": "bash scripts/bootstrap.sh",
     "check:source": "node scripts/check-source.mjs",
@@ -51,7 +51,15 @@
     "deps:rebuild": "pnpm rebuild unrs-resolver sharp",
     "install:verified": "pnpm runtime:check && pnpm install && pnpm deps:rebuild",
     "deps:policy:check": "node scripts/check-build-policy.mjs",
-    "preinstall": "node scripts/check-runtime.mjs"
+    "preinstall": "node scripts/check-runtime.mjs",
+    "supabase:doctor": "node scripts/check-supabase.mjs",
+    "supabase:start": "pnpm dlx supabase@latest start",
+    "supabase:stop": "pnpm dlx supabase@latest stop",
+    "supabase:status": "pnpm dlx supabase@latest status",
+    "supabase:reset": "pnpm dlx supabase@latest db reset",
+    "supabase:link": "pnpm dlx supabase@latest link",
+    "supabase:db:push": "pnpm dlx supabase@latest db push",
+    "supabase:db:pull": "pnpm dlx supabase@latest db pull"
   },
   "devDependencies": {
     "eslint": "10.9.1",

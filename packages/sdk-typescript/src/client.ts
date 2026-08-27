@@ -1,6 +1,6 @@
 
 import { PowerChainSdkError } from "./errors";
-import type { ApiEnvelope, AiModelsSnapshot, AiResponse, Approval, Asset, Chat, CreditsSnapshot, CreditLedgerEntry, CreditQuote, CreditReceipt, HealthSnapshot, Message, NetworkProfile, SendMessageResponse, ServiceHealth, Session, SessionContext, SessionSecurity, TokenDescriptor } from "./types";
+import type { ApiEnvelope, AiModelsSnapshot, AiProvidersSnapshot, AiResponse, Approval, Asset, Chat, CreditsSnapshot, CreditLedgerEntry, CreditQuote, CreditReceipt, HealthSnapshot, Message, NetworkProfile, SendMessageResponse, ServiceHealth, Session, SessionContext, SessionSecurity, SolanaAccountSnapshot, SolanaNetworkSnapshot, SolanaTransactionSnapshot, TokenDescriptor } from "./types";
 
 export type PowerChainClientOptions = {
   baseUrl?: string;
@@ -43,6 +43,8 @@ export class PowerChainClient {
   }
 
   health(): Promise<HealthSnapshot> { return this.request("/v1/health"); }
+  liveness(): Promise<{ status: "alive"; version: string; environment: "development" | "mainnet"; timestamp: string }> { return this.request("/v1/health/live"); }
+  readiness(): Promise<HealthSnapshot> { return this.request("/v1/health/ready"); }
   demo(): Promise<unknown> { return this.request("/v1/auth/demo", { method: "POST" }); }
   signIn(input: { email: string; password: string; rememberMe?: boolean }): Promise<unknown> { return this.request("/v1/auth/sign-in", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(input) }); }
   register(input: { name: string; email: string; password: string; workspaceName: string; plan?: "free" | "pro" | "business"; acceptedTerms: true }): Promise<unknown> { return this.request("/v1/auth/register", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(input) }); }
@@ -56,6 +58,7 @@ export class PowerChainClient {
   approvals(): Promise<Approval[]> { return this.request("/v1/approvals"); }
   updateApproval(id: string, action: "approve" | "request_changes"): Promise<Approval> { return this.request(`/v1/approvals/${pathSegment(id)}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action }) }); }
   aiModels(): Promise<AiModelsSnapshot> { return this.request("/v1/ai/models"); }
+  aiProviders(): Promise<AiProvidersSnapshot> { return this.request("/v1/ai/providers"); }
   generate(prompt: string): Promise<AiResponse> { return this.request("/v1/ai/generate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ prompt }) }); }
   chats(): Promise<Chat[]> { return this.request("/v1/chat"); }
   createChat(title = "New analysis"): Promise<Chat> { return this.request("/v1/chat", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ title }) }); }
@@ -77,7 +80,9 @@ export class PowerChainClient {
     return this.request(`/v1/market/price?${query.toString()}`);
   }
   networkProfile(): Promise<NetworkProfile> { return this.request("/v1/network/profile"); }
-  solanaHealth<T = unknown>(): Promise<T> { return this.request("/v1/network/solana"); }
+  solanaHealth(): Promise<SolanaNetworkSnapshot> { return this.request("/v1/network/solana"); }
+  solanaAccount(address: string): Promise<SolanaAccountSnapshot> { return this.request(`/v1/network/solana/accounts/${pathSegment(address)}`); }
+  solanaTransaction(signature: string): Promise<SolanaTransactionSnapshot> { return this.request(`/v1/network/solana/transactions/${pathSegment(signature)}`); }
   updateProfile(input: { name: string; workspaceName: string }): Promise<unknown> { return this.request("/v1/profile", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(input) }); }
   contact(input: { name: string; email: string; company?: string; message: string; intent?: string }): Promise<unknown> { return this.request("/v1/contact", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(input) }); }
 }

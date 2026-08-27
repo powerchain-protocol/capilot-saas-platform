@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo } from "react";
-import { FaApple, FaGooglePlay, FaWindows } from "react-icons/fa6";
-import { Cloud, Github, Globe2, ShieldCheck } from "lucide-react";
+import { FaApple, FaGithub, FaGooglePlay, FaWindows } from "react-icons/fa6";
+import { Cloud, Globe2, ShieldCheck } from "lucide-react";
 import { Navbar } from "@/components/marketing/navbar";
 import { Footer } from "@/components/marketing/footer";
 import { InstallInstructions } from "./instructions";
@@ -75,7 +75,7 @@ export default function InstallPage() {
               <div className="mt-4 grid gap-2 sm:grid-cols-2">
                 {sources.slice(0, 2).map((source) => (
                   <Link key={source.id} href={`/setup?platform=${encodeURIComponent(platform)}&source=${source.id}`} className="flex min-h-11 items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-xs font-semibold text-[var(--ink-soft)] transition hover:border-[var(--border-strong)] hover:bg-[var(--surface-soft)]">
-                    {source.id === "github" ? <Github className="size-4" /> : source.id === "drive" ? <Cloud className="size-4" /> : <ShieldCheck className="size-4" />}
+                    {source.id === "github" ? <FaGithub className="size-4" /> : source.id === "drive" ? <Cloud className="size-4" /> : <ShieldCheck className="size-4" />}
                     {source.label}
                   </Link>
                 ))}

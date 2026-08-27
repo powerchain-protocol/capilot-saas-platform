@@ -1,11 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "installCommand": "corepack enable && corepack prepare pnpm@11.23.0 --activate && if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; else pnpm install --no-frozen-lockfile; fi",
-  "buildCommand": "pnpm turbo build --filter=@powerchain/capilot-frontend",
+  "installCommand": "if ! command -v corepack >/dev/null 2>&1; then npm install --global corepack@latest; fi && corepack enable && corepack prepare pnpm@11.24.0 --activate && if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; else pnpm install --no-frozen-lockfile; fi",
+  "buildCommand": "NEXT_TELEMETRY_DISABLED=1 pnpm turbo build --filter=@powerchain/capilot-frontend",
   "outputDirectory": "apps/frontend/.next",
   "regions": ["fra1"],
-  "git": { "deploymentEnabled": { "main": true } },
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  },
   "headers": [
     {
       "source": "/api/(.*)",

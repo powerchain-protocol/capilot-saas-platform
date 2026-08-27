@@ -30,6 +30,8 @@ const server = createServer(async (req, res) => {
   }
   try {
     if (path === "/" && method === "GET") return json(res, 200, { name: "PowerChain Copilot Mock API", version: "1.0.0", authoritative: false });
+    if (path === "/api/v1/health/live" && method === "GET") return json(res, 200, { ok: true, data: { status: "alive", version: "1.0.0", environment: "development", timestamp: "2026-08-27T06:00:00.000Z" } });
+    if (path === "/api/v1/health/ready" && method === "GET") return json(res, 200, await fixture("health.json"));
     if (path === "/api/v1/health" && method === "GET") return json(res, 200, await fixture("health.json"));
     if ((path === "/api/v1/auth/demo" || path === "/api/v1/auth/sign-in" || path === "/api/v1/auth/register") && method === "POST") {
       return json(res, path.endsWith("register") ? 201 : 200, { ok: true, data: { ...(await fixture("session.json")).data, sessionId: "ses_0123456789abcdef0123456789abcdef" } }, { "set-cookie": "pc_session=mock-session; Path=/; HttpOnly; SameSite=Lax" });
@@ -48,6 +50,7 @@ const server = createServer(async (req, res) => {
       return json(res, 200, { ok: true, data: { ...current, id: path.split("/").at(-1), status } });
     }
     if (path === "/api/v1/ai/models" && method === "GET") return json(res, 200, await fixture("ai-models.json"));
+    if (path === "/api/v1/ai/providers" && method === "GET") return json(res, 200, await fixture("ai-providers.json"));
     if (path === "/api/v1/ai/generate" && method === "POST") return json(res, 200, await fixture("ai-generate.json"));
     if (path === "/api/v1/chat" && method === "GET") return json(res, 200, await fixture("chat-list.json"));
     if (path === "/api/v1/chat" && method === "POST") return json(res, 201, { ok: true, data: (await fixture("chat-list.json")).data[0] });
@@ -61,6 +64,8 @@ const server = createServer(async (req, res) => {
     if (path === "/api/v1/market/price" && method === "GET") return json(res, 200, await fixture("market-price.json"));
     if (path === "/api/v1/network/profile" && method === "GET") return json(res, 200, await fixture("network-profile.json"));
     if (path === "/api/v1/network/solana" && method === "GET") return json(res, 200, await fixture("solana-network.json"));
+    if (/^\/api\/v1\/network\/solana\/accounts\/[^/]+$/.test(path) && method === "GET") return json(res, 200, await fixture("solana-account.json"));
+    if (/^\/api\/v1\/network\/solana\/transactions\/[^/]+$/.test(path) && method === "GET") return json(res, 200, await fixture("solana-transaction.json"));
     if (path === "/api/v1/contact" && method === "POST") return json(res, 201, await fixture("contact.json"));
     if (path === "/api/v1/credits" && method === "GET") return json(res, 200, await fixture("credits.json"));
     if (path === "/api/v1/credits/ledger" && method === "GET") return json(res, 200, await fixture("credit-ledger.json"));

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ArrowRight, CheckCircle2, Cloud, ExternalLink, Github, Globe2, HardDriveDownload, ShieldCheck } from "lucide-react";
-import { FaApple, FaGooglePlay, FaWindows } from "react-icons/fa6";
+import { ArrowRight, CheckCircle2, Cloud, ExternalLink, Globe2, HardDriveDownload, ShieldCheck } from "lucide-react";
+import { FaApple, FaGithub, FaGooglePlay, FaWindows } from "react-icons/fa6";
 import { getInstallSources, installConfig, type Platform } from "@/config/install";
 import type { InstallSource } from "@/config/rules";
 import { AppIcon } from "@/components/brand/app-icon";
@@ -20,7 +20,7 @@ const platformIcons: Record<Platform, React.ReactNode> = {
 };
 
 const sourceIcons: Record<InstallSource, React.ReactNode> = {
-  github: <Github className="size-5" />,
+  github: <FaGithub className="size-5" />,
   drive: <Cloud className="size-5" />,
   store: <HardDriveDownload className="size-5" />,
   web: <Globe2 className="size-5" />,

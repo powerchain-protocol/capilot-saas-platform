@@ -5,7 +5,7 @@ All notable changes to PowerChain Copilot are documented here. The product remai
 
 ## Runtime, network profiles and AI model routing
 
-- Pinned the repository to Node.js `24.20.0` LTS through `.nvmrc`, `.node-version`, package engines, and a runtime check; pnpm remains `11.23.0` and setup docs use nvm `0.40.7`.
+- Pinned the repository to Node.js `24.20.0` LTS through `.nvmrc`, `.node-version`, package engines, and a runtime check; pnpm remains `11.24.0` and setup docs use nvm `0.40.7`.
 - Migrated pnpm build-script trust from removed `onlyBuiltDependencies` configuration to pnpm 11 `allowBuilds`, explicitly approving only `unrs-resolver@1.12.2` and `sharp` while keeping `strictDepBuilds` fail-closed.
 - Added explicit `development` and `mainnet` profiles with Solana devnet/mainnet-beta and Sui devnet/mainnet selections plus production consistency validation.
 - Added server-side provider/model routing for OpenAI, Anthropic, Gemini, DeepSeek, and Ollama with ordered fallback inside one governed AI request.
@@ -23,9 +23,9 @@ All notable changes to PowerChain Copilot are documented here. The product remai
 ### Added
 
 - pnpm + Turborepo monorepo with `apps/frontend`, `apps/backend`, `apps/dashboard`, `packages/ai`, and `packages/shared`.
-- Node.js `24.20.0`, pnpm `11.23.0`, TypeScript `7.0.2`, and ESLint `10.9.1` toolchain pinning.
+- Node.js `24.20.0`, pnpm `11.24.0`, TypeScript `7.0.2`, and ESLint `10.9.1` toolchain pinning.
 - Fastify `5.12.1` backend with exact-origin CORS, request IDs, secure error envelopes, Swagger UI, and OpenAPI 3.1.
-- PostgreSQL persistence through `pg` `8.23.0`, connection pooling, parameterized queries, and canonical migration under `apps/backend/src/storage/migrations/`.
+- PostgreSQL persistence through `pg` `8.23.0`, connection pooling, parameterized queries, and canonical migration under `supabase/migrations/`.
 - Production fail-closed persistence with development-only memory fallback.
 - Persisted/revocable session records, signed HttpOnly cookies, Remember Me, session inventory, current-session security metadata, and explicit session revocation.
 - Canonical API groups for `/api/v1/auth`, `/sessions`, `/ai`, `/chat`, `/messages/:id`, `/assets`, `/approvals`, `/dashboard`, `/profile`, `/services`, `/market`, `/network`, and `/contact`.
@@ -77,7 +77,7 @@ All notable changes to PowerChain Copilot are documented here. The product remai
 - Added external `/v1` backend alias and configured `api.capilot.powerchain.energy` plus `capilot.powerchain.app` API origins.
 - Added server-only API-key injection in the Next.js same-origin proxy and SHA-256 hash verification in Fastify.
 - Added deterministic API generator with stale-output checks and a frontend `use-api-generator` catalog hook.
-- Added PWRC credit-account and credit-ledger APIs, PostgreSQL migration `0002_credits.sql`, frontend credit UI/hook/types, and SDK methods.
+- Added PWRC credit-account and credit-ledger APIs, PostgreSQL migration `20260827000200_credits.sql`, frontend credit UI/hook/types, and SDK methods.
 - Added token-metadata endpoints and typed PWRC token configuration.
 - Added public-key-only Solana wallet registry files with explicit secret-material exclusions.
 - Updated Postman, OpenAPI, AsyncAPI, mock server, SDK, README, architecture, API, security, and flow documentation.
@@ -107,8 +107,30 @@ All notable changes to PowerChain Copilot are documented here. The product remai
 
 - Ensured `.nvmrc` and `.node-version` are committed at the repository root and both pin Node `24.20.0`.
 - Unified root, frontend, and backend Node engine ranges at `>=24.19.0 <25` so Node `24.19.0` is no longer rejected by a nested workspace manifest.
-- Replaced the legacy Corepack activation example with `corepack install --global pnpm@11.23.0` and added a Corepack-install fallback to `scripts/bootstrap.sh`.
+- Replaced the legacy Corepack activation example with `corepack install --global pnpm@11.24.0` and added a Corepack-install fallback to `scripts/bootstrap.sh`.
 - Added root runtime checks before `pnpm dev` and `pnpm build`.
 - Removed the redundant Next.js `--turbopack` development flag; Next.js 16 uses Turbopack by default.
 - Hardened the backend Node 24 TypeScript runtime with ESM package semantics, explicit `.ts` relative imports, and no-emit build validation to avoid generated-ESM extension failures.
 - Release archives are now packaged with repository files at ZIP root so `.nvmrc` is visible immediately after extraction.
+
+
+### Supabase/Turborepo integration
+
+- Moved executable PostgreSQL migrations to the canonical `supabase/migrations/` tree with timestamped Supabase CLI names and removed the duplicate backend migration owner.
+- Added `supabase/config.toml`, local pooler/Realtime/Storage configuration, and a fail-closed Supabase/Turbo configuration audit.
+- Added optional `@powerchain/supabase` browser/server client boundary pinned to `@supabase/supabase-js` 2.112.4 without changing the existing authentication authority.
+- Added `DIRECT_URL` for migration connections and retained `DATABASE_URL` for pooled runtime traffic.
+- Added package-level Turbo env allowlists so database, Supabase secret, session, and AI credentials are available only to backend tasks instead of becoming global frontend environment state.
+- Updated the workspace runtime to pnpm 11.24.0.
+
+### Next.js / Vercel / API v1 hardening
+
+- Fixed the Next.js 16.3.3 Turbopack build failure caused by importing the GitHub brand mark from `lucide-react`; all GitHub brand usage now comes from `react-icons/fa6` (`FaGithub`).
+- Added a cross-platform Next.js runner and disabled Next telemetry for local, CI and Vercel execution with `NEXT_TELEMETRY_DISABLED=1`.
+- Hardened `next.config.ts` with the Supabase workspace package in `transpilePackages`, AVIF/WebP image optimization, security headers, and no-store API headers.
+- Updated `vercel.json` for pnpm 11.24.0, monorepo Turbo filtering, Frankfurt deployment, explicit API no-store headers, and telemetry-disabled builds.
+- Added API v1 liveness/readiness endpoints, a sanitized AI provider registry, and bounded authenticated Solana account/transaction read endpoints.
+- Expanded Solana integration with cluster-aware RPC selection, configurable commitment, slot/block-height/genesis/version status, account balance metadata, transaction confirmation state, input validation, and per-route read limits. No arbitrary RPC proxy or signing surface was added.
+- Added frontend AI domain modules for renewable analysis, Solana evidence, and PowerChain provider orchestration, including the requested historical `powerchan.tsx` compatibility alias.
+- Exposed Supabase as a sanitized service/health capability while keeping server secrets out of global/frontend Turbo environment allowlists.
+- Regenerated the OpenAPI operation catalog and expanded Postman/mock/SDK coverage for the new API v1 routes.

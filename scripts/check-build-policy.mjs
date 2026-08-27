@@ -12,6 +12,11 @@ if (nvmrc !== "24.20.0" || nodeVersionFile !== nvmrc) {
   console.error(`Runtime files must agree on Node 24.20.0 (.nvmrc=${nvmrc}, .node-version=${nodeVersionFile}).`);
   process.exit(1);
 }
+if (pkg.packageManager !== "pnpm@11.24.0" || pkg.engines?.pnpm !== ">=11.24.0 <12") {
+  console.error(`pnpm runtime must be pinned to pnpm@11.24.0 with engine >=11.24.0 <12; got ${pkg.packageManager} / ${pkg.engines?.pnpm}.`);
+  process.exit(1);
+}
+
 for (const [name, manifest] of [["root", pkg], ["frontend", frontendPkg], ["backend", backendPkg]]) {
   if (manifest.engines?.node !== ">=24.19.0 <25") {
     console.error(`${name} Node engine must be >=24.19.0 <25; got ${manifest.engines?.node ?? "missing"}.`);

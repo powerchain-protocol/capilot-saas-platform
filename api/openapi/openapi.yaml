@@ -2,7 +2,10 @@ openapi: 3.1.0
 info:
   title: PowerChain Copilot API
   version: 1.0.0
-  description: Canonical HTTP API for PowerChain Copilot 1.0.0. Public API traffic uses the versioned /v1 surface and X-Api-Key client authentication. User/workspace operations additionally require the signed HttpOnly session cookie. The web application calls a same-origin /api/v1 gateway that injects the server-side API key; browser code never receives the key. AI and network responses do not constitute approval, dispatch, financial advice, transaction confirmation, or settlement evidence.
+  description: Canonical HTTP API for PowerChain Copilot 1.0.0. Public API traffic uses the versioned /v1 surface and X-Api-Key
+    client authentication. User/workspace operations additionally require the signed HttpOnly session cookie. The web application
+    calls a same-origin /api/v1 gateway that injects the server-side API key; browser code never receives the key. AI and
+    network responses do not constitute approval, dispatch, financial advice, transaction confirmation, or settlement evidence.
   license:
     name: MIT
   summary: Governed SaaS API for PowerChain Copilot renewable-infrastructure operations.
@@ -388,7 +391,8 @@ paths:
         '429':
           description: Preview rate limit exceeded
       operationId: generateAnalysis
-      description: Development/diagnostic analysis endpoint. Production should keep ALLOW_UNBILLED_AI_PREVIEW=false so clients use persisted chat, deterministic PWRC quotes, reservation, settlement, and receipts.
+      description: Development/diagnostic analysis endpoint. Production should keep ALLOW_UNBILLED_AI_PREVIEW=false so clients
+        use persisted chat, deterministic PWRC quotes, reservation, settlement, and receipts.
       security:
       - ApiKey: []
         sessionCookie: []
@@ -490,7 +494,8 @@ paths:
         '402':
           $ref: '#/components/responses/PaymentRequired'
       operationId: sendChatMessage
-      description: Persist user message and generate Copilot response A successful completed response persists a deterministic 10,000 PWRC quote, reserves atomically, settles with the delivered message, and returns a non-transferable receipt.
+      description: Persist user message and generate Copilot response A successful completed response persists a deterministic
+        10,000 PWRC quote, reserves atomically, settles with the delivered message, and returns a non-transferable receipt.
       security:
       - ApiKey: []
         sessionCookie: []
@@ -545,7 +550,8 @@ paths:
         '402':
           $ref: '#/components/responses/PaymentRequired'
       operationId: sendDefaultCopilotMessage
-      description: Compatibility endpoint to send a default Copilot message A successful completed response persists a deterministic 10,000 PWRC quote, reserves atomically, settles with the delivered message, and returns a non-transferable receipt.
+      description: Compatibility endpoint to send a default Copilot message A successful completed response persists a deterministic
+        10,000 PWRC quote, reserves atomically, settles with the delivered message, and returns a non-transferable receipt.
       security:
       - ApiKey: []
         sessionCookie: []
@@ -668,9 +674,17 @@ paths:
       summary: Solana RPC health
       responses:
         '200':
-          description: RPC health
+          description: Sanitized Solana RPC/network snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SolanaNetworkEnvelope'
         '401':
           $ref: '#/components/responses/InvalidApiKey'
+        '429':
+          description: Solana read limit exceeded
+        '503':
+          description: Solana RPC is not configured
       operationId: getSolanaHealth
       description: Solana RPC health
       security:
@@ -740,7 +754,8 @@ paths:
       - Credits
       operationId: getCredits
       summary: Current PWRC credit account
-      description: Returns the authenticated user credit-account balances and the configured completed-response lifecycle. Values are integer PWRC accounting units represented as strings.
+      description: Returns the authenticated user credit-account balances and the configured completed-response lifecycle.
+        Values are integer PWRC accounting units represented as strings.
       security:
       - ApiKey: []
         sessionCookie: []
@@ -922,7 +937,8 @@ paths:
       tags:
       - AI
       summary: List configured AI model aliases and provider availability
-      description: Returns non-secret AI provider/model configuration for the authenticated workspace runtime. A configured flag means server credentials or a local runtime are present; it does not guarantee provider health.
+      description: Returns non-secret AI provider/model configuration for the authenticated workspace runtime. A configured
+        flag means server credentials or a local runtime are present; it does not guarantee provider health.
       operationId: listAiModels
       security:
       - ApiKey: []
@@ -937,7 +953,8 @@ paths:
       tags:
       - Network
       summary: Get the active development or mainnet network profile
-      description: Returns the sanitized PowerChain environment and chain selections. RPC URLs and credentials are never returned.
+      description: Authenticated development/mainnet profile including Solana cluster/commitment and Sui network; no RPC URLs
+        or credentials are exposed.
       operationId: getNetworkProfile
       security:
       - ApiKey: []
@@ -947,6 +964,132 @@ paths:
           description: Sanitized environment profile
         '401':
           $ref: '#/components/responses/Unauthorized'
+  /v1/health/live:
+    get:
+      tags:
+      - Health
+      summary: Process liveness probe
+      description: Lightweight liveness probe that does not call external dependencies.
+      operationId: getLiveness
+      security: &id001
+      - ApiKey: []
+      responses:
+        '200':
+          description: Process is alive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LivenessEnvelope'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
+  /v1/health/ready:
+    get:
+      tags:
+      - Health
+      summary: Dependency readiness probe
+      description: Returns the full dependency health snapshot and HTTP 503 while required dependencies are degraded.
+      operationId: getReadiness
+      security: *id001
+      responses:
+        '200':
+          description: Runtime is ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthEnvelope'
+        '503':
+          description: Runtime is not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthEnvelope'
+        '401':
+          $ref: '#/components/responses/InvalidApiKey'
+  /v1/ai/providers:
+    get:
+      tags:
+      - AI
+      summary: List sanitized AI provider runtime state
+      description: Returns provider order, model aliases and configuration state without returning API keys or provider secrets.
+      operationId: listAiProviders
+      security: &id002
+      - ApiKey: []
+        sessionCookie: []
+      responses:
+        '200':
+          description: AI provider runtime registry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiProvidersEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/network/solana/accounts/{address}:
+    get:
+      tags:
+      - Network
+      summary: Read a Solana account snapshot
+      description: Authenticated, read-only balance and account metadata lookup against the configured Solana RPC. Arbitrary
+        RPC proxying is not exposed.
+      operationId: getSolanaAccount
+      security: *id002
+      parameters:
+      - in: path
+        name: address
+        required: true
+        schema:
+          type: string
+          minLength: 32
+          maxLength: 44
+        description: Base58 Solana account address
+      responses:
+        '200':
+          description: Solana account snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SolanaAccountEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '429':
+          description: Solana read limit exceeded
+        '503':
+          description: Solana RPC is not configured
+  /v1/network/solana/transactions/{signature}:
+    get:
+      tags:
+      - Network
+      summary: Read Solana signature confirmation state
+      description: Authenticated, read-only confirmation lookup using getSignatureStatuses with transaction-history search
+        enabled.
+      operationId: getSolanaTransactionStatus
+      security: *id002
+      parameters:
+      - in: path
+        name: signature
+        required: true
+        schema:
+          type: string
+          minLength: 64
+          maxLength: 88
+        description: Base58 Solana transaction signature
+      responses:
+        '200':
+          description: Solana transaction confirmation snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SolanaTransactionEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '429':
+          description: Solana read limit exceeded
+        '503':
+          description: Solana RPC is not configured
 components:
   securitySchemes:
     ApiKey:
@@ -1497,6 +1640,276 @@ components:
         createdAt:
           type: string
           format: date-time
+    LivenessEnvelope:
+      type: object
+      required:
+      - ok
+      - data
+      properties:
+        ok:
+          const: true
+        data:
+          type: object
+          required:
+          - status
+          - version
+          - environment
+          - timestamp
+          properties:
+            status:
+              type: string
+              const: alive
+            version:
+              type: string
+              const: 1.0.0
+            environment:
+              type: string
+              enum:
+              - development
+              - mainnet
+            timestamp:
+              type: string
+              format: date-time
+    AiProvidersEnvelope:
+      type: object
+      required:
+      - ok
+      - data
+      properties:
+        ok:
+          const: true
+        data:
+          type: object
+          required:
+          - environment
+          - providerOrder
+          - fallbackEnabled
+          - providers
+          properties:
+            environment:
+              type: string
+              enum:
+              - development
+              - mainnet
+            providerOrder:
+              type: array
+              items:
+                type: string
+            fallbackEnabled:
+              type: boolean
+            providers:
+              type: array
+              items:
+                type: object
+                required:
+                - provider
+                - model
+                - configured
+                - local
+                - priority
+                - fallbackEligible
+                properties:
+                  provider:
+                    type: string
+                    enum:
+                    - openai
+                    - anthropic
+                    - gemini
+                    - deepseek
+                    - ollama
+                  model:
+                    type: string
+                  configured:
+                    type: boolean
+                  local:
+                    type: boolean
+                  priority:
+                    type:
+                    - integer
+                    - 'null'
+                    minimum: 1
+                  fallbackEligible:
+                    type: boolean
+    SolanaNetworkEnvelope:
+      type: object
+      required:
+      - ok
+      - data
+      properties:
+        ok:
+          const: true
+        data:
+          type: object
+          required:
+          - network
+          - status
+          - latencyMs
+          - cluster
+          - provider
+          - commitment
+          - slot
+          - blockHeight
+          - genesisHash
+          - version
+          - rpcConfigured
+          - timestamp
+          properties:
+            network:
+              type: string
+              const: solana
+            status:
+              type: string
+              enum:
+              - operational
+              - degraded
+            latencyMs:
+              type: number
+            cluster:
+              type: string
+              enum:
+              - devnet
+              - mainnet-beta
+            provider:
+              type: string
+              enum:
+              - custom
+              - helius
+              - public-devnet
+            commitment:
+              type: string
+              enum:
+              - processed
+              - confirmed
+              - finalized
+            slot:
+              type:
+              - integer
+              - 'null'
+              minimum: 0
+            blockHeight:
+              type:
+              - integer
+              - 'null'
+              minimum: 0
+            genesisHash:
+              type:
+              - string
+              - 'null'
+            version:
+              type:
+              - string
+              - 'null'
+            rpcConfigured:
+              const: true
+            timestamp:
+              type: string
+              format: date-time
+    SolanaAccountEnvelope:
+      type: object
+      required:
+      - ok
+      - data
+      properties:
+        ok:
+          const: true
+        data:
+          type: object
+          required:
+          - address
+          - cluster
+          - commitment
+          - exists
+          - balanceLamports
+          - balanceSol
+          - owner
+          - executable
+          - rentEpoch
+          - contextSlot
+          properties:
+            address:
+              type: string
+            cluster:
+              type: string
+              enum:
+              - devnet
+              - mainnet-beta
+            commitment:
+              type: string
+              enum:
+              - processed
+              - confirmed
+              - finalized
+            exists:
+              type: boolean
+            balanceLamports:
+              type: integer
+              minimum: 0
+            balanceSol:
+              type: number
+              minimum: 0
+            owner:
+              type:
+              - string
+              - 'null'
+            executable:
+              type:
+              - boolean
+              - 'null'
+            rentEpoch:
+              type:
+              - integer
+              - 'null'
+            contextSlot:
+              type: integer
+              minimum: 0
+    SolanaTransactionEnvelope:
+      type: object
+      required:
+      - ok
+      - data
+      properties:
+        ok:
+          const: true
+        data:
+          type: object
+          required:
+          - signature
+          - cluster
+          - confirmationStatus
+          - confirmations
+          - slot
+          - err
+          - found
+          properties:
+            signature:
+              type: string
+            cluster:
+              type: string
+              enum:
+              - devnet
+              - mainnet-beta
+            confirmationStatus:
+              type:
+              - string
+              - 'null'
+              enum:
+              - processed
+              - confirmed
+              - finalized
+              - null
+            confirmations:
+              type:
+              - integer
+              - 'null'
+              minimum: 0
+            slot:
+              type:
+              - integer
+              - 'null'
+              minimum: 0
+            err: {}
+            found:
+              type: boolean
   examples:
     Unauthenticated:
       summary: Authentication required

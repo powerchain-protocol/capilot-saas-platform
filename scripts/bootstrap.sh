@@ -34,9 +34,9 @@ if ! command -v corepack >/dev/null 2>&1; then
 fi
 
 corepack enable
-if ! corepack install --global pnpm@11.23.0; then
+if ! corepack install --global pnpm@11.24.0; then
   echo "Corepack could not activate pnpm; falling back to npm global pnpm install." >&2
-  npm install --global pnpm@11.23.0
+  npm install --global pnpm@11.24.0
 fi
 
 printf 'Node: '; node --version

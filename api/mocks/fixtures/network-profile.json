@@ -4,6 +4,7 @@
     "environment": "development",
     "production": false,
     "solanaCluster": "devnet",
+    "solanaCommitment": "confirmed",
     "suiNetwork": "devnet",
     "representativeDataAllowed": true
   }

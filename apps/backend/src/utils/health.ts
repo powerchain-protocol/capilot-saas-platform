@@ -14,7 +14,7 @@ export type HealthSnapshot = {
   ai: "managed" | "deterministic-demo" | "unavailable";
   aiProvidersConfigured: number;
   websocket: "enabled";
-  providers: { pyth: boolean; birdeye: boolean; helius: boolean; solanaRpc: boolean };
+  providers: { pyth: boolean; birdeye: boolean; helius: boolean; solanaRpc: boolean; supabase: boolean };
 };
 
 export async function collectHealth(): Promise<HealthSnapshot> {
@@ -43,7 +43,8 @@ export async function collectHealth(): Promise<HealthSnapshot> {
       pyth: Boolean(env.pythHermesUrl),
       birdeye: Boolean(env.birdeyeApiKey),
       helius: Boolean(env.heliusRpcUrl || env.heliusApiKey),
-      solanaRpc: Boolean(env.solanaRpcUrl || env.heliusRpcUrl || env.heliusApiKey || env.solanaCluster === "devnet")
+      solanaRpc: Boolean(env.solanaRpcUrl || env.heliusRpcUrl || env.heliusApiKey || env.solanaCluster === "devnet"),
+      supabase: Boolean(env.supabaseUrl && (env.supabaseSecretKey || env.supabasePublishableKey))
     }
   };
 }

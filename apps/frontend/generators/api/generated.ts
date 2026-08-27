@@ -54,6 +54,11 @@ export const GENERATED_API_OPERATIONS = [
     "path": "/v1/health"
   },
   {
+    "operationId": "getLiveness",
+    "method": "GET",
+    "path": "/v1/health/live"
+  },
+  {
     "operationId": "getMarketPrice",
     "method": "GET",
     "path": "/v1/market/price"
@@ -74,9 +79,19 @@ export const GENERATED_API_OPERATIONS = [
     "path": "/v1/tokens/pwrc"
   },
   {
+    "operationId": "getReadiness",
+    "method": "GET",
+    "path": "/v1/health/ready"
+  },
+  {
     "operationId": "getSessionSecurity",
     "method": "GET",
     "path": "/v1/security/session"
+  },
+  {
+    "operationId": "getSolanaAccount",
+    "method": "GET",
+    "path": "/v1/network/solana/accounts/{address}"
   },
   {
     "operationId": "getSolanaHealth",
@@ -84,9 +99,19 @@ export const GENERATED_API_OPERATIONS = [
     "path": "/v1/network/solana"
   },
   {
+    "operationId": "getSolanaTransactionStatus",
+    "method": "GET",
+    "path": "/v1/network/solana/transactions/{signature}"
+  },
+  {
     "operationId": "listAiModels",
     "method": "GET",
     "path": "/v1/ai/models"
+  },
+  {
+    "operationId": "listAiProviders",
+    "method": "GET",
+    "path": "/v1/ai/providers"
   },
   {
     "operationId": "listApprovals",

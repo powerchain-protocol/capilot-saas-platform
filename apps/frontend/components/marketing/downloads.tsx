@@ -1,5 +1,5 @@
-import { FaApple, FaGooglePlay, FaWindows } from "react-icons/fa6";
-import { ArrowUpRight, Cloud, Github, Globe2, MonitorSmartphone, ShieldCheck } from "lucide-react";
+import { FaApple, FaGithub, FaGooglePlay, FaWindows } from "react-icons/fa6";
+import { ArrowUpRight, Cloud, Globe2, MonitorSmartphone, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppIcon } from "@/components/brand/app-icon";
 
@@ -29,7 +29,7 @@ export function Downloads() {
             <StoreBadge href="/setup?platform=Android&source=store" icon={<FaGooglePlay />} overline="Managed mobile" title="Google Play" />
             <InstallCard icon={<FaApple />} appIcon={<AppIcon variant="light" size={42} />} title="PowerChain for macOS" meta="macOS 14+ · Apple silicon / Intel" href="/setup?platform=macOS" action="Setup" />
             <InstallCard icon={<FaWindows />} appIcon={<AppIcon variant="dark-green" size={42} />} title="PowerChain for Windows" meta="Windows 11 · x64 / ARM64" href="/setup?platform=Windows" action="Setup" />
-            <InstallCard icon={<Github />} appIcon={<AppIcon variant="dark" size={42} />} title="GitHub Releases" meta="Signed artifacts · checksums · notes" href="/setup?platform=macOS&source=github" action="Open" />
+            <InstallCard icon={<FaGithub />} appIcon={<AppIcon variant="dark" size={42} />} title="GitHub Releases" meta="Signed artifacts · checksums · notes" href="/setup?platform=macOS&source=github" action="Open" />
             <InstallCard icon={<Cloud />} appIcon={<AppIcon variant="green" size={42} />} title="Google Drive" meta="Managed beta / enterprise distribution" href="/setup?platform=macOS&source=drive" action="Open" />
             <InstallCard icon={<Globe2 />} appIcon={<AppIcon variant="green" size={42} />} title="PowerChain Web" meta="No installation required" wide action="Open" href="/sign-in" />
             <div className="flex items-start gap-3 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-soft)] px-4 py-3 text-[10px] leading-5 text-[var(--muted)] sm:col-span-2"><MonitorSmartphone className="mt-0.5 size-4 shrink-0 text-[var(--success)]" /><span>Install sources are configuration-driven. Missing production URLs fail closed and route to a real access-request workflow rather than a dead download.</span></div>

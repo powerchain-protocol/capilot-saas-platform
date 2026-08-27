@@ -5,10 +5,11 @@ import { env } from "../config/env.ts";
 import { migrationDir } from "../config/paths.ts";
 
 async function main(): Promise<void> {
-  if (!env.databaseUrl) throw new Error("DATABASE_URL is required to run PostgreSQL migrations.");
+  const migrationUrl = env.directDatabaseUrl || env.databaseUrl;
+  if (!migrationUrl) throw new Error("DIRECT_URL or DATABASE_URL is required to run PostgreSQL migrations.");
   const files = (await readdir(migrationDir)).filter((file) => /^\d+_.+\.sql$/.test(file)).sort();
   if (files.length === 0) throw new Error("No PostgreSQL migrations were found.");
-  const pool = new Pool({ connectionString: env.databaseUrl, max: 1, connectionTimeoutMillis: 5_000 });
+  const pool = new Pool({ connectionString: migrationUrl, max: 1, connectionTimeoutMillis: 10_000, application_name: "powerchain-copilot-migrations" });
   try {
     for (const file of files) {
       const sql = await readFile(resolve(migrationDir, file), "utf8");

@@ -3,7 +3,7 @@ import { env } from "../config/env.ts";
 
 async function main(): Promise<void> {
   if (!env.databaseUrl) throw new Error("DATABASE_URL is required to check PostgreSQL connectivity.");
-  const pool = new Pool({ connectionString: env.databaseUrl, max: 1, connectionTimeoutMillis: 5_000 });
+  const pool = new Pool({ connectionString: env.databaseUrl, max: 1, connectionTimeoutMillis: 10_000, application_name: "powerchain-copilot-health" });
   try {
     const result = await pool.query<{ database: string; now: string }>("select current_database() as database, now()::text as now");
     const row = result.rows[0];

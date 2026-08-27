@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "data": {
+    "signature": "5VfRepresentativeSolanaSignature1111111111111111111111111111111111111111111111111",
+    "cluster": "devnet",
+    "confirmationStatus": "finalized",
+    "confirmations": null,
+    "slot": 372000000,
+    "err": null,
+    "found": true
+  }
+}

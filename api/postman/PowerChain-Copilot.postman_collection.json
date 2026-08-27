@@ -76,6 +76,14 @@
     {
       "key": "tokenAddress",
       "value": "So11111111111111111111111111111111111111112"
+    },
+    {
+      "key": "solanaAddress",
+      "value": "So11111111111111111111111111111111111111112"
+    },
+    {
+      "key": "solanaSignature",
+      "value": ""
     }
   ],
   "item": [
@@ -152,6 +160,78 @@
                 "exec": [
                   "pm.test('health returns 200', () => pm.response.to.have.status(200));",
                   "const b = pm.response.json(); pm.expect(b.data.version).to.eql('1.0.0');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Liveness",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/health/live",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "health",
+                "live"
+              ]
+            },
+            "description": "Lightweight process liveness probe."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('liveness endpoint responds', () => pm.expect(pm.response.code).to.be.oneOf([200, 401, 422, 429, 503]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Readiness",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/health/ready",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "health",
+                "ready"
+              ]
+            },
+            "description": "Dependency readiness probe. Returns 503 when required runtime dependencies are degraded."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('readiness endpoint responds', () => pm.expect(pm.response.code).to.be.oneOf([200, 401, 422, 429, 503]));"
                 ]
               }
             }
@@ -860,6 +940,42 @@
               ],
               "cookie": [],
               "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"environment\": \"development\",\n    \"providerOrder\": [\n      \"openai\",\n      \"anthropic\",\n      \"gemini\",\n      \"deepseek\",\n      \"ollama\"\n    ],\n    \"models\": [\n      {\n        \"provider\": \"openai\",\n        \"model\": \"gpt-5.6-mini\",\n        \"configured\": true,\n        \"local\": false\n      },\n      {\n        \"provider\": \"anthropic\",\n        \"model\": \"claude-sonnet-4-5\",\n        \"configured\": false,\n        \"local\": false\n      },\n      {\n        \"provider\": \"gemini\",\n        \"model\": \"gemini-2.5-pro\",\n        \"configured\": false,\n        \"local\": false\n      },\n      {\n        \"provider\": \"deepseek\",\n        \"model\": \"deepseek-chat\",\n        \"configured\": false,\n        \"local\": false\n      },\n      {\n        \"provider\": \"ollama\",\n        \"model\": \"llama3.3\",\n        \"configured\": false,\n        \"local\": true\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "AI providers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/ai/providers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "ai",
+                "providers"
+              ]
+            },
+            "description": "Sanitized managed/local provider order and configuration state. No provider keys are returned."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('AI providers endpoint responds', () => pm.expect(pm.response.code).to.be.oneOf([200, 401, 422, 429, 503]));"
+                ]
+              }
             }
           ]
         },
@@ -1795,6 +1911,82 @@
               ],
               "cookie": [],
               "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"provider\": \"pyth\",\n    \"symbol\": \"SOL/USD\",\n    \"price\": 100.0,\n    \"currency\": \"USD\",\n    \"timestamp\": \"2026-08-27T06:00:00.000Z\",\n    \"source\": \"mock\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Solana account",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/network/solana/accounts/{{solanaAddress}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "network",
+                "solana",
+                "accounts",
+                "{{solanaAddress}}"
+              ]
+            },
+            "description": "Read-only Solana account/balance snapshot through the configured RPC boundary."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Solana account endpoint responds', () => pm.expect(pm.response.code).to.be.oneOf([200, 401, 422, 429, 503]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Solana transaction status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/network/solana/transactions/{{solanaSignature}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "network",
+                "solana",
+                "transactions",
+                "{{solanaSignature}}"
+              ]
+            },
+            "description": "Read-only Solana confirmation state lookup."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Solana transaction endpoint responds', () => pm.expect(pm.response.code).to.be.oneOf([200, 401, 422, 429, 503]));"
+                ]
+              }
             }
           ]
         }

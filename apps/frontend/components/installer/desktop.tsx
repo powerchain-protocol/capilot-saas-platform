@@ -1,7 +1,7 @@
 "use client";
 
-import { Cpu, Github, HardDriveDownload, ShieldCheck } from "lucide-react";
-import { FaApple, FaWindows } from "react-icons/fa6";
+import { Cpu, HardDriveDownload, ShieldCheck } from "lucide-react";
+import { FaApple, FaGithub, FaWindows } from "react-icons/fa6";
 import { AppIcon } from "@/components/brand/app-icon";
 import { getInstallSources } from "@/config/install";
 import { useMobile } from "@/hooks/mobile";
@@ -26,7 +26,7 @@ export function DesktopInstaller({ platform }: { platform: "macOS" | "Windows" }
       </div>
 
       <div className="mt-5 grid gap-2 sm:grid-cols-2">
-        {github ? <a href={github.href} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[var(--forest)] px-4 text-xs font-bold text-white"><Github className="size-4" /> GitHub Releases</a> : null}
+        {github ? <a href={github.href} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[var(--forest)] px-4 text-xs font-bold text-white"><FaGithub className="size-4" /> GitHub Releases</a> : null}
         {drive ? <a href={drive.href} target={drive.external ? "_blank" : undefined} rel={drive.external ? "noreferrer" : undefined} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] px-4 text-xs font-bold text-[var(--ink)]"><HardDriveDownload className="size-4" /> {drive.configured ? "Managed Drive" : "Request managed build"}</a> : null}
       </div>
 

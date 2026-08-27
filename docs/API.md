@@ -123,3 +123,18 @@ Use `pnpm api:key:hash -- <key>` to create the SHA-256 value stored in `POWERCHA
 ## AI preview vs billed chat
 
 `POST /v1/ai/generate` is an optional development/diagnostic preview endpoint. Keep `ALLOW_UNBILLED_AI_PREVIEW=false` in production. Customer-facing completed Copilot responses use `/v1/chat/:id/messages`, which persists the request, creates and hashes a quote, reserves PWRC, generates the response, and atomically settles the delivered message with a non-transferable receipt.
+
+## Runtime and Solana reads
+
+The canonical external namespace is `/v1`; the frontend-compatible alias remains `/api/v1`.
+
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /v1/health/live` | Lightweight process liveness |
+| `GET /v1/health/ready` | Dependency readiness; returns 503 while degraded |
+| `GET /v1/ai/providers` | Sanitized provider order and configuration state |
+| `GET /v1/network/solana` | Cluster/RPC status, commitment, slot, block height and version |
+| `GET /v1/network/solana/accounts/:address` | Read-only account and SOL balance metadata |
+| `GET /v1/network/solana/transactions/:signature` | Read-only confirmation state |
+
+The Solana API exposes fixed read operations only. It does not expose an arbitrary JSON-RPC tunnel, signing keys, wallet secrets, transaction signing, or transaction submission.

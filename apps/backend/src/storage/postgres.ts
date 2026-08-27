@@ -30,7 +30,7 @@ function row<T>(value: QueryResultRow): T { return value as T; }
 export class PostgresStore implements Store {
   readonly pool: Pool;
   constructor(connectionString: string) {
-    this.pool = new Pool({ connectionString, max: 10, idleTimeoutMillis: 30_000, connectionTimeoutMillis: 5_000 });
+    this.pool = new Pool({ connectionString, max: 10, idleTimeoutMillis: 30_000, connectionTimeoutMillis: 10_000, application_name: "powerchain-copilot-api" });
   }
 
   async health() {

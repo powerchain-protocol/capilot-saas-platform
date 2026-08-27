@@ -3,9 +3,15 @@
   "data": {
     "network": "solana",
     "status": "operational",
-    "rpcConfigured": true,
-    "heliusConfigured": true,
     "latencyMs": 42,
+    "cluster": "devnet",
+    "provider": "public-devnet",
+    "commitment": "confirmed",
+    "slot": 372000000,
+    "blockHeight": 350000000,
+    "genesisHash": "EtWTRABZaYq6iMfeYKouRu166VU2xqa1",
+    "version": "2.x",
+    "rpcConfigured": true,
     "timestamp": "2026-08-27T06:00:00.000Z"
   }
 }

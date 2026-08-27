@@ -15,7 +15,7 @@ export type Message = { id: string; chatId: string; workspaceId: string; userId:
 export type SuggestedAction = { id: string; label: string; href: string };
 export type AiResponse = { mode: "managed" | "demo"; text: string; actions: SuggestedAction[] };
 export type SendMessageResponse = AiResponse & { chat: Chat; userMessage: Message; message: Message; billing: { quote: CreditQuote; receipt: CreditReceipt; account: CreditAccount } };
-export type HealthSnapshot = { status: "operational" | "degraded"; version: string; timestamp: string; database: { ok: boolean; adapter: string; latencyMs: number }; sessions: string; ai: string; websocket: string; providers: { pyth: boolean; birdeye: boolean; helius: boolean; solanaRpc: boolean } };
+export type HealthSnapshot = { status: "operational" | "degraded"; version: string; timestamp: string; database: { ok: boolean; adapter: string; latencyMs: number }; sessions: string; ai: string; websocket: string; providers: { pyth: boolean; birdeye: boolean; helius: boolean; solanaRpc: boolean; supabase?: boolean } };
 export type ServiceHealth = { key: string; name: string; category: string; configured: boolean };
 export type SessionSecurity = { ip: string; masked: boolean; role: Role; persistent: boolean; expiresAt: string; sessionId: string };
 export type ChatSocketEvent = { type: "chat.message" | "chat.receipt" | "chat.updated" | "system.heartbeat"; chatId: string; payload: unknown; timestamp: string };
@@ -41,10 +41,22 @@ export type AiModelsSnapshot = {
   models: AiModelStatus[];
 };
 
+export type AiProviderStatus = AiModelStatus & { priority: number | null; fallbackEligible: boolean };
+export type AiProvidersSnapshot = { environment: "development" | "mainnet"; providerOrder: string[]; fallbackEnabled: boolean; providers: AiProviderStatus[] };
+
+export type SolanaNetworkSnapshot = {
+  network: "solana"; status: "operational" | "degraded"; latencyMs: number; cluster: "devnet" | "mainnet-beta";
+  provider: "custom" | "helius" | "public-devnet"; commitment: "processed" | "confirmed" | "finalized";
+  slot: number | null; blockHeight: number | null; genesisHash: string | null; version: string | null; rpcConfigured: true; timestamp: string;
+};
+export type SolanaAccountSnapshot = { address: string; cluster: "devnet" | "mainnet-beta"; commitment: "processed" | "confirmed" | "finalized"; exists: boolean; balanceLamports: number; balanceSol: number; owner: string | null; executable: boolean | null; rentEpoch: number | null; contextSlot: number };
+export type SolanaTransactionSnapshot = { signature: string; cluster: "devnet" | "mainnet-beta"; confirmationStatus: "processed" | "confirmed" | "finalized" | null; confirmations: number | null; slot: number | null; err: unknown; found: boolean };
+
 export type NetworkProfile = {
   environment: "development" | "mainnet";
   production: boolean;
   solanaCluster: "devnet" | "mainnet-beta";
+  solanaCommitment?: "processed" | "confirmed" | "finalized";
   suiNetwork: "devnet" | "mainnet";
   representativeDataAllowed: boolean;
 };

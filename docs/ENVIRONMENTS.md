@@ -16,8 +16,7 @@ Development permits representative/demo AI when explicitly enabled and defaults 
 Use:
 
 ```bash
-cp apps/backend/.env.example apps/backend/.env
-cp apps/frontend/.env.example apps/frontend/.env.local
+cp .env.example .env.local
 ```
 
 ## Mainnet
@@ -42,8 +41,7 @@ Mainnet is fail-closed:
 Use the templates:
 
 ```bash
-cp apps/backend/.env.mainnet.example apps/backend/.env
-cp apps/frontend/.env.mainnet.example apps/frontend/.env.local
+cp .env.mainnet.example .env.local
 ```
 
 Never commit populated mainnet environment files.
@@ -57,3 +55,8 @@ GET /v1/network/profile
 ```
 
 The response contains only the environment name, Solana cluster, Sui network, production flag, and whether representative data is allowed. RPC URLs, API keys, database URLs, and wallet secrets are never returned.
+
+
+## Supabase
+
+Supabase configuration follows the same development/mainnet boundary. Browser-safe publishable configuration uses `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`; database URLs and secret/service-role keys remain server-only. Runtime PostgreSQL uses `DATABASE_URL`, while migration tooling prefers `DIRECT_URL`. `apps/backend/turbo.json` owns private database/provider env allowlists so they are not elevated into root `globalEnv` or frontend task environments.

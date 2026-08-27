@@ -11,7 +11,8 @@ export async function registerServiceRoutes(app: FastifyInstance): Promise<void>
       { key: "birdeye", name: "Birdeye", category: "market-data", configured: Boolean(env.birdeyeApiKey) },
       { key: "helius", name: "Helius", category: "solana-rpc", configured: Boolean(env.heliusRpcUrl || env.heliusApiKey) },
       { key: "solana-rpc", name: "Solana RPC", category: "network", configured: Boolean(env.solanaRpcUrl || env.heliusRpcUrl || env.nodeEnv !== "production") },
-      { key: "postgres", name: "PostgreSQL", category: "storage", configured: Boolean(env.databaseUrl) }
+      { key: "postgres", name: "PostgreSQL", category: "storage", configured: Boolean(env.databaseUrl) },
+      { key: "supabase", name: "Supabase", category: "realtime-storage", configured: Boolean(env.supabaseUrl && (env.supabaseSecretKey || env.supabasePublishableKey)) }
     ]);
   });
 }
