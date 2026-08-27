@@ -1,0 +1,1 @@
+import {LegalPage} from "@/components/marketing/legal-page";export default function Page(){return <LegalPage title="Terms" body="This software scaffold is provided for PowerChain product development. Production commercial terms, acceptable-use rules, service levels, payment terms, and customer responsibilities must be finalized before public launch."/>}

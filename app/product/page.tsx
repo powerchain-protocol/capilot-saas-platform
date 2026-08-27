@@ -1,0 +1,8 @@
+import { Navbar } from "@/components/marketing/navbar";
+import { Footer } from "@/components/marketing/footer";
+import { Workflow } from "@/components/marketing/workflow";
+import { Capabilities } from "@/components/marketing/capabilities";
+import { DashboardPreview } from "@/components/marketing/dashboard-preview";
+import { FinalCTA } from "@/components/marketing/final-cta";
+import { Button } from "@/components/ui/button";
+export default function ProductPage(){return <><Navbar/><main><section className="bg-white py-24"><div className="pc-shell grid gap-10 lg:grid-cols-[1fr_.8fr] lg:items-end"><div><p className="pc-kicker">Product</p><h1 className="mt-5 max-w-4xl text-5xl font-bold tracking-[-.055em] sm:text-6xl">One intelligence layer for the energy lifecycle.</h1><p className="mt-6 max-w-2xl text-lg leading-8 text-[#66706A]">Monitor infrastructure, investigate performance, review evidence, and move approved actions toward execution from one governed workspace.</p><div className="mt-8 flex flex-wrap gap-3"><Button href="/get-started" arrow>Open Copilot</Button><Button variant="secondary" href="/dashboard">View Dashboard</Button></div></div><div className="pc-card p-6"><p className="text-xs font-bold text-[#1E6B4B]">System model</p><div className="mt-4 grid gap-2">{["Assets + Telemetry","Operational Intelligence","Evidence + Policy","Human Approval","Execution + Verification"].map((x,i)=><div key={x} className="flex items-center gap-3 rounded-xl bg-[#F5F8F6] px-4 py-3 text-sm font-semibold"><span className="grid size-7 place-items-center rounded-lg bg-white text-[10px] text-[#1E6B4B]">0{i+1}</span>{x}</div>)}</div></div></div></section><DashboardPreview/><Workflow/><Capabilities/><FinalCTA/></main><Footer/></>}

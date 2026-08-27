@@ -1,0 +1,2 @@
+import {DashboardShell} from "@/components/dashboard/dashboard-shell";import {requireSession} from "@/lib/server/auth";import {findUserById,getWorkspace} from "@/lib/server/repository";import {redirect} from "next/navigation";
+export default async function Layout({children}:{children:React.ReactNode}){const s=await requireSession();const [u,w]=await Promise.all([findUserById(s.userId),getWorkspace(s.workspaceId)]);if(!u||!w)redirect("/sign-in");return <DashboardShell userName={u.name} workspaceName={w.name}>{children}</DashboardShell>}

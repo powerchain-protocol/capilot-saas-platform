@@ -1,0 +1,1 @@
+import {LegalPage} from "@/components/marketing/legal-page";export default function Page(){return <LegalPage title="Cookies" body="The authentication implementation uses a strictly necessary signed HttpOnly session cookie. Add analytics or marketing cookies only after consent requirements and the production cookie policy have been configured."/>}

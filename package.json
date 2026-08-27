@@ -1,0 +1,38 @@
+{
+  "name": "@powerchain/capilot-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PowerChain Copilot full-stack SaaS for renewable infrastructure, AI operations, approvals, assets, and governed onchain workflows",
+  "license": "MIT",
+  "packageManager": "pnpm@11.24.0",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "check:links": "node scripts/check-links.mjs",
+    "check": "pnpm check:links && pnpm check:actions && pnpm typecheck && pnpm lint",
+    "check:actions": "node scripts/check-actions.mjs"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "lucide-react": "1.34.0",
+    "next": "16.3.3",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-icons": "5.7.0",
+    "tailwindcss": "4.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "26.3.0",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.5",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.3",
+    "typescript": "7.0.2"
+  }
+}
