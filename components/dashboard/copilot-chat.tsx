@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Bot, CheckCircle2, Loader2, Send, ShieldCheck, Sparkles } from "lucide-react";
 import { PwrcIcon } from "@/components/brand/pwrc-icon";
 import { useToast } from "@/components/ui/toast";
+import { apiRoutes } from "@/config/api";
 
 type Msg = { id: string; role: "user" | "assistant"; content: string };
 type Action = { label: string; href: string };
@@ -29,7 +30,7 @@ export function CopilotChat() {
   const { toast } = useToast();
 
   useEffect(() => {
-    fetch("/api/copilot")
+    fetch(apiRoutes.copilot)
       .then((response) => response.json())
       .then((json) => { if (json.ok) setMessages(json.data); else setError(json?.error?.message || "Unable to load conversation."); })
       .catch(() => setError("Unable to load conversation."))
@@ -53,7 +54,7 @@ export function CopilotChat() {
     setMessages((current) => [...current, { id: `local-${Date.now()}`, role: "user", content: message }]);
     setLoading(true);
 
-    const response = await fetch("/api/copilot", {
+    const response = await fetch(apiRoutes.copilot, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ message }),

@@ -1,1 +1,3 @@
-import {LegalPage} from "@/components/marketing/legal-page";export default function Page(){return <LegalPage title="Privacy" body="PowerChain Copilot stores account, workspace, operational application, and support-request data needed to provide the service. Production deployments should configure the organization’s final privacy policy, processors, retention rules, and regional requirements before launch."/>}
+import { LegalPage } from "@/components/marketing/legal-page";
+import { legalDocuments } from "@/data/legal";
+export default function Page() { return <LegalPage document={legalDocuments.privacy} />; }

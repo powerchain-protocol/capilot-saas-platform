@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { AlertTriangle, Bot, LayoutDashboard, LogOut, Settings, ShieldCheck, Sun } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { useToast } from "@/components/ui/toast";
+import { apiV1 } from "@/apps/frontend/api/v1";
 
 const items = [
   [/^\/dashboard$/, "Overview", LayoutDashboard, "/dashboard"],
@@ -22,8 +23,9 @@ export function DashboardShell({ children, userName, workspaceName }: { children
   const initial = userName.trim().charAt(0).toUpperCase() || "P";
 
   async function signOut() {
-    const response = await fetch("/api/auth/sign-out", { method: "POST" });
-    if (!response.ok) {
+    try {
+      await apiV1.signOut();
+    } catch {
       toast({ title: "Sign out failed", description: "Please try again.", tone: "error" });
       return;
     }

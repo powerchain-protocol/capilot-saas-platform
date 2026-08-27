@@ -66,6 +66,15 @@ export type Message = {
   createdAt: string;
 };
 
+
+export type LegalAcceptance = {
+  id: string;
+  userId: string;
+  document: "terms";
+  version: string;
+  acceptedAt: string;
+};
+
 export type ContactRequest = {
   id: string;
   name: string;
@@ -85,6 +94,7 @@ export type AppState = {
   activities: Activity[];
   messages: Message[];
   contacts: ContactRequest[];
+  legalAcceptances: LegalAcceptance[];
 };
 
 export type Session = {
@@ -92,4 +102,5 @@ export type Session = {
   workspaceId: string;
   role: Role;
   exp: number;
+  persistent?: boolean;
 };

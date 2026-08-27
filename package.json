@@ -15,8 +15,9 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "check:links": "node scripts/check-links.mjs",
-    "check": "pnpm check:links && pnpm check:actions && pnpm typecheck && pnpm lint",
-    "check:actions": "node scripts/check-actions.mjs"
+    "check": "pnpm check:links && pnpm check:actions && pnpm check:api && pnpm typecheck && pnpm lint",
+    "check:actions": "node scripts/check-actions.mjs",
+    "check:api": "node scripts/check-api.mjs"
   },
   "dependencies": {
     "@tailwindcss/postcss": "4.3.3",

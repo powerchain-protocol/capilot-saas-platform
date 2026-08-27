@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, CheckCircle2, Loader2, ShieldCheck, SlidersHorizontal, X } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
+import { apiRoutes } from "@/config/api";
 
 type Approval = { id: string; title: string; description: string; severity: string; status: string; amount?: string };
 type Filter = "pending" | "all" | "resolved";
@@ -17,7 +18,7 @@ export function ApprovalsClient() {
 
   async function load() {
     try {
-      const response = await fetch("/api/approvals");
+      const response = await fetch(apiRoutes.approvals);
       const json = await response.json();
       if (json.ok) setItems(json.data); else setError(json.error.message);
     } catch { setError("Unable to load approvals."); }
@@ -29,7 +30,7 @@ export function ApprovalsClient() {
 
   async function act(id: string, action: "approve" | "request_changes") {
     setBusy(id + action); setError("");
-    const response = await fetch(`/api/approvals/${id}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action }) });
+    const response = await fetch(apiRoutes.approval(id), { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action }) });
     const json = await response.json().catch(() => null);
     setBusy("");
     if (!response.ok) {

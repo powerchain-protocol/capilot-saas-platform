@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Search, ShieldCheck, Sun, Wind, Zap } from "lucide-react";
+import { apiRoutes } from "@/config/api";
 
 type Asset = {
   id: string;
@@ -24,7 +25,7 @@ export function AssetsClient() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/assets")
+    fetch(apiRoutes.assets)
       .then((response) => response.json())
       .then((json) => json.ok ? setAssets(json.data) : setError(json.error.message))
       .catch(() => setError("Unable to load assets."))

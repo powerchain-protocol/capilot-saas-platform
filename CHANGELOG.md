@@ -38,3 +38,15 @@ PowerChain Copilot uses **1.0.0** as the canonical product version. Internal ite
 - Vercel configuration added.
 - `.gitignore` expanded for Next.js, Vercel, package managers, generated artifacts, secrets, and local data.
 - TypeScript configuration modernized for strict Next.js App Router development.
+
+### Full-stack organization and security refinement
+- Added `/data/`, `/utils/`, `components/services/`, `/cors/`, and `apps/frontend/api/v1/` architecture.
+- Added the canonical `/api/v1` browser-facing API surface while retaining legacy route modules for compatibility.
+- Added shared `cache.ts`, `safe-actions.ts`, Pyth, Birdeye, Helius, and Solana RPC server adapters.
+- Added exact-origin CORS configuration with uniform `/api/v1` proxy/preflight enforcement and upgraded request security/rate-limit handling with hashed transient IP keys.
+- Added Remember me session persistence with a 30-day explicit opt-in and a 12-hour standard session lifetime.
+- Added masked-by-default current IP visibility in workspace settings without application-database IP persistence.
+- Added cookie notice UI, expanded Terms of Service, Privacy, Cookie Policy, and Product Disclaimer routes.
+- Added configurable centered update top bar with editable badge/message/link and dismiss state.
+- Added neutral light-gray ecosystem/integration strip above the footer without implying endorsements.
+- Added provider service configuration UI and updated README, API, integrations, security, architecture, and progress documentation.

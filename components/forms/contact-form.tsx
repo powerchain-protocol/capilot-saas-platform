@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
+import { apiRoutes } from "@/config/api";
 
 export function ContactForm() {
   const params = useSearchParams();
@@ -16,7 +17,7 @@ export function ContactForm() {
     setState("loading");
     setError("");
     const form = new FormData(event.currentTarget);
-    const response = await fetch("/api/contact", {
+    const response = await fetch(apiRoutes.contact, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({

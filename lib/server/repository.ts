@@ -2,7 +2,8 @@ import { randomUUID } from "node:crypto";
 import { assertDurablePersistence, hasSupabase } from "./env";
 import { mutateLocalState, readLocalState } from "./local-store";
 import { supabaseRest } from "./supabase-rest";
-import type { Activity, Approval, Asset, ContactRequest, Message, Plan, Role, User, Workspace } from "@/lib/types/domain";
+import type { Activity, Approval, Asset, ContactRequest, LegalAcceptance, Message, Plan, Role, User, Workspace } from "@/lib/types/domain";
+import { slugify } from "@/utils/helpers";
 
 const now = () => new Date().toISOString();
 const eq = (v: string) => encodeURIComponent(v);
@@ -35,7 +36,7 @@ export async function findUserById(id: string): Promise<User | null> {
 export async function createAccount(input: { email:string; name:string; passwordHash:string; workspaceName:string; plan:Plan }) {
   assertDurablePersistence();
   const user: User = { id:randomUUID(), email:input.email.toLowerCase(), name:input.name, passwordHash:input.passwordHash, createdAt:now() };
-  const workspace: Workspace = { id:randomUUID(), name:input.workspaceName, slug:`${input.workspaceName.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"") || "workspace"}-${Math.random().toString(36).slice(2,6)}`, plan:input.plan, createdAt:now() };
+  const workspace: Workspace = { id:randomUUID(), name:input.workspaceName, slug:`${slugify(input.workspaceName) || "workspace"}-${Math.random().toString(36).slice(2,6)}`, plan:input.plan, createdAt:now() };
   const membership = { id:randomUUID(), userId:user.id, workspaceId:workspace.id, role:"owner" as Role };
   const seeded = seedResources(workspace.id);
 
@@ -140,6 +141,14 @@ export async function addContact(input:Omit<ContactRequest,"id"|"createdAt">) {
   const item:ContactRequest={id:randomUUID(),createdAt:now(),...input};
   if(hasSupabase) await supabaseRest.insert("contacts",{id:item.id,name:item.name,email:item.email,company:item.company,message:item.message,intent:item.intent,created_at:item.createdAt});
   else await mutateLocalState(s=>{s.contacts.push(item);});
+  return item;
+}
+
+export async function recordLegalAcceptance(userId:string, version:string) {
+  assertDurablePersistence();
+  const item:LegalAcceptance={id:randomUUID(),userId,document:"terms",version,acceptedAt:now()};
+  if(hasSupabase) await supabaseRest.insert("legal_acceptances",{id:item.id,user_id:item.userId,document:item.document,version:item.version,accepted_at:item.acceptedAt});
+  else await mutateLocalState(s=>{s.legalAcceptances.push(item);});
   return item;
 }
 

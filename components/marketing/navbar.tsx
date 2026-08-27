@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { Logo } from "@/components/brand/logo";
 import { siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/button";
+import { Topbar } from "@/components/marketing/topbar";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
@@ -26,7 +27,8 @@ export function Navbar() {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#E3E7E4]/80 bg-white/90 backdrop-blur-xl supports-[backdrop-filter]:bg-white/78">
+    <header className="sticky top-0 z-50 border-b border-[#E3E7E4]/80 bg-white/92 backdrop-blur-xl supports-[backdrop-filter]:bg-white/80">
+      <Topbar />
       <div className="pc-shell flex h-[72px] items-center justify-between gap-4">
         <Logo size="default" priority />
 
@@ -65,7 +67,7 @@ export function Navbar() {
 
       {open ? (
         <>
-          <button aria-label="Close navigation" type="button" className="fixed inset-0 top-[72px] z-[-1] bg-[#101513]/18 backdrop-blur-[2px] lg:hidden" onClick={() => setOpen(false)} />
+          <button aria-label="Close navigation" type="button" className="fixed inset-0 z-[-1] bg-[#101513]/18 backdrop-blur-[2px] lg:hidden" onClick={() => setOpen(false)} />
           <div id="mobile-navigation" className="border-t border-[#E3E7E4] bg-white shadow-[0_24px_60px_rgba(16,21,19,.12)] lg:hidden">
             <div className="pc-shell grid gap-1 py-4">
               {siteConfig.nav.map((item) => {

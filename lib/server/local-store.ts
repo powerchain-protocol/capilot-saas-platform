@@ -3,7 +3,7 @@ import path from "node:path";
 import type { AppState } from "@/lib/types/domain";
 
 const file = path.join(process.cwd(), ".data", "powerchain-saas.json");
-const emptyState: AppState = { users: [], workspaces: [], memberships: [], assets: [], approvals: [], activities: [], messages: [], contacts: [] };
+const emptyState: AppState = { users: [], workspaces: [], memberships: [], assets: [], approvals: [], activities: [], messages: [], contacts: [], legalAcceptances: [] };
 
 let writeQueue = Promise.resolve();
 
@@ -14,7 +14,10 @@ async function ensure() {
 
 export async function readLocalState(): Promise<AppState> {
   await ensure();
-  try { return JSON.parse(await fs.readFile(file, "utf8")) as AppState; }
+  try {
+    const parsed = JSON.parse(await fs.readFile(file, "utf8")) as Partial<AppState>;
+    return { ...structuredClone(emptyState), ...parsed, legalAcceptances: parsed.legalAcceptances ?? [] } as AppState;
+  }
   catch { return structuredClone(emptyState); }
 }
 

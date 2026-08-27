@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
+import { CookieNotice } from "@/components/legal/cookies";
 
 export const metadata: Metadata = {
   title: { default: "PowerChain Copilot", template: "%s · PowerChain Copilot" },
@@ -34,7 +35,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body>
         <a className="pc-skip-link" href="#main-content">Skip to content</a>
-        <ToastProvider><div id="main-content">{children}</div></ToastProvider>
+        <ToastProvider>
+          <div id="main-content">{children}</div>
+          <CookieNotice />
+        </ToastProvider>
       </body>
     </html>
   );

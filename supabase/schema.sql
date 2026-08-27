@@ -97,3 +97,14 @@ alter table public.contacts enable row level security;
 -- application accesses these tables only through trusted Next.js server routes
 -- using SUPABASE_SERVICE_ROLE_KEY. Add end-user RLS policies only if direct
 -- Supabase client access is introduced later.
+
+create table if not exists public.legal_acceptances (
+  id uuid primary key,
+  user_id uuid not null references public.users(id) on delete cascade,
+  document text not null check (document in ('terms')),
+  version text not null,
+  accepted_at timestamptz not null default now(),
+  unique(user_id, document, version)
+);
+create index if not exists legal_acceptances_user_idx on public.legal_acceptances(user_id, accepted_at desc);
+alter table public.legal_acceptances enable row level security;

@@ -4,6 +4,7 @@ export const UI_RULES = {
   tabletBreakpointPx: 1024,
   maxContentWidthPx: 1440,
   reducedMotionSafe: true,
+  lazyLoadNonCriticalMarketingSections: true,
 } as const;
 
 export const INSTALL_RULES = {
@@ -19,6 +20,19 @@ export const SECURITY_RULES = {
   requireProductionDurableStore: true,
   noPrivateKeyCustody: true,
   sensitiveActionsRequireExplicitApproval: true,
+  standardSessionHours: 12,
+  rememberedSessionDays: 30,
+  rawIpPersistedByReferenceApp: false,
+  providerSecretsServerOnly: true,
+  externalProviderTimeoutMs: 6_000,
+} as const;
+
+export const API_RULES = {
+  version: "v1",
+  basePath: "/api/v1",
+  corsDefault: "same-origin",
+  cacheProviderDataMs: 30_000,
+  failClosedOnMissingProductionRpc: true,
 } as const;
 
 export type InstallSource = (typeof INSTALL_RULES.allowedSources)[number];

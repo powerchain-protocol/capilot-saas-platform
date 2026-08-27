@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Activity, AlertTriangle, Bot, Leaf, ShieldCheck, Sun, Wind, Zap } from "lucide-react";
 import { PwrcIcon } from "@/components/brand/pwrc-icon";
+import { apiRoutes } from "@/config/api";
 
 type Asset = { id: string; name: string; type: string; location: string; capacityMw: number; availability: number; status: string; verified?: boolean };
 type Approval = { id: string; title: string; description: string; severity: string; status: string };
@@ -22,7 +23,7 @@ export function OverviewClient() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("/api/dashboard")
+    fetch(apiRoutes.dashboard)
       .then(async (response) => {
         const json = await response.json();
         if (!response.ok) throw new Error(json?.error?.message || "Failed to load");
