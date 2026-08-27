@@ -1,8 +1,16 @@
-const [major = 0, minor = 0, patch = 0] = process.versions.node.split(".").map(Number);
-const validNode = major === 24 && (minor > 20 || (minor === 20 && patch >= 0));
-if (!validNode) {
-  console.error(`PowerChain Copilot requires Node >=24.20.0 <25. Current: ${process.versions.node}. Run: nvm install && nvm use`);
+import { readFile } from "node:fs/promises";
+
+const pkg = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+const [major, minor] = process.versions.node.split(".").map(Number);
+const supported = major === 24 && minor >= 19;
+
+if (!supported) {
+  console.error(`PowerChain Copilot supports Node >=24.19.0 <25. Current: ${process.versions.node}.`);
+  console.error("Recommended: nvm install 24.20.0 && nvm use 24.20.0");
   process.exit(1);
 }
-console.log(`Node ${process.versions.node} is compatible.`);
-console.log("pnpm 11.23.0 is pinned through packageManager; run `corepack enable` then `pnpm install`.");
+
+console.log(`Node: ${process.versions.node} (supported; .nvmrc recommends 24.20.0 LTS)`);
+console.log(`Package manager: ${pkg.packageManager}`);
+console.log("pnpm project settings live in pnpm-workspace.yaml; package.json does not contain a deprecated pnpm config block.");
+console.log("If pnpm is unavailable: npm install -g corepack@latest && corepack enable && corepack prepare pnpm@11.23.0 --activate");

@@ -1,3 +1,4 @@
+- Added `sharp 0.35.3` to the Next.js frontend runtime for production image optimization.
 # Changelog
 
 All notable changes to PowerChain Copilot are documented here. The product remains on the canonical `1.0.0` release line until an intentional release is cut.
@@ -94,3 +95,10 @@ All notable changes to PowerChain Copilot are documented here. The product remai
 - Added API DX drift validation covering API-key security, unique OpenAPI operation IDs, configured public API origins, and complete Postman HTTP-operation coverage.
 - Closed the standalone AI-preview billing bypass by disabling `/v1/ai/generate` by default in production and rate-limiting it when explicitly enabled.
 - Added bounded stale-reservation reconciliation with PostgreSQL row locking and compensating ledger releases for crash recovery.
+
+### Runtime / pnpm workspace correction
+
+- Moved the API generator from root `api-generator/` to `api/api-generator/` and updated all generator/check references.
+- Moved the `unrs-resolver` override out of the deprecated `package.json#pnpm` block into `pnpm-workspace.yaml`.
+- Kept Node `24.20.0` LTS as the `.nvmrc`/`.node-version` recommendation while widening the supported Node 24 engine floor to `24.19.0` so an existing `v24.19.0` checkout can install dependencies before upgrading.
+- Added `pnpm setup:runtime` / `scripts/bootstrap.sh` for repeatable nvm + Corepack + pnpm activation.

@@ -2,6 +2,9 @@ packages:
   - "apps/*"
   - "packages/*"
 
+overrides:
+  unrs-resolver: 1.12.2
+
 # pnpm 11 build-script trust policy. Unlisted dependency build scripts fail
 # closed under strictDepBuilds instead of executing implicitly.
 strictDepBuilds: true

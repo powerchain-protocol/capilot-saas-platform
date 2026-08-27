@@ -335,3 +335,35 @@ PowerChain exposes the external versioned API through `https://api.capilot.power
 Developer tooling includes OpenAPI 3.1, AsyncAPI 3.0, Postman datasets/flows, a deterministic mock API, the typed TypeScript SDK, and `pnpm api:generate` for a generated operation catalog. PWRC usage-credit and token-metadata APIs are included under `/v1/credits*` and `/v1/tokens*`.
 
 Solana wallet configuration under `wallets/solana/` is public-key metadata only. Never commit private keys, mnemonic phrases, seed material, or signing arrays.
+
+## Runtime troubleshooting
+
+The repository recommends Node `24.20.0` LTS through `.nvmrc` and `.node-version`, while the package engine accepts Node `>=24.19.0 <25`. This keeps `v24.19.0` usable for dependency installation without giving up the canonical LTS pin.
+
+```bash
+# From the repository root
+nvm install 24.20.0
+nvm use 24.20.0
+
+# If Corepack is not present in this Node installation
+npm install -g corepack@latest
+corepack enable
+corepack prepare pnpm@11.23.0 --activate
+
+pnpm install
+```
+
+Or run the repository bootstrap after nvm is installed/loaded:
+
+```bash
+pnpm setup:runtime
+```
+
+pnpm project settings, including the `unrs-resolver` override and trusted dependency builds, live in `pnpm-workspace.yaml`. Do not add a top-level `pnpm.overrides` block back to `package.json`.
+
+The API generator is organized with the API contracts at `api/api-generator/`:
+
+```bash
+pnpm api:generate
+pnpm api:generate:check
+```

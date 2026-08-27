@@ -59,7 +59,7 @@ const required = [
   "apps/backend/src/storage/migrations/0002_credits.sql",
   "wallets/solana/keypairs.json",
   "wallets/solana/trusted-wallets.ts",
-  "api-generator/generate.mjs",
+  "api/api-generator/generate.mjs",
   "apps/backend/src/storage/postgres.ts",
   "apps/backend/src/storage/migrations/0001_initial.sql",
   "apps/backend/src/ws/routes.ts",
