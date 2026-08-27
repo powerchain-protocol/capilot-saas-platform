@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "data": {
+    "chat": {
+      "id": "cht_0123456789abcdef0123456789abcdef",
+      "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+      "userId": "usr_0123456789abcdef0123456789abcdef",
+      "slug": "portfolio-review-01234567",
+      "title": "Portfolio review",
+      "createdAt": "2026-08-27T06:00:00.000Z",
+      "updatedAt": "2026-08-27T06:00:00.000Z"
+    },
+    "userMessage": {
+      "id": "msg_11111111111111111111111111111111",
+      "chatId": "cht_0123456789abcdef0123456789abcdef",
+      "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+      "userId": "usr_0123456789abcdef0123456789abcdef",
+      "role": "user",
+      "content": "Compare solar and wind availability.",
+      "createdAt": "2026-08-27T06:00:00.000Z"
+    },
+    "message": {
+      "id": "msg_22222222222222222222222222222222",
+      "chatId": "cht_0123456789abcdef0123456789abcdef",
+      "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+      "userId": "usr_0123456789abcdef0123456789abcdef",
+      "role": "assistant",
+      "content": "Solar Farm 45 is at 98% availability and Wind Farm North is at 96%. Solar is currently 2 percentage points higher.",
+      "createdAt": "2026-08-27T06:00:01.000Z"
+    },
+    "mode": "demo",
+    "text": "Solar Farm 45 is at 98% availability and Wind Farm North is at 96%. Solar is currently 2 percentage points higher.",
+    "actions": [
+      {
+        "id": "open-assets",
+        "label": "Open assets",
+        "href": "/dashboard/assets"
+      }
+    ]
+  }
+}

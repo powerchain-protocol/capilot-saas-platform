@@ -1,0 +1,74 @@
+
+asyncapi: 3.0.0
+info:
+  title: PowerChain Copilot Realtime API
+  version: 1.0.0
+  description: |
+    WebSocket contract for authenticated Copilot chat events. The browser sends
+    no privileged execution commands over this channel; authoritative mutations
+    remain on HTTP API v1. If realtime is unavailable, clients must fall back to
+    HTTP reads rather than inventing state.
+servers:
+  local:
+    host: localhost:8000
+    protocol: ws
+    description: Local Fastify backend
+  production:
+    host: api.powerchain.energy
+    protocol: wss
+    description: Production endpoint when deployed
+channels:
+  chat:
+    address: /ws/v1/chat/{id}
+    description: Authenticated events for one user-owned chat.
+    parameters:
+      id:
+        description: Opaque chat ID or resolvable chat slug.
+    messages:
+      chatMessage:
+        $ref: '#/components/messages/ChatMessage'
+      chatUpdated:
+        $ref: '#/components/messages/ChatUpdated'
+      heartbeat:
+        $ref: '#/components/messages/Heartbeat'
+operations:
+  receiveChatEvents:
+    action: receive
+    channel:
+      $ref: '#/channels/chat'
+    summary: Receive persisted chat and heartbeat events.
+    messages:
+      - $ref: '#/channels/chat/messages/chatMessage'
+      - $ref: '#/channels/chat/messages/chatUpdated'
+      - $ref: '#/channels/chat/messages/heartbeat'
+components:
+  messages:
+    ChatMessage:
+      name: chat.message
+      title: Persisted chat message
+      payload:
+        $ref: '#/components/schemas/ChatEvent'
+    ChatUpdated:
+      name: chat.updated
+      title: Chat metadata updated
+      payload:
+        $ref: '#/components/schemas/ChatEvent'
+    Heartbeat:
+      name: system.heartbeat
+      title: Realtime heartbeat
+      payload:
+        $ref: '#/components/schemas/ChatEvent'
+  schemas:
+    ChatEvent:
+      type: object
+      required: [type, chatId, payload, timestamp]
+      properties:
+        type:
+          type: string
+          enum: [chat.message, chat.updated, system.heartbeat]
+        chatId:
+          type: string
+        payload: {}
+        timestamp:
+          type: string
+          format: date-time

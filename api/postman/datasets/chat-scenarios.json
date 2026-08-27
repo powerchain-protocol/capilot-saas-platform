@@ -1,0 +1,27 @@
+[
+  {
+    "scenario": "asset-health",
+    "chatTitle": "Asset health",
+    "prompt": "Summarize current asset health and flag assets requiring attention."
+  },
+  {
+    "scenario": "availability-compare",
+    "chatTitle": "Availability comparison",
+    "prompt": "Compare solar and wind availability."
+  },
+  {
+    "scenario": "approval-review",
+    "chatTitle": "Approval review",
+    "prompt": "Summarize pending approvals without executing them."
+  },
+  {
+    "scenario": "evidence-review",
+    "chatTitle": "Evidence review",
+    "prompt": "List the evidence state for the highest-priority renewable asset."
+  },
+  {
+    "scenario": "market-context",
+    "chatTitle": "Market context",
+    "prompt": "Explain the current market context without making a financial recommendation."
+  }
+]

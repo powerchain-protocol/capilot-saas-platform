@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "data": [
+    {
+      "key": "solana-rpc",
+      "name": "Solana RPC",
+      "category": "network",
+      "configured": true
+    },
+    {
+      "key": "helius",
+      "name": "Helius",
+      "category": "network",
+      "configured": true
+    },
+    {
+      "key": "pyth",
+      "name": "Pyth",
+      "category": "market",
+      "configured": true
+    },
+    {
+      "key": "birdeye",
+      "name": "Birdeye",
+      "category": "market",
+      "configured": false
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+scenario,chatTitle,prompt,approvalAction,marketProvider,pythFeedId,tokenAddress
+demo-smoke,Portfolio review,Summarize current asset health.,approve,pyth,,So11111111111111111111111111111111111111112

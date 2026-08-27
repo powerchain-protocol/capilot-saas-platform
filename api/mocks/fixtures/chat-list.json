@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "cht_0123456789abcdef0123456789abcdef",
+      "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+      "userId": "usr_0123456789abcdef0123456789abcdef",
+      "slug": "portfolio-review-01234567",
+      "title": "Portfolio review",
+      "createdAt": "2026-08-27T06:00:00.000Z",
+      "updatedAt": "2026-08-27T06:00:00.000Z"
+    }
+  ]
+}

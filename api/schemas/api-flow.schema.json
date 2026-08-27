@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://powerchain.energy/schemas/api-flow/v1",
+  "title": "PowerChain API flow manifest",
+  "type": "object",
+  "required": [
+    "schema",
+    "version",
+    "name",
+    "steps"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string"
+    },
+    "version": {
+      "const": "1.0.0"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "authoritative": {
+      "type": "boolean"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "request"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "request": {
+            "type": "string"
+          },
+          "expect": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "capture": {
+            "type": "object"
+          },
+          "variables": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

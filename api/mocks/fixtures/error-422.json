@@ -1,0 +1,8 @@
+{
+  "ok": false,
+  "error": {
+    "message": "Prompt is required.",
+    "code": "VALIDATION",
+    "requestId": "req_mock_validation"
+  }
+}

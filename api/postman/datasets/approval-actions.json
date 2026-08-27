@@ -1,0 +1,10 @@
+[
+  {
+    "scenario": "approve",
+    "approvalAction": "approve"
+  },
+  {
+    "scenario": "request-changes",
+    "approvalAction": "request_changes"
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "data": {
+    "provider": "pyth",
+    "symbol": "SOL/USD",
+    "price": 100.0,
+    "currency": "USD",
+    "timestamp": "2026-08-27T06:00:00.000Z",
+    "source": "mock"
+  }
+}

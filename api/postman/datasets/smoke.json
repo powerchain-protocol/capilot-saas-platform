@@ -1,0 +1,11 @@
+[
+  {
+    "scenario": "demo-smoke",
+    "chatTitle": "Portfolio review",
+    "prompt": "Summarize current asset health.",
+    "approvalAction": "approve",
+    "marketProvider": "pyth",
+    "pythFeedId": "",
+    "tokenAddress": "So11111111111111111111111111111111111111112"
+  }
+]

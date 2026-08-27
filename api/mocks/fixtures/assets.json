@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "ast_0123456789abcdef0123456789abcdef",
+      "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+      "slug": "solar-farm-45-01234567",
+      "name": "Solar Farm 45",
+      "type": "solar",
+      "location": "Mojave, California",
+      "capacityMw": 120,
+      "availability": 98,
+      "status": "operational",
+      "verified": true
+    },
+    {
+      "id": "ast_11111111111111111111111111111111",
+      "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+      "slug": "wind-farm-north-11111111",
+      "name": "Wind Farm North",
+      "type": "wind",
+      "location": "Aberdeenshire, Scotland",
+      "capacityMw": 80,
+      "availability": 96,
+      "status": "operational",
+      "verified": true
+    }
+  ]
+}

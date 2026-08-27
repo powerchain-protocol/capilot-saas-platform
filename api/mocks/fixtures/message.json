@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "data": {
+    "id": "msg_22222222222222222222222222222222",
+    "chatId": "cht_0123456789abcdef0123456789abcdef",
+    "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+    "userId": "usr_0123456789abcdef0123456789abcdef",
+    "role": "assistant",
+    "content": "Solar Farm 45 is at 98% availability and Wind Farm North is at 96%. Solar is currently 2 percentage points higher.",
+    "createdAt": "2026-08-27T06:00:01.000Z"
+  }
+}

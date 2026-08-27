@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "data": {
+    "network": "solana",
+    "status": "operational",
+    "rpcConfigured": true,
+    "heliusConfigured": true,
+    "latencyMs": 42,
+    "timestamp": "2026-08-27T06:00:00.000Z"
+  }
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "scenario": "sol-pyth",
+    "marketProvider": "pyth",
+    "pythFeedId": "<configure-feed-id>",
+    "tokenAddress": ""
+  },
+  {
+    "scenario": "sol-birdeye",
+    "marketProvider": "birdeye",
+    "pythFeedId": "",
+    "tokenAddress": "So11111111111111111111111111111111111111112"
+  },
+  {
+    "scenario": "auto",
+    "marketProvider": "auto",
+    "pythFeedId": "<configure-feed-id>",
+    "tokenAddress": "So11111111111111111111111111111111111111112"
+  }
+]

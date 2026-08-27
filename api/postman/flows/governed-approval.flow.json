@@ -1,0 +1,43 @@
+{
+  "schema": "https://powerchain.energy/schemas/api-flow/v1",
+  "version": "1.0.0",
+  "authoritative": false,
+  "name": "Governed approval review",
+  "description": "Lists approvals before applying an explicit test action. Never run against production without a test workspace.",
+  "steps": [
+    {
+      "id": "demo",
+      "request": "Auth / Open demo workspace",
+      "expect": [
+        200
+      ]
+    },
+    {
+      "id": "list",
+      "request": "Workspace / Approvals",
+      "capture": {
+        "approvalId": "$.data[0].id"
+      },
+      "expect": [
+        200
+      ]
+    },
+    {
+      "id": "mutate",
+      "request": "Workspace / Approve",
+      "variables": {
+        "approvalAction": "request_changes"
+      },
+      "expect": [
+        200
+      ]
+    },
+    {
+      "id": "verify",
+      "request": "Workspace / Approvals",
+      "expect": [
+        200
+      ]
+    }
+  ]
+}

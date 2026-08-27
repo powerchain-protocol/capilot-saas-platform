@@ -1,0 +1,37 @@
+{
+  "schema": "https://powerchain.energy/schemas/api-flow/v1",
+  "version": "1.0.0",
+  "authoritative": false,
+  "name": "Provider and network health",
+  "description": "Checks API health, configured services, and Solana adapter state without submitting transactions.",
+  "steps": [
+    {
+      "id": "health",
+      "request": "Health / Health",
+      "expect": [
+        200
+      ]
+    },
+    {
+      "id": "demo",
+      "request": "Auth / Open demo workspace",
+      "expect": [
+        200
+      ]
+    },
+    {
+      "id": "services",
+      "request": "Integrations / Services",
+      "expect": [
+        200
+      ]
+    },
+    {
+      "id": "solana",
+      "request": "Integrations / Solana health",
+      "expect": [
+        200
+      ]
+    }
+  ]
+}

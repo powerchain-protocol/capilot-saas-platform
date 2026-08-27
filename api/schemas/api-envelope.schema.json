@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://powerchain.energy/schemas/api-envelope-v1.json",
+  "title": "PowerChain API envelope",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "ok",
+        "data"
+      ],
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {}
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "ok",
+        "error"
+      ],
+      "properties": {
+        "ok": {
+          "const": false
+        },
+        "error": {
+          "type": "object",
+          "required": [
+            "message",
+            "code"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "code": {
+              "type": "string"
+            },
+            "requestId": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}

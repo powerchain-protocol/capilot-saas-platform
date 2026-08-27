@@ -1,0 +1,21 @@
+
+export type ApiSuccess<T> = { ok: true; data: T };
+export type ApiFailure = { ok: false; error: { message: string; code: string; requestId?: string } };
+export type ApiEnvelope<T> = ApiSuccess<T> | ApiFailure;
+export type Role = "owner" | "admin" | "operator" | "analyst" | "viewer";
+export type Plan = "free" | "pro" | "business";
+export type Session = { id: string; userId: string; workspaceId: string; role: Role; persistent: boolean; expiresAt: string; revokedAt: string | null; createdAt: string; lastSeenAt: string };
+export type UserSummary = { id: string; name: string; email: string };
+export type Workspace = { id: string; name: string; slug: string; plan: Plan; createdAt: string };
+export type SessionContext = { session: Session; user: UserSummary; workspace: Workspace; role: Role };
+export type Asset = { id: string; workspaceId: string; slug: string; name: string; type: "solar" | "wind" | "storage" | "ev" | "meter"; location: string; capacityMw: number; availability: number; status: "operational" | "attention" | "offline"; verified: boolean };
+export type Approval = { id: string; workspaceId: string; slug: string; title: string; description: string; severity: "low" | "medium" | "high"; amount?: string; status: "pending" | "approved" | "changes_requested"; updatedAt: string };
+export type Chat = { id: string; workspaceId: string; userId: string; slug: string; title: string; createdAt: string; updatedAt: string };
+export type Message = { id: string; chatId: string; workspaceId: string; userId: string; role: "user" | "assistant" | "system"; content: string; createdAt: string };
+export type SuggestedAction = { id: string; label: string; href: string };
+export type AiResponse = { mode: "managed" | "demo"; text: string; actions: SuggestedAction[] };
+export type SendMessageResponse = AiResponse & { chat: Chat; userMessage: Message; message: Message };
+export type HealthSnapshot = { status: "operational" | "degraded"; version: string; timestamp: string; database: { ok: boolean; adapter: string; latencyMs: number }; sessions: string; ai: string; websocket: string; providers: { pyth: boolean; birdeye: boolean; helius: boolean; solanaRpc: boolean } };
+export type ServiceHealth = { key: string; name: string; category: string; configured: boolean };
+export type SessionSecurity = { ip: string; masked: boolean; role: Role; persistent: boolean; expiresAt: string; sessionId: string };
+export type ChatSocketEvent = { type: "chat.message" | "chat.updated" | "system.heartbeat"; chatId: string; payload: unknown; timestamp: string };

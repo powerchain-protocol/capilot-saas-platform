@@ -86,3 +86,13 @@ Do not scatter literal API URLs through components.
 ```
 
 Supported event types currently include `chat.message`, `chat.updated`, and `system.heartbeat`.
+
+
+## Developer artifacts
+
+- Postman guide: `docs/POSTMAN.md`
+- Postman environments/datasets: `api/postman/`
+- Local mock server: `api/mocks/`
+- OpenAPI/AsyncAPI/JSON Schemas: `api/openapi/`, `api/asyncapi/`, `api/schemas/`
+- TypeScript SDK: `packages/sdk-typescript/`
+- API lifecycle flows: `docs/FLOWS.md`

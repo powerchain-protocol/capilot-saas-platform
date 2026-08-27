@@ -1,0 +1,57 @@
+{
+  "ok": true,
+  "data": {
+    "workspace": {
+      "id": "wsp_0123456789abcdef0123456789abcdef",
+      "name": "PowerChain Demo",
+      "slug": "powerchain-demo",
+      "plan": "pro",
+      "createdAt": "2026-08-27T06:00:00.000Z"
+    },
+    "metrics": {
+      "verifiedEnergyMwh": 24812,
+      "assets": 2,
+      "availabilityPct": 97,
+      "pendingApprovals": 1
+    },
+    "assets": [
+      {
+        "id": "ast_0123456789abcdef0123456789abcdef",
+        "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+        "slug": "solar-farm-45-01234567",
+        "name": "Solar Farm 45",
+        "type": "solar",
+        "location": "Mojave, California",
+        "capacityMw": 120,
+        "availability": 98,
+        "status": "operational",
+        "verified": true
+      },
+      {
+        "id": "ast_11111111111111111111111111111111",
+        "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+        "slug": "wind-farm-north-11111111",
+        "name": "Wind Farm North",
+        "type": "wind",
+        "location": "Aberdeenshire, Scotland",
+        "capacityMw": 80,
+        "availability": 96,
+        "status": "operational",
+        "verified": true
+      }
+    ],
+    "approvals": [
+      {
+        "id": "apr_0123456789abcdef0123456789abcdef",
+        "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+        "slug": "energy-batch-verification-01234567",
+        "title": "Energy Batch Verification",
+        "description": "Solar Farm 45 · 1,250 MWh · meter evidence complete",
+        "severity": "high",
+        "status": "pending",
+        "updatedAt": "2026-08-27T06:00:00.000Z"
+      }
+    ],
+    "activity": []
+  }
+}

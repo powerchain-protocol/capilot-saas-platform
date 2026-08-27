@@ -1,0 +1,50 @@
+{
+  "schema": "https://powerchain.energy/schemas/api-flow/v1",
+  "version": "1.0.0",
+  "authoritative": false,
+  "name": "Demo to persisted chat",
+  "description": "Runner-friendly API scenario. This is a portable PowerChain flow manifest, not a proprietary Postman Flows export.",
+  "steps": [
+    {
+      "id": "demo",
+      "request": "Auth / Open demo workspace",
+      "expect": [
+        200
+      ]
+    },
+    {
+      "id": "session",
+      "request": "Sessions / Current session",
+      "expect": [
+        200
+      ]
+    },
+    {
+      "id": "create-chat",
+      "request": "AI and Chat / Create chat",
+      "capture": {
+        "chatId": "$.data.id"
+      },
+      "expect": [
+        201
+      ]
+    },
+    {
+      "id": "send-message",
+      "request": "AI and Chat / Send chat message",
+      "capture": {
+        "messageId": "$.data.message.id"
+      },
+      "expect": [
+        200
+      ]
+    },
+    {
+      "id": "get-message",
+      "request": "AI and Chat / Get message",
+      "expect": [
+        200
+      ]
+    }
+  ]
+}

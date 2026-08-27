@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://powerchain.energy/schemas/chat-event-v1.json",
+  "title": "PowerChain chat event",
+  "type": "object",
+  "required": [
+    "type",
+    "chatId",
+    "payload",
+    "timestamp"
+  ],
+  "properties": {
+    "type": {
+      "enum": [
+        "chat.message",
+        "chat.updated",
+        "system.heartbeat"
+      ]
+    },
+    "chatId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "payload": {},
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}

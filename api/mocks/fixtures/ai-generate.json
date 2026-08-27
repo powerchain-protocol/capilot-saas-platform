@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "data": {
+    "mode": "demo",
+    "text": "Two assets are operational with average availability of 97%.",
+    "actions": [
+      {
+        "id": "view-assets",
+        "label": "View assets",
+        "href": "/dashboard/assets"
+      }
+    ]
+  }
+}

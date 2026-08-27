@@ -29,7 +29,9 @@
     "dev:backend": "pnpm --filter @powerchain/capilot-backend dev",
     "db:migrate": "pnpm --filter @powerchain/capilot-backend db:migrate",
     "api:docs": "pnpm --filter @powerchain/capilot-backend dev",
-    "db:check": "pnpm --filter @powerchain/capilot-backend db:check"
+    "db:check": "pnpm --filter @powerchain/capilot-backend db:check",
+    "api:mock": "node api/mocks/server.mjs",
+    "sdk:check": "pnpm --filter @powerchain/copilot-sdk check"
   },
   "devDependencies": {
     "eslint": "10.9.1",

@@ -1,0 +1,8 @@
+{
+  "ok": false,
+  "error": {
+    "message": "Sign in required.",
+    "code": "UNAUTHENTICATED",
+    "requestId": "req_mock_unauthenticated"
+  }
+}

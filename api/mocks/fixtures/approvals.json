@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "apr_0123456789abcdef0123456789abcdef",
+      "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+      "slug": "energy-batch-verification-01234567",
+      "title": "Energy Batch Verification",
+      "description": "Solar Farm 45 · 1,250 MWh · meter evidence complete",
+      "severity": "high",
+      "status": "pending",
+      "updatedAt": "2026-08-27T06:00:00.000Z"
+    }
+  ]
+}

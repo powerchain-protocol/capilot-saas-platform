@@ -1,0 +1,6 @@
+scenario,chatTitle,prompt
+asset-health,Asset health,Summarize current asset health and flag assets requiring attention.
+availability-compare,Availability comparison,Compare solar and wind availability.
+approval-review,Approval review,Summarize pending approvals without executing them.
+evidence-review,Evidence review,List the evidence state for the highest-priority renewable asset.
+market-context,Market context,Explain the current market context without making a financial recommendation.

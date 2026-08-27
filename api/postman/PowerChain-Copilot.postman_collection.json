@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "PowerChain Copilot API v1",
-    "description": "Canonical Postman collection for PowerChain Copilot 1.0.0. Session auth uses the pc_session HttpOnly cookie returned by auth endpoints.",
+    "description": "Canonical Postman collection for PowerChain Copilot 1.0.0. It covers REST API v1, cookie-based sessions, AI/chat flows, governed approvals, market/network adapters, and developer smoke tests. Import an environment from api/postman/environments/. For deterministic development responses, run `pnpm api:mock` and select the Local Mock environment. The mock layer is representative only and must never be treated as live operational, financial, settlement, telemetry, or onchain evidence.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -20,6 +20,62 @@
     {
       "key": "approvalId",
       "value": ""
+    },
+    {
+      "key": "wsBaseUrl",
+      "value": "ws://localhost:8000"
+    },
+    {
+      "key": "name",
+      "value": "API Test Operator"
+    },
+    {
+      "key": "email",
+      "value": "api-test@example.com"
+    },
+    {
+      "key": "password",
+      "value": "StrongPassword123"
+    },
+    {
+      "key": "workspaceName",
+      "value": "API Test Workspace"
+    },
+    {
+      "key": "plan",
+      "value": "pro"
+    },
+    {
+      "key": "rememberMe",
+      "value": "false"
+    },
+    {
+      "key": "chatTitle",
+      "value": "Portfolio review"
+    },
+    {
+      "key": "prompt",
+      "value": "Compare solar and wind availability."
+    },
+    {
+      "key": "sessionId",
+      "value": ""
+    },
+    {
+      "key": "approvalAction",
+      "value": "approve"
+    },
+    {
+      "key": "marketProvider",
+      "value": "pyth"
+    },
+    {
+      "key": "pythFeedId",
+      "value": ""
+    },
+    {
+      "key": "tokenAddress",
+      "value": "So11111111111111111111111111111111111111112"
     }
   ],
   "item": [
@@ -46,9 +102,62 @@
                 "v1",
                 "health"
               ]
-            }
+            },
+            "description": "Public liveness/dependency snapshot. Does not require a session."
           },
-          "response": []
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/health",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "health"
+                  ]
+                },
+                "description": "Public liveness/dependency snapshot. Does not require a session."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"status\": \"operational\",\n    \"version\": \"1.0.0\",\n    \"timestamp\": \"2026-08-27T06:00:00.000Z\",\n    \"database\": {\n      \"ok\": true,\n      \"adapter\": \"memory\",\n      \"latencyMs\": 1\n    },\n    \"sessions\": \"operational\",\n    \"ai\": \"demo\",\n    \"websocket\": \"operational\",\n    \"providers\": {\n      \"pyth\": true,\n      \"birdeye\": false,\n      \"helius\": true,\n      \"solanaRpc\": true\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('health returns 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json(); pm.expect(b.data.version).to.eql('1.0.0');"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -83,15 +192,27 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"demo@powerchain.energy\",\n  \"password\": \"ReplaceWithYourPassword1\",\n  \"rememberMe\": true\n}",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"rememberMe\": {{rememberMe}}\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
-            }
+            },
+            "description": "Authenticates an existing user. `rememberMe=true` requests a persistent session; the cookie remains HttpOnly."
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) { const b = pm.response.json(); if (b.ok && b.data.sessionId) pm.environment.set('sessionId', b.data.sessionId); }"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Open demo workspace",
@@ -114,9 +235,22 @@
                 "auth",
                 "demo"
               ]
-            }
+            },
+            "description": "Creates or reuses the representative development demo workspace and stores the HttpOnly session cookie in the Postman cookie jar."
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('demo session created', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json(); if (b.ok && b.data.sessionId) pm.environment.set('sessionId', b.data.sessionId);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Register",
@@ -146,15 +280,27 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Alex Morgan\",\n  \"email\": \"alex@example.com\",\n  \"password\": \"StrongPassword123\",\n  \"workspaceName\": \"Acme Energy\",\n  \"plan\": \"pro\",\n  \"acceptedTerms\": true\n}",
+              "raw": "{\n  \"name\": \"{{name}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"workspaceName\": \"{{workspaceName}}\",\n  \"plan\": \"{{plan}}\",\n  \"acceptedTerms\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
-            }
+            },
+            "description": "Creates a user, workspace, owner membership, and session. Use only non-production test addresses in Runner datasets."
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) { const b = pm.response.json(); if (b.ok && b.data.sessionId) pm.environment.set('sessionId', b.data.sessionId); }"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Sign out",
@@ -207,9 +353,91 @@
                 "sessions",
                 "current"
               ]
-            }
+            },
+            "description": "Returns the authenticated user/workspace/session context."
           },
-          "response": []
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/sessions/current",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "sessions",
+                    "current"
+                  ]
+                },
+                "description": "Returns the authenticated user/workspace/session context."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"session\": {\n      \"id\": \"ses_0123456789abcdef0123456789abcdef\",\n      \"userId\": \"usr_0123456789abcdef0123456789abcdef\",\n      \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n      \"role\": \"operator\",\n      \"persistent\": false,\n      \"expiresAt\": \"2026-08-28T06:00:00.000Z\",\n      \"revokedAt\": null,\n      \"createdAt\": \"2026-08-27T06:00:00.000Z\",\n      \"lastSeenAt\": \"2026-08-27T06:00:00.000Z\"\n    },\n    \"user\": {\n      \"id\": \"usr_0123456789abcdef0123456789abcdef\",\n      \"name\": \"Demo Operator\",\n      \"email\": \"demo@powerchain.energy\"\n    },\n    \"workspace\": {\n      \"id\": \"wsp_0123456789abcdef0123456789abcdef\",\n      \"name\": \"PowerChain Demo\",\n      \"slug\": \"powerchain-demo\",\n      \"plan\": \"pro\",\n      \"createdAt\": \"2026-08-27T06:00:00.000Z\"\n    },\n    \"role\": \"operator\"\n  }\n}"
+            },
+            {
+              "name": "401 Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/sessions/current",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "sessions",
+                    "current"
+                  ]
+                },
+                "description": "Returns the authenticated user/workspace/session context."
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": false,\n  \"error\": {\n    \"message\": \"Sign in required.\",\n    \"code\": \"UNAUTHENTICATED\",\n    \"requestId\": \"req_mock_unauthenticated\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "List sessions",
@@ -262,8 +490,46 @@
                   "value": "0"
                 }
               ]
+            },
+            "description": "Returns masked session IP by default. Set `reveal=1` only for explicit troubleshooting."
+          },
+          "response": []
+        },
+        {
+          "name": "Revoke session",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "description": "Revokes the session identified by `sessionId`. Revoking the current session also clears the session cookie.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/sessions/{{sessionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "sessions",
+                "{{sessionId}}"
+              ]
             }
           },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) { const b = pm.response.json(); pm.test('session revoked', () => pm.expect(b.data.revoked).to.eql(true)); }"
+                ]
+              }
+            }
+          ],
           "response": []
         }
       ]
@@ -293,7 +559,46 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/dashboard",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "dashboard"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"workspace\": {\n      \"id\": \"wsp_0123456789abcdef0123456789abcdef\",\n      \"name\": \"PowerChain Demo\",\n      \"slug\": \"powerchain-demo\",\n      \"plan\": \"pro\",\n      \"createdAt\": \"2026-08-27T06:00:00.000Z\"\n    },\n    \"metrics\": {\n      \"verifiedEnergyMwh\": 24812,\n      \"assets\": 2,\n      \"availabilityPct\": 97,\n      \"pendingApprovals\": 1\n    },\n    \"assets\": [\n      {\n        \"id\": \"ast_0123456789abcdef0123456789abcdef\",\n        \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n        \"slug\": \"solar-farm-45-01234567\",\n        \"name\": \"Solar Farm 45\",\n        \"type\": \"solar\",\n        \"location\": \"Mojave, California\",\n        \"capacityMw\": 120,\n        \"availability\": 98,\n        \"status\": \"operational\",\n        \"verified\": true\n      },\n      {\n        \"id\": \"ast_11111111111111111111111111111111\",\n        \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n        \"slug\": \"wind-farm-north-11111111\",\n        \"name\": \"Wind Farm North\",\n        \"type\": \"wind\",\n        \"location\": \"Aberdeenshire, Scotland\",\n        \"capacityMw\": 80,\n        \"availability\": 96,\n        \"status\": \"operational\",\n        \"verified\": true\n      }\n    ],\n    \"approvals\": [\n      {\n        \"id\": \"apr_0123456789abcdef0123456789abcdef\",\n        \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n        \"slug\": \"energy-batch-verification-01234567\",\n        \"title\": \"Energy Batch Verification\",\n        \"description\": \"Solar Farm 45 \\u00b7 1,250 MWh \\u00b7 meter evidence complete\",\n        \"severity\": \"high\",\n        \"status\": \"pending\",\n        \"updatedAt\": \"2026-08-27T06:00:00.000Z\"\n      }\n    ],\n    \"activity\": []\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Assets",
@@ -317,7 +622,46 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/assets",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "assets"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": [\n    {\n      \"id\": \"ast_0123456789abcdef0123456789abcdef\",\n      \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n      \"slug\": \"solar-farm-45-01234567\",\n      \"name\": \"Solar Farm 45\",\n      \"type\": \"solar\",\n      \"location\": \"Mojave, California\",\n      \"capacityMw\": 120,\n      \"availability\": 98,\n      \"status\": \"operational\",\n      \"verified\": true\n    },\n    {\n      \"id\": \"ast_11111111111111111111111111111111\",\n      \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n      \"slug\": \"wind-farm-north-11111111\",\n      \"name\": \"Wind Farm North\",\n      \"type\": \"wind\",\n      \"location\": \"Aberdeenshire, Scotland\",\n      \"capacityMw\": 80,\n      \"availability\": 96,\n      \"status\": \"operational\",\n      \"verified\": true\n    }\n  ]\n}"
+            }
+          ]
         },
         {
           "name": "Approvals",
@@ -341,7 +685,57 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/approvals",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "approvals"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": [\n    {\n      \"id\": \"apr_0123456789abcdef0123456789abcdef\",\n      \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n      \"slug\": \"energy-batch-verification-01234567\",\n      \"title\": \"Energy Batch Verification\",\n      \"description\": \"Solar Farm 45 \\u00b7 1,250 MWh \\u00b7 meter evidence complete\",\n      \"severity\": \"high\",\n      \"status\": \"pending\",\n      \"updatedAt\": \"2026-08-27T06:00:00.000Z\"\n    }\n  ]\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const b = pm.response.json(); if (b.ok && Array.isArray(b.data) && b.data[0]?.id) pm.environment.set('approvalId', b.data[0].id);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Approve",
@@ -371,13 +765,14 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"action\": \"approve\"\n}",
+              "raw": "{\n  \"action\": \"{{approvalAction}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
-            }
+            },
+            "description": "Governed mutation. Requires owner/admin/operator role. Set `approvalAction` to `approve` or `request_changes`."
           },
           "response": []
         },
@@ -451,15 +846,123 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"prompt\": \"Summarize current asset health.\"\n}",
+              "raw": "{\n  \"prompt\": \"{{prompt}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
-            }
+            },
+            "description": "Produces AI analysis without persisting a chat message. Analysis is not authorization or execution."
           },
-          "response": []
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/ai/generate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "ai",
+                    "generate"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"prompt\": \"{{prompt}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "description": "Produces AI analysis without persisting a chat message. Analysis is not authorization or execution."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"mode\": \"demo\",\n    \"text\": \"Two assets are operational with average availability of 97%.\",\n    \"actions\": [\n      {\n        \"id\": \"view-assets\",\n        \"label\": \"View assets\",\n        \"href\": \"/dashboard/assets\"\n      }\n    ]\n  }\n}"
+            },
+            {
+              "name": "422 Unprocessable Entity",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/ai/generate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "ai",
+                    "generate"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"prompt\": \"{{prompt}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "description": "Produces AI analysis without persisting a chat message. Analysis is not authorization or execution."
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": false,\n  \"error\": {\n    \"message\": \"Prompt is required.\",\n    \"code\": \"VALIDATION\",\n    \"requestId\": \"req_mock_validation\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "List chats",
@@ -483,7 +986,46 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/chat",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "chat"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": [\n    {\n      \"id\": \"cht_0123456789abcdef0123456789abcdef\",\n      \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n      \"userId\": \"usr_0123456789abcdef0123456789abcdef\",\n      \"slug\": \"portfolio-review-01234567\",\n      \"title\": \"Portfolio review\",\n      \"createdAt\": \"2026-08-27T06:00:00.000Z\",\n      \"updatedAt\": \"2026-08-27T06:00:00.000Z\"\n    }\n  ]\n}"
+            }
+          ]
         },
         {
           "name": "Create chat",
@@ -512,7 +1054,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Portfolio review\"\n}",
+              "raw": "{\n  \"title\": \"{{chatTitle}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -520,7 +1062,71 @@
               }
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/chat",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "chat"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"{{chatTitle}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"id\": \"cht_0123456789abcdef0123456789abcdef\",\n    \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n    \"userId\": \"usr_0123456789abcdef0123456789abcdef\",\n    \"slug\": \"portfolio-review-01234567\",\n    \"title\": \"Portfolio review\",\n    \"createdAt\": \"2026-08-27T06:00:00.000Z\",\n    \"updatedAt\": \"2026-08-27T06:00:00.000Z\"\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('chat created', () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json(); if (b.ok && b.data.id) pm.environment.set('chatId', b.data.id);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Get chat",
@@ -545,7 +1151,47 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/chat/{{chatId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "chat",
+                    "{{chatId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"chat\": {\n      \"id\": \"cht_0123456789abcdef0123456789abcdef\",\n      \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n      \"userId\": \"usr_0123456789abcdef0123456789abcdef\",\n      \"slug\": \"portfolio-review-01234567\",\n      \"title\": \"Portfolio review\",\n      \"createdAt\": \"2026-08-27T06:00:00.000Z\",\n      \"updatedAt\": \"2026-08-27T06:00:00.000Z\"\n    },\n    \"messages\": [\n      {\n        \"id\": \"msg_11111111111111111111111111111111\",\n        \"chatId\": \"cht_0123456789abcdef0123456789abcdef\",\n        \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n        \"userId\": \"usr_0123456789abcdef0123456789abcdef\",\n        \"role\": \"user\",\n        \"content\": \"Compare solar and wind availability.\",\n        \"createdAt\": \"2026-08-27T06:00:00.000Z\"\n      },\n      {\n        \"id\": \"msg_22222222222222222222222222222222\",\n        \"chatId\": \"cht_0123456789abcdef0123456789abcdef\",\n        \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n        \"userId\": \"usr_0123456789abcdef0123456789abcdef\",\n        \"role\": \"assistant\",\n        \"content\": \"Solar Farm 45 is at 98% availability and Wind Farm North is at 96%. Solar is currently 2 percentage points higher.\",\n        \"createdAt\": \"2026-08-27T06:00:01.000Z\"\n      }\n    ]\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Send chat message",
@@ -576,15 +1222,137 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"message\": \"Compare solar and wind availability.\"\n}",
+              "raw": "{\n  \"message\": \"{{prompt}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
-            }
+            },
+            "description": "Persists the user message and assistant response. Captures the returned assistant `messageId` for subsequent requests."
           },
-          "response": []
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/chat/{{chatId}}/messages",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "chat",
+                    "{{chatId}}",
+                    "messages"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"message\": \"{{prompt}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "description": "Persists the user message and assistant response. Captures the returned assistant `messageId` for subsequent requests."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"chat\": {\n      \"id\": \"cht_0123456789abcdef0123456789abcdef\",\n      \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n      \"userId\": \"usr_0123456789abcdef0123456789abcdef\",\n      \"slug\": \"portfolio-review-01234567\",\n      \"title\": \"Portfolio review\",\n      \"createdAt\": \"2026-08-27T06:00:00.000Z\",\n      \"updatedAt\": \"2026-08-27T06:00:00.000Z\"\n    },\n    \"userMessage\": {\n      \"id\": \"msg_11111111111111111111111111111111\",\n      \"chatId\": \"cht_0123456789abcdef0123456789abcdef\",\n      \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n      \"userId\": \"usr_0123456789abcdef0123456789abcdef\",\n      \"role\": \"user\",\n      \"content\": \"Compare solar and wind availability.\",\n      \"createdAt\": \"2026-08-27T06:00:00.000Z\"\n    },\n    \"message\": {\n      \"id\": \"msg_22222222222222222222222222222222\",\n      \"chatId\": \"cht_0123456789abcdef0123456789abcdef\",\n      \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n      \"userId\": \"usr_0123456789abcdef0123456789abcdef\",\n      \"role\": \"assistant\",\n      \"content\": \"Solar Farm 45 is at 98% availability and Wind Farm North is at 96%. Solar is currently 2 percentage points higher.\",\n      \"createdAt\": \"2026-08-27T06:00:01.000Z\"\n    },\n    \"mode\": \"demo\",\n    \"text\": \"Solar Farm 45 is at 98% availability and Wind Farm North is at 96%. Solar is currently 2 percentage points higher.\",\n    \"actions\": [\n      {\n        \"id\": \"open-assets\",\n        \"label\": \"Open assets\",\n        \"href\": \"/dashboard/assets\"\n      }\n    ]\n  }\n}"
+            },
+            {
+              "name": "429 Too Many Requests",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/chat/{{chatId}}/messages",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "chat",
+                    "{{chatId}}",
+                    "messages"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"message\": \"{{prompt}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "description": "Persists the user message and assistant response. Captures the returned assistant `messageId` for subsequent requests."
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": false,\n  \"error\": {\n    \"message\": \"Too many requests. Try again shortly.\",\n    \"code\": \"RATE_LIMITED\",\n    \"requestId\": \"req_mock_rate_limited\"\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('chat response delivered', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json(); if (b.ok && b.data.message?.id) pm.environment.set('messageId', b.data.message.id);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Get message",
@@ -609,7 +1377,47 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/messages/{{messageId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "messages",
+                    "{{messageId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"id\": \"msg_22222222222222222222222222222222\",\n    \"chatId\": \"cht_0123456789abcdef0123456789abcdef\",\n    \"workspaceId\": \"wsp_0123456789abcdef0123456789abcdef\",\n    \"userId\": \"usr_0123456789abcdef0123456789abcdef\",\n    \"role\": \"assistant\",\n    \"content\": \"Solar Farm 45 is at 98% availability and Wind Farm North is at 96%. Solar is currently 2 percentage points higher.\",\n    \"createdAt\": \"2026-08-27T06:00:01.000Z\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Copilot compatibility GET",
@@ -699,7 +1507,46 @@
               ]
             }
           },
-          "response": []
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/services",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "services"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": [\n    {\n      \"key\": \"solana-rpc\",\n      \"name\": \"Solana RPC\",\n      \"category\": \"network\",\n      \"configured\": true\n    },\n    {\n      \"key\": \"helius\",\n      \"name\": \"Helius\",\n      \"category\": \"network\",\n      \"configured\": true\n    },\n    {\n      \"key\": \"pyth\",\n      \"name\": \"Pyth\",\n      \"category\": \"market\",\n      \"configured\": true\n    },\n    {\n      \"key\": \"birdeye\",\n      \"name\": \"Birdeye\",\n      \"category\": \"market\",\n      \"configured\": false\n    }\n  ]\n}"
+            }
+          ]
         },
         {
           "name": "Solana health",
@@ -722,9 +1569,51 @@
                 "network",
                 "solana"
               ]
-            }
+            },
+            "description": "Returns configured Solana/Helius network adapter health; this is not transaction confirmation."
           },
-          "response": []
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/network/solana",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "network",
+                    "solana"
+                  ]
+                },
+                "description": "Returns configured Solana/Helius network adapter health; this is not transaction confirmation."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"network\": \"solana\",\n    \"status\": \"operational\",\n    \"rpcConfigured\": true,\n    \"heliusConfigured\": true,\n    \"latencyMs\": 42,\n    \"timestamp\": \"2026-08-27T06:00:00.000Z\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Market price",
@@ -737,7 +1626,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/market/price",
+              "raw": "{{baseUrl}}/api/v1/market/price?provider={{marketProvider}}&feedId={{pythFeedId}}&address={{tokenAddress}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -750,16 +1639,76 @@
               "query": [
                 {
                   "key": "provider",
-                  "value": "pyth"
+                  "value": "{{marketProvider}}"
                 },
                 {
                   "key": "feedId",
-                  "value": ""
+                  "value": "{{pythFeedId}}"
+                },
+                {
+                  "key": "address",
+                  "value": "{{tokenAddress}}"
                 }
               ]
-            }
+            },
+            "description": "Server-side market adapter. Configure either a Pyth feed ID or Birdeye token address; external provider availability can fail."
           },
-          "response": []
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/market/price?provider={{marketProvider}}&feedId={{pythFeedId}}&address={{tokenAddress}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "market",
+                    "price"
+                  ],
+                  "query": [
+                    {
+                      "key": "provider",
+                      "value": "{{marketProvider}}"
+                    },
+                    {
+                      "key": "feedId",
+                      "value": "{{pythFeedId}}"
+                    },
+                    {
+                      "key": "address",
+                      "value": "{{tokenAddress}}"
+                    }
+                  ]
+                },
+                "description": "Server-side market adapter. Configure either a Pyth feed ID or Birdeye token address; external provider availability can fail."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "X-Request-Id",
+                  "value": "req_mock_example"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"provider\": \"pyth\",\n    \"symbol\": \"SOL/USD\",\n    \"price\": 100.0,\n    \"currency\": \"USD\",\n    \"timestamp\": \"2026-08-27T06:00:00.000Z\",\n    \"source\": \"mock\"\n  }\n}"
+            }
+          ]
         }
       ]
     },
@@ -804,6 +1753,34 @@
           "response": []
         }
       ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.variables.get('requestId')) { pm.variables.set('requestId', 'pm_' + pm.variables.replaceIn('{{$guid}}')); }",
+          "pm.request.headers.upsert({ key: 'X-Request-Id', value: pm.variables.get('requestId') });"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('response is not a server error', function () { pm.expect(pm.response.code).to.be.below(500); });",
+          "const ct = pm.response.headers.get('content-type') || '';",
+          "if (ct.includes('application/json')) {",
+          "  pm.test('JSON response uses PowerChain envelope when applicable', function () {",
+          "    const body = pm.response.json();",
+          "    if (body && Object.prototype.hasOwnProperty.call(body, 'ok')) pm.expect(body.ok).to.be.oneOf([true, false]);",
+          "  });",
+          "}"
+        ]
+      }
     }
   ]
 }

@@ -1,0 +1,18 @@
+[
+  {
+    "scenario": "free",
+    "name": "API Test User",
+    "email": "api-free-{{$randomUUID}}@example.com",
+    "password": "StrongPassword123",
+    "workspaceName": "API Free Workspace",
+    "plan": "free"
+  },
+  {
+    "scenario": "pro",
+    "name": "API Test Operator",
+    "email": "api-pro-{{$randomUUID}}@example.com",
+    "password": "StrongPassword123",
+    "workspaceName": "API Pro Workspace",
+    "plan": "pro"
+  }
+]

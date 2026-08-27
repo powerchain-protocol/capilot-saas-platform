@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "data": {
+    "session": {
+      "id": "ses_0123456789abcdef0123456789abcdef",
+      "userId": "usr_0123456789abcdef0123456789abcdef",
+      "workspaceId": "wsp_0123456789abcdef0123456789abcdef",
+      "role": "operator",
+      "persistent": false,
+      "expiresAt": "2026-08-28T06:00:00.000Z",
+      "revokedAt": null,
+      "createdAt": "2026-08-27T06:00:00.000Z",
+      "lastSeenAt": "2026-08-27T06:00:00.000Z"
+    },
+    "user": {
+      "id": "usr_0123456789abcdef0123456789abcdef",
+      "name": "Demo Operator",
+      "email": "demo@powerchain.energy"
+    },
+    "workspace": {
+      "id": "wsp_0123456789abcdef0123456789abcdef",
+      "name": "PowerChain Demo",
+      "slug": "powerchain-demo",
+      "plan": "pro",
+      "createdAt": "2026-08-27T06:00:00.000Z"
+    },
+    "role": "operator"
+  }
+}

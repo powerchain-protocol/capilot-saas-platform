@@ -1,10 +1,36 @@
-# PowerChain Copilot API
 
-This directory contains API artifacts shared by the monorepo:
+# PowerChain Copilot API workspace
 
-- `openapi/openapi.yaml` — canonical OpenAPI 3.1 contract.
-- `postman/PowerChain-Copilot.postman_collection.json` — importable Postman collection.
-- `swagger/README.md` — local Swagger UI instructions.
-- `schema.sql` — canonical PostgreSQL schema snapshot; executable migration lives under `apps/backend/src/storage/migrations/`.
+Portable API developer-experience artifacts for canonical release `1.0.0`.
 
-Runtime implementation lives in `apps/backend/src/api/v1/`. The Next.js frontend only exposes a thin same-origin HTTP proxy at `/api/v1/*`; business logic is not duplicated in the frontend.
+```text
+api/
+├── DESCRIPTION.md
+├── openapi/
+│   ├── openapi.yaml
+│   └── openapi.json
+├── asyncapi/
+│   └── asyncapi.yaml
+├── postman/
+│   ├── PowerChain-Copilot.postman_collection.json
+│   ├── environments/
+│   ├── datasets/
+│   └── flows/
+├── mocks/
+│   ├── server.mjs
+│   └── fixtures/
+├── schemas/
+├── sdks/
+├── specifications/
+├── swagger/
+└── schema.sql
+```
+
+- OpenAPI 3.1 is the HTTP contract.
+- AsyncAPI 3.0 is the WebSocket contract.
+- Postman includes environments, runner datasets, tests, example responses, and portable flow recipes.
+- `api/mocks` supplies a deterministic local mock server (`pnpm api:mock`).
+- `packages/sdk-typescript` is the first-party typed TypeScript reference SDK.
+- Executable PostgreSQL migrations remain owned by `apps/backend/src/storage/migrations/`.
+
+Runtime implementation lives in `apps/backend/src/api/v1/`. The Next.js frontend exposes only a thin same-origin `/api/v1/*` proxy and consumes the backend through `apps/frontend/lib/powerchain/`.
